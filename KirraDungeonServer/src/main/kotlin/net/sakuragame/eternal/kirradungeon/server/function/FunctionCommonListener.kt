@@ -1,4 +1,4 @@
-package net.sakuragame.eternal.kirrazones.server.function
+package net.sakuragame.eternal.kirradungeon.server.function
 
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.kirradungeon.server.zone.PlayerZone
@@ -10,8 +10,8 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import taboolib.common.platform.event.SubscribeEvent
 
 /**
- * KirraZones
- * net.sakuragame.kirrazones.server.function.FunctionListener
+ * KirraDungeons
+ * net.sakuragame.KirraDungeons.server.function.FunctionListener
  *
  * @author kirraObj
  * @since 2021/11/8 3:51

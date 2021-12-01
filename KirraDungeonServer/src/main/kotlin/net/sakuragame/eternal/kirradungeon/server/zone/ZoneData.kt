@@ -3,8 +3,8 @@ package net.sakuragame.eternal.kirradungeon.server.zone
 import com.dscalzi.skychanger.core.api.SkyPacket
 
 /**
- * KirraZones
- * net.sakuragame.kirrazones.server.zone.ZoneData
+ * KirraDungeons
+ * net.sakuragame.KirraDungeons.server.zone.ZoneData
  *
  * @author kirraObj
  * @since 2021/11/8 9:26

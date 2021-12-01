@@ -13,7 +13,7 @@ import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
-import net.sakuragame.eternal.kirrazones.server.compat.NergiganteScriptCompat
+import net.sakuragame.eternal.KirraDungeons.server.compat.NergiganteScriptCompat
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.GameMode

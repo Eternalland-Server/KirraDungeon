@@ -11,8 +11,8 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 
 /**
- * KirraZones
- * net.sakuragame.kirrazones.server.Profile
+ * KirraDungeons
+ * net.sakuragame.KirraDungeons.server.Profile
  *
  * @author kirraObj
  * @since 2021/11/9 15:51

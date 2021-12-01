@@ -1,4 +1,4 @@
-package net.sakuragame.eternal.kirrazones.server.compat
+package net.sakuragame.eternal.KirraDungeons.server.compat
 
 
 import net.sakuragame.eternal.dragoncore.network.PacketSender

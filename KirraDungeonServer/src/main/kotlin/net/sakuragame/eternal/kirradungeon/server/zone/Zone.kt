@@ -8,8 +8,8 @@ import taboolib.module.chat.colored
 import taboolib.module.chat.uncolored
 
 /**
- * KirraZones
- * net.sakuragame.kirrazones.server.zone.Zone
+ * KirraDungeons
+ * net.sakuragame.KirraDungeons.server.zone.Zone
  *
  * @author kirraObj
  * @since 2021/11/8 4:39

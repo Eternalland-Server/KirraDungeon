@@ -3,8 +3,8 @@ package net.sakuragame.eternal.kirradungeon.client.zone
 import com.google.gson.Gson
 
 /**
- * KirraZones
- * net.sakuragame.kirrazones.client.ZoneFrequency
+ * KirraDungeons
+ * net.sakuragame.KirraDungeons.client.ZoneFrequency
  *
  * @author kirraObj
  * @since 2021/11/4 14:11

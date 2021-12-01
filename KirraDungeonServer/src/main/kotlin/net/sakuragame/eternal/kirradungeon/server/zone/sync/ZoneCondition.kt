@@ -5,8 +5,8 @@ import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 
 
 /**
- * KirraZones
- * net.sakuragame.kirrazones.server.zone.sync.ZoneCondition
+ * KirraDungeons
+ * net.sakuragame.KirraDungeons.server.zone.sync.ZoneCondition
  *
  * @author kirraObj
  * @since 2021/11/8 4:39
@@ -32,17 +32,17 @@ data class ZoneCondition(
         fun syncToRedis() {
             doDataRecycle()
             conditionMap.forEach { (id, zoneConditionList) ->
-                KirraDungeonServer.redisConn.async().lpush("KirraZoneNames", id)
+                KirraDungeonServer.redisConn.async().lpush("KirraDungeonNames", id)
                 zoneConditionList.forEach { zoneCondition ->
-                    KirraDungeonServer.redisConn.async().lpush("KirraZoneConditions:$id", Gson().toJson(zoneCondition))
+                    KirraDungeonServer.redisConn.async().lpush("KirraDungeonConditions:$id", Gson().toJson(zoneCondition))
                 }
             }
         }
 
         private fun doDataRecycle() {
-            KirraDungeonServer.redisConn.async().del("KirraZoneNames")
+            KirraDungeonServer.redisConn.async().del("KirraDungeonNames")
             conditionMap.keys.forEach {
-                KirraDungeonServer.redisConn.async().del("KirraZoneConditions:$it")
+                KirraDungeonServer.redisConn.async().del("KirraDungeonConditions:$it")
             }
         }
     }

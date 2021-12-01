@@ -11,6 +11,17 @@ group = "net.sakuragame.eternal.kirradungeon.server"
 version = projectVersion
 
 taboolib {
+    description {
+        dependencies {
+            name("MythicMobs")
+            name("DataManager")
+            name("KirraCoreBukkit")
+            name("DungeonServer")
+            name("DragonCore")
+            name("JustAttribute")
+            name("UIFactory")
+        }
+    }
     install("common")
     install("common-5")
     install("module-lang")
@@ -35,7 +46,6 @@ repositories {
 
 dependencies {
     compileOnly("public:MythicMobs:4.12.0@jar")
-    compileOnly("ink.ptms:Zaphkiel:1.7.0@jar")
 
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DataManager-Bukkit-API:1.3.2-SNAPSHOT@jar")

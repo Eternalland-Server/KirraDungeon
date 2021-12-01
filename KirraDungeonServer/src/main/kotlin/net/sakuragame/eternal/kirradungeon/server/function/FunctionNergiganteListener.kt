@@ -6,7 +6,7 @@ import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.getMobMaxHealth
 import net.sakuragame.eternal.kirradungeon.server.sendBrokenTitleAnimation
 import net.sakuragame.eternal.kirradungeon.server.zone.PlayerZone
-import net.sakuragame.eternal.kirrazones.server.compat.NergiganteScriptCompat
+import net.sakuragame.eternal.KirraDungeons.server.compat.NergiganteScriptCompat
 import net.sakuragame.eternal.script.api.NergiganteAPI
 import net.sakuragame.eternal.script.api.event.NSConversationEndEvent
 import net.sakuragame.eternal.script.api.event.NSConversationOptionEvent
@@ -24,7 +24,7 @@ import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 
 /**
- * KirraZones
+ * KirraDungeons
  * net.sakuragame.eternal.kirradungeon.server.function.FunctionNergiganteListener
  *
  * @author kirraObj

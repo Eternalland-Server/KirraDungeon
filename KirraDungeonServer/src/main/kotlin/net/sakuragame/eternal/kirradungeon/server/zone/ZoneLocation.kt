@@ -5,8 +5,8 @@ import org.bukkit.Location
 import org.bukkit.World
 
 /**
- * KirraZones
- * net.sakuragame.kirrazones.server.zone.ZoneLocation
+ * KirraDungeons
+ * net.sakuragame.KirraDungeons.server.zone.ZoneLocation
  *
  * @author kirraObj
  * @since 2021/11/8 9:29
