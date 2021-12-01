@@ -1,0 +1,3 @@
+settings:
+  debug-mode: true
+  delay-back-spawn-server-secs: 5

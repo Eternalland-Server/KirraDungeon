@@ -74,13 +74,13 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         })
     }
 
-    private fun Player.teleportToAnotherServer(serverID: String) {
+    fun Player.teleportToAnotherServer(serverID: String) {
         KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverID, this)
     }
 
-    private fun Array<Player>.sendMessage(message: String) = forEach { it.sendMessage(message) }
+    fun List<Player>.sendMessage(message: String) = forEach { it.sendMessage(message) }
 
-    private fun Array<Player>.checkFee(): Boolean {
+    fun List<Player>.checkFee(): Boolean {
         forEach {
             it.getZoneFee(this@Zone).forEach mapForeach@{ mapFee ->
                 if (KirraCoreBukkitAPI.getBalance(it, mapFee.key) >= mapFee.value) {
@@ -98,7 +98,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         return true
     }
 
-    private fun Array<Player>.checkCounts(): Boolean {
+    fun List<Player>.checkCounts(): Boolean {
         forEach {
             if (it.getFeeJoinCounts(this@Zone) < 0) {
                 sendMessage(it.asLangText("message-zone-count-not-enough", it.name))
@@ -108,7 +108,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         return true
     }
 
-    private fun Array<Player>.checkItems(): Boolean {
+    fun List<Player>.checkItems(): Boolean {
         forEach {
             it.getZoneItems(this@Zone).forEach mapForeach@{ mapItem ->
                 if (!ZaphkielAPI.registeredItem.containsKey(mapItem.key)) {
@@ -131,7 +131,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         return true
     }
 
-    private fun Array<Player>.withDraw() {
+    fun List<Player>.withDraw() {
         forEach { player ->
             if (ZoneWithDraw.itemsMap.containsKey(player.uniqueId)) {
                 val itemMapList = ZoneWithDraw.itemsMap[player.uniqueId]!!
