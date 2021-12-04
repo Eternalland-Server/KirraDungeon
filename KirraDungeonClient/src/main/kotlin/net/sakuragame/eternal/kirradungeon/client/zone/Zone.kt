@@ -2,6 +2,8 @@ package net.sakuragame.eternal.kirradungeon.client.zone
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
+import net.sakuragame.dungeonsystem.common.exception.DungeonServerRunOutException
+import net.sakuragame.dungeonsystem.common.exception.UnknownDungeonException
 import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
@@ -48,34 +50,51 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         // 进行扣除操作. (物品 & 金额)
         players.withDraw()
         // 进行传送操作, 之后转交由 Server 端处理.
-        val serverId = DungeonClientAPI.getClientManager().queryServer("RPG-DUNGEON") ?: kotlin.run {
-            players.sendMessage("")
-            return
+        try {
+            val serverName = DungeonClientAPI.getClientManager().queryServer("RPG-DUNGEON")
+            if (serverName == null) {
+                players.forEach {
+                    it.sendLang("message-dungeon-server-ran-out-exception")
+                }
+                return
+            }
+            val playerSet = LinkedHashSet<Player>().also {
+                it.addAll(players)
+            }
+            DungeonClientAPI.getClientManager().queryDungeon(name, serverName, playerSet, object : MapRequestHandler() {
+
+                override fun onTimeout(serverId: String) =
+                    players.forEach {
+                        it.sendLang("message-dungeon-create-timed-out", serverId)
+                    }
+
+                override fun onTeleportTimeout(serverID: String) =
+                    players.forEach {
+                        it.sendLang("message-dungeon-teleport-timed-out", serverID)
+                    }
+
+                override fun handle(serverId: String, mapUUID: UUID) {
+                    players.forEach {
+                        it.teleportToAnotherServer(serverId)
+                    }
+                }
+            })
+        } catch (e: Exception) {
+            when (e) {
+                is UnknownDungeonException ->
+                    players.forEach {
+                        it.sendLang("message-unknown-dungeon-exception")
+                    }
+                is DungeonServerRunOutException ->
+                    players.forEach {
+                        it.sendLang("message-dungeon-server-ran-out-exception")
+                    }
+            }
         }
-        val linkedHashSet = LinkedHashSet<Player>().also {
-            it.addAll(players)
-        }
-        DungeonClientAPI.getClientManager().queryDungeon(name, serverId, linkedHashSet, object : MapRequestHandler() {
-
-            override fun onTimeout(serverId: String) =
-                players.forEach {
-                    it.sendLang("message-zone-create-timed-out", serverId)
-                }
-
-            override fun onTeleportTimeout(serverID: String) =
-                players.forEach {
-                    it.sendLang("message-zone-teleport-timed-out", serverID)
-                }
-
-            override fun handle(serverId: String, mapUUID: UUID) =
-                players.forEach {
-                    it.teleportToAnotherServer(serverId)
-                }
-        })
     }
 
-    fun Player.teleportToAnotherServer(serverID: String) {
-        KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverID, this)
+    fun Player.teleportToAnotherServer(serverId: String) {
+        KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverId, this)
     }
 
     fun List<Player>.sendMessage(message: String) = forEach { it.sendMessage(message) }
@@ -83,14 +102,14 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
     fun List<Player>.checkFee(): Boolean {
         forEach {
             it.getZoneFee(this@Zone).forEach mapForeach@{ mapFee ->
-                if (KirraCoreBukkitAPI.getBalance(it, mapFee.key) >= mapFee.value) {
+                if (KirraCoreBukkitAPI.getBalance(it, mapFee.key)!! >= mapFee.value) {
                     if (ZoneWithDraw.gemsMap.containsKey(it.uniqueId)) {
                         ZoneWithDraw.gemsMap[it.uniqueId]!![mapFee.key] = mapFee.value
                         return@mapForeach
                     }
                     ZoneWithDraw.gemsMap[it.uniqueId] = mutableMapOf(Pair(mapFee.key, mapFee.value))
                 } else {
-                    sendMessage(it.asLangText("message-zone-economy-not-enough", it.name, mapFee.key))
+                    sendMessage(it.asLangText("message-dungeon-economy-not-enough", it.name, mapFee.key))
                     return false
                 }
             }
@@ -101,7 +120,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
     fun List<Player>.checkCounts(): Boolean {
         forEach {
             if (it.getFeeJoinCounts(this@Zone) < 0) {
-                sendMessage(it.asLangText("message-zone-count-not-enough", it.name))
+                sendMessage(it.asLangText("message-dungeon-count-not-enough", it.name))
                 return false
             }
         }
@@ -117,7 +136,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
                 val item = ZaphkielAPI.registeredItem[mapItem.key]!!.buildItemStack(it)
                 if (item.isAir()) return@mapForeach
                 if (!it.checkItem(item, mapItem.value, remove = false)) {
-                    sendMessage(it.asLangText(it.asLangText("message-item-count-not-enough", it.name, item.itemMeta.displayName)))
+                    sendMessage(it.asLangText(it.asLangText("message-dungeon-item-not-enough", it.name, item.itemMeta.displayName)))
                     return false
                 } else {
                     if (ZoneWithDraw.itemsMap.containsKey(it.uniqueId)) {

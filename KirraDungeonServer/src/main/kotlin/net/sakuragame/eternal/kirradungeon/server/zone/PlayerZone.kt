@@ -4,25 +4,22 @@ import com.dscalzi.skychanger.bukkit.api.SkyChanger
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.kirradungeon.server.Commands
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
-import net.sakuragame.eternal.KirraDungeons.server.compat.NergiganteScriptCompat
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.platform.util.sendLang
 import java.util.*
@@ -62,14 +59,14 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
         }
 
         // 玩家进入.
-        @EventHandler
+        @SubscribeEvent
         fun e(e: DungeonPlayerJoinEvent) =
             submit(delay = 3) {
                 doJoinTask(e.player, e.dungeonWorld)
             }
 
         // 玩家死亡判断.
-        @EventHandler
+        @SubscribeEvent
         fun e(e: PlayerDeathEvent) {
             if (!e.entity.profile().isChallenging) return
             val playerZone = getByPlayer(e.entity.uniqueId) ?: return
@@ -88,7 +85,7 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
         }
 
         // 副本怪物死亡判断.
-        @EventHandler
+        @SubscribeEvent
         fun e(e: EntityDeathEvent) {
             val entity = e.entity
             val playerZone = getByMobUUID(entity.uniqueId) ?: return
@@ -99,19 +96,9 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
             }
         }
 
-        @EventHandler
-        fun e(e: YamlSendFinishedEvent) {
-            val player = e.player
-            val playerZone = getByPlayer(player.uniqueId) ?: return
-            if (NergiganteScriptCompat.shouldPlay(playerZone.zone.id)) {
-                return
-            }
-            playerZone.showJoinHud(player, playerZone.zone.name)
-        }
-
         private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {
             // 如果在编辑模式, 则不进行操作.
-            if (Commands.editingDungeonWorld != null) {
+            if (Zone.editingDungeonWorld != null) {
                 return
             }
             val playerZone = getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
@@ -122,30 +109,21 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
             val loc = zoneData.spawnLoc.toBukkitLocation(dungeonWorld.bukkitWorld)
             playerZone.uuidList += player.uniqueId
             player.profile().isChallenging = true
-            if (NergiganteScriptCompat.shouldPlay(playerZone.zone.id)) {
-                NergiganteScriptCompat.uuidToEntityList[player.uniqueId] = mutableListOf()
-                NergiganteScriptCompat.play(player, playerZone)
-            } else {
-                player.teleport(loc)
-            }
+            player.teleport(loc)
             if (zoneData.isCustomSkyEnabled())
                 zoneData.skyData!!.apply {
                     val skyChangerPlayer = SkyChanger.wrapPlayer(player)
                     KirraDungeonServer.skyAPI.changeSky(skyChangerPlayer, packetType, value)
                 }
-            if (NergiganteScriptCompat.shouldPlay(playerZone.zone.id)) return
             playerZone.showJoinMessage(player)
         }
     }
 
-    fun showJoinHud(player: Player, dungeonName: String) {
-        PacketSender.sendYaml(player, FolderType.Gui, DragonCoreCompat.joinTitleHudID, DragonCoreCompat.joinTitleHudYaml)
-        DragonCoreCompat.updateDragonVars(player, dungeonName)
-        PacketSender.sendOpenHud(player, DragonCoreCompat.joinTitleHudID)
-    }
-
     // 展示进入信息.
     fun showJoinMessage(player: Player) {
+        PacketSender.sendYaml(player, FolderType.Gui, DragonCoreCompat.joinTitleHudID, DragonCoreCompat.joinTitleHudYaml)
+        DragonCoreCompat.updateDragonVars(player, zone.name)
+        PacketSender.sendOpenHud(player, DragonCoreCompat.joinTitleHudID)
         player.sendLang("message-player-join-dungeon", zone.name)
     }
 
@@ -176,7 +154,7 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
             it.sendLang("message-player-clear-dungeon", delay2BackSpawnServer)
         }
         submit(delay = delay2BackSpawnServer * 20, async = true) {
-            KirraCoreBukkitAPI.teleportPlayerToHudServer(*uuidList.toTypedArray())
+            KirraCoreBukkitAPI.teleportToSpawnServer(*uuidList.toTypedArray())
         }
     }
 
@@ -201,7 +179,7 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
         }
         // 超时判断. (副本创建后长时间未进入)
         submit(async = true, delay = 1000) {
-            if (Commands.editingDungeonWorld != null) return@submit
+            if (Zone.editingDungeonWorld != null) return@submit
             if (canDelete()) delete()
         }
     }

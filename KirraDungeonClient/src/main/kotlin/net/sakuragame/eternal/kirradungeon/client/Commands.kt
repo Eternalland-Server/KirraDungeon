@@ -24,25 +24,32 @@ object Commands {
     val join = subCommand {
         dynamic {
             execute<Player> { player, _, argument ->
-                val zone = Zone.getByID(argument) ?: kotlin.run {
+                if (argument == "nergigante_dragon" && !player.hasPermission("admin")) {
+                    player.sendLang("command-cant-join-story-zone")
+                    return@execute
+                }
+                val zone = Zone.getByID(argument)
+                if (zone == null) {
                     player.sendLang("command-not-found-zone")
                     return@execute
                 }
                 // 与组队系统挂钩.
-                val party = player.getParty() ?: kotlin.run {
+                val party = player.getParty()
+                if (party == null) {
                     zone.join(listOf(player))
                     return@execute
                 }
                 if (party.getTeamPosition(player.uniqueId) != Party.Position.LEADER) {
                     player.sendLang("command-member-try-join-zone")
                     return@execute
+                } else {
+                    zone.join(party.getWholeMembers().map {
+                        Bukkit.getPlayer(it) ?: kotlin.run {
+                            player.sendLang("command-party-member-not-found")
+                            return@execute
+                        }
+                    })
                 }
-                zone.join(party.getWholeMembers().map {
-                    Bukkit.getPlayer(it) ?: kotlin.run {
-                        player.sendLang("command-party-member-not-found")
-                        return@execute
-                    }
-                })
             }
         }
     }

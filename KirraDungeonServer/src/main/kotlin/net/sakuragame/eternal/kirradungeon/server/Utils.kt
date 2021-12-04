@@ -10,8 +10,6 @@ import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 import taboolib.platform.util.asLangTextList
 
-fun <T> T.hasValue() = this != null
-
 fun Player.playDeathAnimation() = world.strikeLightningEffect(location)!!
 
 fun String.splitWithNoSpace(regex: String) = this

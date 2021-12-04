@@ -1,9 +1,12 @@
 package net.sakuragame.eternal.kirradungeon.server.zone
 
 import com.dscalzi.skychanger.core.api.SkyPacket
+import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.splitWithNoSpace
 import net.sakuragame.eternal.kirradungeon.server.zone.sync.ZoneCondition
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
 import taboolib.module.chat.colored
 import taboolib.module.chat.uncolored
 
@@ -18,12 +21,15 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
 
     companion object {
 
+        var editingDungeonWorld: DungeonWorld? = null
+
         val zones = mutableListOf<Zone>()
 
         fun getByName(name: String) = zones.firstOrNull { it.name == name }
 
         fun getByID(id: String) = zones.firstOrNull { it.id == id }
 
+        @Awake(LifeCycle.ENABLE)
         fun init() {
             clearAll()
             KirraDungeonServer.data.getKeys(false).forEach {
@@ -158,5 +164,5 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
         }
     }
 
-    override fun toString() = "Zone($id, ${name.uncolored()}, $, ${ZoneCondition.getConditionByName(name) ?: ""})"
+    override fun toString() = "Zone($id, ${name.uncolored()}, $data, ${ZoneCondition.getConditionByName(name) ?: ""})"
 }

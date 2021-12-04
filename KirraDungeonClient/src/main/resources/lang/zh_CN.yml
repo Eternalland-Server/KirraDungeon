@@ -2,18 +2,23 @@ command-not-found-player: "&4&l➱ &c未找到该玩家."
 command-not-found-zone: "&4&l➱ &c未找到该副本, 请检查是否拼写错误."
 command-member-try-join-zone: "&4&l➱ &c您不是队伍的队长, 不能进行该操作!"
 command-party-member-not-found: "&4&l➱ &c有队伍成员未在你的服务器上, 请检查后重试."
-message-noobie-zone-join-timed-out:
+command-cant-join-story-zone: "&4&l➱ &c您不能加入这个副本."
+message-noobie-dungeon-join-timed-out:
   - "&4&l➱ &c进入副本失败! 目标服务器: {0}"
   - "&4&l➱ &c若频繁出现该信息, 请联系管理员."
-message-zone-create-timed-out:
+message-dungeon-create-timed-out:
   - "&4&l➱ &c创建副本时超时, 目标服务器: {0}."
   - "&4&l➱ &c若频繁出现该信息, 请截图联系管理员."
-message-zone-teleport-timed-out:
+message-dungeon-teleport-timed-out:
   - "&4&l➱ &c执行传送操作时超时, 目标服务器: {0}."
   - "&4&l➱ &c若频繁出现该信息, 请截图联系管理员."
-message-zone-count-not-enough:
+message-dungeon-count-not-enough:
   - "&4&l➱ &c玩家 &r{0}&c 的进入次数不够了."
-message-zone-economy-not-enough:
+message-dungeon-economy-not-enough:
   - "&4&l➱ &c玩家 &r{0}&c 没有足额的 {1} 货币."
-message-item-count-not-enough:
-  - "&4&l➱ &e玩家 &r{1}&c 没有足够的物品."
+message-dungeon-item-not-enough:
+  - "&4&l➱ &c玩家 &r{1}&c 没有足够的物品."
+message-unknown-dungeon-exception:
+  - "&4&l➱ &c未知的副本名, 请向管理员反馈!"
+message-dungeon-server-ran-out-exception:
+  - "&4&l➱ &c没有可用的副本服务器, 请向管理员反馈"

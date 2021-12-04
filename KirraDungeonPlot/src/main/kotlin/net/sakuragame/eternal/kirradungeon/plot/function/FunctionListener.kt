@@ -1,20 +1,28 @@
-package net.sakuragame.eternal.kirradungeon.server.function
+package net.sakuragame.eternal.kirradungeon.plot.function
 
 import com.sakuragame.eternal.justattribute.api.event.JARoleAttackEvent
+import net.luckperms.api.node.types.MetaNode
+import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
+import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
-import net.sakuragame.eternal.kirradungeon.server.getMobMaxHealth
-import net.sakuragame.eternal.kirradungeon.server.sendBrokenTitleAnimation
-import net.sakuragame.eternal.kirradungeon.server.zone.PlayerZone
-import net.sakuragame.eternal.KirraDungeons.server.compat.NergiganteScriptCompat
+import net.sakuragame.eternal.justmessage.JustMessage
+import net.sakuragame.eternal.justmessage.api.MessageAPI
+import net.sakuragame.eternal.justmessage.screen.hud.BossBar
+import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
+import net.sakuragame.eternal.kirradungeon.plot.Profile.Companion.profile
+import net.sakuragame.eternal.kirradungeon.plot.function.FunctionPlot.playDome
+import net.sakuragame.eternal.kirradungeon.plot.getMobMaxHealth
+import net.sakuragame.eternal.kirradungeon.plot.sendBrokenTitleAnimation
 import net.sakuragame.eternal.script.api.NergiganteAPI
 import net.sakuragame.eternal.script.api.event.NSConversationEndEvent
 import net.sakuragame.eternal.script.api.event.NSConversationOptionEvent
+import net.sakuragame.eternal.script.api.event.NSFilmEndEvent
+import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityCombustEvent
-import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
@@ -24,22 +32,27 @@ import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 
 /**
- * KirraDungeons
- * net.sakuragame.eternal.kirradungeon.server.function.FunctionNergiganteListener
+ * KirraPlotZone
+ * net.sakuragame.eternal.kirraplotzone.function.FunctionListener
  *
  * @author kirraObj
- * @since 2021/11/28 18:14
+ * @since 2021/11/30 19:00
  */
 @Suppress("SpellCheckingInspection")
-object FunctionNergiganteListener {
+object FunctionListener {
+
+    private val firstStepNode by lazy {
+        MetaNode
+            .builder()
+            .key("noobie_tutorial_step_1")
+            .value(true)
+            .build()
+    }
 
     @SubscribeEvent
-    fun e(e: PlayerQuitEvent) {
-        val player = e.player
-        if (NergiganteScriptCompat.uuidToEntityList.containsKey(player.uniqueId)) {
-            NergiganteScriptCompat.dataRecycle(player, true)
-            player.removeMetadata("NergiganteHalfHealth", KirraDungeonServer.plugin)
-            player.removeMetadata("NergiganteClear", KirraDungeonServer.plugin)
+    fun e(e: DungeonPlayerJoinEvent) {
+        submit(delay = 3L) {
+            doJoinTask(e.player, e.dungeonWorld)
         }
     }
 
@@ -62,32 +75,44 @@ object FunctionNergiganteListener {
     }
 
     @SubscribeEvent
+    fun e(e: NSFilmEndEvent) {
+        submit(delay = 10L) {
+            val player = e.player
+            KirraDungeonPlot.luckPermsAPI.userManager.getUser(player.uniqueId)!!.also { user ->
+                user.data().clear { data -> data.key == "noobie_tutorial_step_1" }
+                user.data().add(firstStepNode)
+                KirraDungeonPlot.luckPermsAPI.userManager.saveUser(user)
+            }
+            KirraCoreBukkitAPI.teleportToSpawnServer(player)
+        }
+    }
+
+    @SubscribeEvent
     fun e(e: NSConversationEndEvent) {
         val player = e.player
-        val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return
         when (e.convID) {
             0 -> {
-                NergiganteScriptCompat.endBound(player)
-                NergiganteScriptCompat.dataRecycle(player)
-                NergiganteScriptCompat.spawnEntity(player, playerZone, "nergigante_dragon")
-                playerZone.showJoinHud(player, "&c&l战胜灭尽龙")
+                FunctionPlot.endBound(player)
+                FunctionPlot.dataRecycle(player)
+                FunctionPlot.spawnEntity(player, "nergigante_dragon")
+                FunctionPlot.showJoinHud(player, "&c&l战胜灭尽龙")
                 player.gameMode = GameMode.ADVENTURE
             }
             1 -> {
-                NergiganteScriptCompat.endBound(player)
-                NergiganteScriptCompat.dataRecycle(player)
-                NergiganteScriptCompat.spawnEntity(player, playerZone, "nergigante_dragon").also {
+                FunctionPlot.endBound(player)
+                FunctionPlot.dataRecycle(player)
+                FunctionPlot.spawnEntity(player, "nergigante_dragon").also {
                     it.health = (getMobMaxHealth("nergigante_dragon") / 2)
                 }
             }
             2 -> {
                 submit(delay = 10) {
-                    player.setMetadata("NergiganteClear", FixedMetadataValue(KirraDungeonServer.plugin, ""))
-                    player.sendTitle("", "", 0, 10, 0)
+                    player.setMetadata("NergiganteClear", FixedMetadataValue(KirraDungeonPlot.plugin, ""))
+                    player.resetTitle()
                     player.removePotionEffect(PotionEffectType.BLINDNESS)
                     player.removePotionEffect(PotionEffectType.CONFUSION)
                     NergiganteAPI.startEnd(e.player)
-                    PacketSender.sendStopSound(player, NergiganteScriptCompat.battleThemeBgmId)
+                    PacketSender.sendStopSound(player, FunctionPlot.battleThemeBgmId)
                 }
             }
         }
@@ -100,7 +125,7 @@ object FunctionNergiganteListener {
         val player = e.player
         if (entity.name != "&c&l灭尽龙".colored()) return
         if (!player.hasMetadata("NergiganteHalfHealth") && entity.health < entityHalfMaxHealth) {
-            player.setMetadata("NergiganteHalfHealth", FixedMetadataValue(KirraDungeonServer.plugin, ""))
+            player.setMetadata("NergiganteHalfHealth", FixedMetadataValue(KirraDungeonPlot.plugin, ""))
             playDome(player)
             submit(delay = 30) {
                 NergiganteAPI.startConversation(player, 1)
@@ -122,10 +147,14 @@ object FunctionNergiganteListener {
         if (e.player.spectatorTarget != null) e.isCancelled = true
     }
 
-    private fun playDome(player: Player) {
-        val playerZone = PlayerZone.getByPlayer(player.uniqueId)!!
-        NergiganteScriptCompat.dataRecycle(player)
-        NergiganteScriptCompat.forceBoundToEntity(player, NergiganteScriptCompat.getSpawnLoc(player))
-        NergiganteScriptCompat.spawnEntity(player, playerZone, "nergigante_dragon_dome")
+    @SubscribeEvent
+    fun e(e: InventoryClickEvent) {
+        val player = e.whoClicked as? Player ?: return
+        if (player.gameMode == GameMode.SPECTATOR) e.isCancelled = true
+    }
+
+    private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {
+        player.profile().dungeonWorld = dungeonWorld
+        FunctionPlot.start(player)
     }
 }

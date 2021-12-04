@@ -1,4 +1,6 @@
-package net.sakuragame.eternal.kirradungeon.server.compat
+@file:Suppress("SpellCheckingInspection")
+
+package net.sakuragame.eternal.kirradungeon.plot.compat
 
 import com.taylorswiftcn.megumi.uifactory.generate.function.Statements
 import com.taylorswiftcn.megumi.uifactory.generate.type.FunctionType
@@ -11,7 +13,6 @@ import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 
-@Suppress("SpellCheckingInspection")
 object DragonCoreCompat {
 
     lateinit var joinTitleHud: ScreenUI
