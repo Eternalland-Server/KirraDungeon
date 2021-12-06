@@ -5,9 +5,6 @@ import net.luckperms.api.node.types.MetaNode
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.justmessage.JustMessage
-import net.sakuragame.eternal.justmessage.api.MessageAPI
-import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
 import net.sakuragame.eternal.kirradungeon.plot.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.plot.function.FunctionPlot.playDome
@@ -22,6 +19,7 @@ import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityCombustEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.metadata.FixedMetadataValue
@@ -151,6 +149,15 @@ object FunctionListener {
     fun e(e: InventoryClickEvent) {
         val player = e.whoClicked as? Player ?: return
         if (player.gameMode == GameMode.SPECTATOR) e.isCancelled = true
+    }
+
+    // 濒死保护机制.
+    @SubscribeEvent
+    fun e(e: EntityDamageEvent) {
+        val player = e.entity as? Player ?: return
+        if (e.damage >= player.health) {
+            e.isCancelled = true
+        }
     }
 
     private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {

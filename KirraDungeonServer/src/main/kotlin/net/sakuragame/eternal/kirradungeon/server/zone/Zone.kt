@@ -44,7 +44,10 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
             }
         }
 
-        fun clearAll() = zones.clear()
+        fun clearAll() {
+            zones.clear()
+            ZoneCondition.doDataRecycle()
+        }
 
         fun createZone(id: String, name: String) {
             writeDefaultZoneDataToConf(id, name)
@@ -95,11 +98,11 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                 it.add("")
             }
             // 进入条件.
-            KirraDungeonServer.data["$id.conditions.daily-count"] = 10
-            KirraDungeonServer.data["$id.conditions.fee"] = mutableListOf<String>().also {
+            KirraDungeonServer.data["$id.conditions.default.daily-count"] = 10
+            KirraDungeonServer.data["$id.conditions.default.fee"] = mutableListOf<String>().also {
                 it.add("coins; 100")
             }
-            KirraDungeonServer.data["$id.conditions.items"] = mutableListOf<String>().also {
+            KirraDungeonServer.data["$id.conditions.default.items"] = mutableListOf<String>().also {
                 it.add("test-item; 1")
             }
             // 坐标.
@@ -164,5 +167,5 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
         }
     }
 
-    override fun toString() = "Zone($id, ${name.uncolored()}, $data, ${ZoneCondition.getConditionByName(name) ?: ""})"
+    override fun toString() = "Zone($id, ${name.uncolored()}, $data, ${ZoneCondition.getConditionByName(id) ?: ""})"
 }

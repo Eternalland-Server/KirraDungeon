@@ -6,8 +6,11 @@ import io.lumine.xikage.mythicmobs.MythicMobs
 import net.sakuragame.serversystems.manage.api.redis.RedisManager
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import taboolib.common.platform.Plugin
+import taboolib.common.platform.function.getDataFolder
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.Type
+import taboolib.module.configuration.createLocal
 import taboolib.platform.BukkitPlugin
 import java.util.concurrent.TimeUnit
 
@@ -17,9 +20,9 @@ object KirraDungeonServer : Plugin() {
     lateinit var conf: Configuration
         private set
 
-    @Config("data.yml")
-    lateinit var data: Configuration
-        private set
+    val data by lazy {
+        createLocal("data.json", 200, Type.JSON)
+    }
 
     val plugin by lazy {
         BukkitPlugin.getInstance()

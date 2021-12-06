@@ -33,7 +33,8 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
             val zoneNames = KirraDungeonClient.redisConn.sync().lrange("KirraDungeonNames", 0, -1)
             zoneNames.forEach { name ->
                 zones += Zone(name, KirraDungeonClient.redisConn.sync().lrange("KirraDungeonConditions:$name", 0, -1)
-                    .map { ZoneCondition.stringToZoneCondition(it) })
+                    .map { ZoneCondition.stringToZoneCondition(it) }
+                )
             }
         }
 

@@ -6,6 +6,7 @@ import net.sakuragame.eternal.kirraparty.bukkit.party.Party.Companion.getParty
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.spigotmc.SpigotConfig
 import taboolib.common.platform.command.*
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
@@ -61,6 +62,18 @@ object Commands {
             Zone.zones.forEach {
                 sender.sendMessage("&a$it".colored())
             }
+        }
+    }
+
+    @CommandBody
+    val reload = subCommand {
+        execute<CommandSender> { sender, _, _ ->
+            if (sender.hasPermission("admin")) {
+                Zone.load()
+                sender.sendMessage("&7已重载.".colored())
+                return@execute
+            }
+            sender.sendMessage(SpigotConfig.unknownCommandMessage)
         }
     }
 }
