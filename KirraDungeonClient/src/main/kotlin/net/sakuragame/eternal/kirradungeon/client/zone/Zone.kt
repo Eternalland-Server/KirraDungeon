@@ -10,6 +10,7 @@ import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneFee
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneItems
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -33,8 +34,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
             val zoneNames = KirraDungeonClient.redisConn.sync().lrange("KirraDungeonNames", 0, -1)
             zoneNames.forEach { name ->
                 zones += Zone(name, KirraDungeonClient.redisConn.sync().lrange("KirraDungeonConditions:$name", 0, -1)
-                    .map { ZoneCondition.stringToZoneCondition(it) }
-                )
+                    .map { ZoneCondition.stringToZoneCondition(it) })
             }
         }
 
@@ -52,17 +52,15 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         players.withDraw()
         // 进行传送操作, 之后转交由 Server 端处理.
         try {
-            val serverName = DungeonClientAPI.getClientManager().queryServer("RPG-DUNGEON")
-            if (serverName == null) {
+            val serverId = DungeonClientAPI.getClientManager().queryServer("rpg-dungeon")
+            if (serverId == null) {
                 players.forEach {
                     it.sendLang("message-dungeon-server-ran-out-exception")
                 }
                 return
             }
-            val playerSet = LinkedHashSet<Player>().also {
-                it.addAll(players)
-            }
-            DungeonClientAPI.getClientManager().queryDungeon(name, serverName, playerSet, object : MapRequestHandler() {
+            val playerSet = LinkedHashSet<Player>().also { it.addAll(players) }
+            DungeonClientAPI.getClientManager().queryDungeon(name, serverId, playerSet, object : MapRequestHandler() {
 
                 override fun onTimeout(serverId: String) =
                     players.forEach {
@@ -102,8 +100,11 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
 
     fun List<Player>.checkFee(): Boolean {
         forEach {
-            it.getZoneFee(this@Zone).forEach mapForeach@{ mapFee ->
-                if (KirraCoreBukkitAPI.getBalance(it, mapFee.key)!! >= mapFee.value) {
+            val feeMap = it.getZoneFee(this@Zone)
+            if (feeMap.isEmpty()) return true
+            feeMap.forEach mapForeach@{ mapFee ->
+                val playerBal = KirraCoreBukkitAPI.getBalance(it, mapFee.key) ?: return@mapForeach
+                if (playerBal >= mapFee.value) {
                     if (ZoneWithDraw.gemsMap.containsKey(it.uniqueId)) {
                         ZoneWithDraw.gemsMap[it.uniqueId]!![mapFee.key] = mapFee.value
                         return@mapForeach
@@ -130,7 +131,9 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
 
     fun List<Player>.checkItems(): Boolean {
         forEach {
-            it.getZoneItems(this@Zone).forEach mapForeach@{ mapItem ->
+            val itemMap = it.getZoneItems(this@Zone)
+            if (itemMap.isEmpty()) return true
+            itemMap.forEach mapForeach@{ mapItem ->
                 if (!ZaphkielAPI.registeredItem.containsKey(mapItem.key)) {
                     return@mapForeach
                 }

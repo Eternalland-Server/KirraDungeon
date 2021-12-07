@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.client.zone
 
 import com.google.gson.Gson
+import net.sakuragame.eternal.kirradungeon.client.printDebug
 
 /**
  * KirraDungeons
@@ -20,8 +21,9 @@ data class ZoneCondition(
 
         private val gson = Gson()
 
-        fun zoneConditionToString(condition: ZoneCondition) = gson.toJson(condition)!!
-
-        fun stringToZoneCondition(string: String) = gson.fromJson(string, ZoneCondition::class.java)!!
+        fun stringToZoneCondition(string: String): ZoneCondition {
+            string.printDebug()
+            return gson.fromJson(string, ZoneCondition::class.java)!!
+        }
     }
 }

@@ -5,7 +5,8 @@ message-player-join-dungeon:
   - "&6&l➱ &e开始挑战: &f{0}"
   - "&6&l➱ &e祝您好运, 愿樱花大佐护佑您."
 message-player-clear-dungeon:
-  - "&6&l➱ &e挑战成功! &f{0} &a秒后会将您传送回主城服务器!"
+  - "&6&l➱ &e挑战成功! "
+  - "&6&l➱ &e{0} 秒后会将您传送回主城服务器!"
 message-player-lose-dungeon-verge:
   - "&4&l➱ &c啪! 您在副本 {0} 的挑战中死亡了..."
   - "&4&l➱ &c您可以等待您的队友通关, 或是再次回到主城服进行挑战."

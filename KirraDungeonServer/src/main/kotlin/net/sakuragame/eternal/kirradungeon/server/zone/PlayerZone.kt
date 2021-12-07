@@ -1,34 +1,39 @@
 package net.sakuragame.eternal.kirradungeon.server.zone
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
+import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
+import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
-import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
-import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
-import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import taboolib.module.chat.colored
 import taboolib.platform.util.sendLang
+import java.time.Duration
+import java.time.Period
 import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
 
+    val millis = System.currentTimeMillis()
+
     val uuidList = mutableListOf<UUID>()
 
-    val need2KillEntityList = mutableListOf<LivingEntity>()
+    val need2KillEntityUUIDList = mutableListOf<UUID>()
 
     companion object {
 
@@ -47,7 +52,7 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
 
         fun getByMobUUID(mobUUID: UUID): PlayerZone? {
             playerZones.forEach { playerZone ->
-                if (playerZone.need2KillEntityList.firstOrNull { it.uniqueId == mobUUID } != null) {
+                if (playerZone.need2KillEntityUUIDList.firstOrNull { it == mobUUID } != null) {
                     return playerZone
                 }
             }
@@ -86,14 +91,20 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
 
         // 副本怪物死亡判断.
         @SubscribeEvent
-        fun e(e: EntityDeathEvent) {
+        fun e(e: MythicMobDeathEvent) {
             val entity = e.entity
             val playerZone = getByMobUUID(entity.uniqueId) ?: return
-            playerZone.removeEntity(entity)
+            playerZone.removeEntity(entity.uniqueId)
             if (playerZone.canClear()) {
                 // 当副本可通关时, 执行通关操作.
                 playerZone.clear()
             }
+        }
+
+        @SubscribeEvent
+        fun e(e: YamlSendFinishedEvent) {
+            val player = e.player
+            PacketSender.sendYaml(player, FolderType.Gui, DragonCoreCompat.joinTitleHudID, DragonCoreCompat.joinTitleHudYaml)
         }
 
         private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {
@@ -115,13 +126,15 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
                     val skyChangerPlayer = SkyChanger.wrapPlayer(player)
                     KirraDungeonServer.skyAPI.changeSky(skyChangerPlayer, packetType, value)
                 }
-            playerZone.showJoinMessage(player)
+            submit(delay = 40) {
+                playerZone.showJoinMessage(player)
+                playerZone.spawnEntities()
+            }
         }
     }
 
     // 展示进入信息.
     fun showJoinMessage(player: Player) {
-        PacketSender.sendYaml(player, FolderType.Gui, DragonCoreCompat.joinTitleHudID, DragonCoreCompat.joinTitleHudYaml)
         DragonCoreCompat.updateDragonVars(player, zone.name)
         PacketSender.sendOpenHud(player, DragonCoreCompat.joinTitleHudID)
         player.sendLang("message-player-join-dungeon", zone.name)
@@ -135,26 +148,44 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
 
     // 使目前所有的怪物都恢复至满血.
     fun allEntityRegen2MaxHealth() {
-        need2KillEntityList.forEach {
-            it.health = it.maxHealth
+        need2KillEntityUUIDList.forEach {
+            val entity = Bukkit.getEntity(it) as? LivingEntity ?: return@forEach
+            entity.health = getMobMaxHealth(entity)
         }
     }
 
     // 移除怪物.
-    fun removeEntity(entity: Entity) = need2KillEntityList.removeIf { it.uniqueId == entity.uniqueId }
+    fun removeEntity(entityUUID: UUID) = need2KillEntityUUIDList.removeIf { it == entityUUID }
 
     // 是否可以通关.
-    fun canClear() = need2KillEntityList.isEmpty()
+    fun canClear() = need2KillEntityUUIDList.isEmpty()
 
     // 执行通关操作.
     fun clear() {
-        val delay2BackSpawnServer = KirraDungeonServer.conf.getLong("delay-back-spawn-server-secs")
-        uuidList.map { Bukkit.getPlayer(it) }.forEach {
-            if (it == null) return@forEach
-            it.sendLang("message-player-clear-dungeon", delay2BackSpawnServer)
-        }
-        submit(delay = delay2BackSpawnServer * 20, async = true) {
-            KirraCoreBukkitAPI.teleportToSpawnServer(*uuidList.toTypedArray())
+        val delay2BackSpawnServer = KirraDungeonServer.conf.getInt("settings.delay-back-spawn-server-secs")
+        sendClearMessage(uuidList.map { Bukkit.getPlayer(it) }, delay2BackSpawnServer)
+    }
+
+    fun sendClearMessage(players: List<Player>, delaySecs: Int) {
+        val passedTime = formatSeconds(TimeUnit.SECONDS.convert((System.currentTimeMillis() - millis), TimeUnit.MILLISECONDS).toInt())
+        players.forEach {
+            it.sendTitle("&a&l通关!".colored(), "&7通关时长: $passedTime".colored(), 20, 100, 20)
+            it.sendLang("message-player-clear-dungeon", delaySecs)
+            var secs = delaySecs
+            submit(delay = 60L, period = 20, async = true) {
+                if (!it.isOnline) {
+                    cancel()
+                    return@submit
+                }
+                secs--
+                it.sendTitle("", "&a将在 &f&l$secs &a秒后传送回您到主城.".colored(), 10, 20, 0)
+                if (secs <= 0) {
+                    it.sendTitle("", "&e&l正在传送...".colored(), 10, 200, 0)
+                    KirraCoreBukkitAPI.teleportToSpawnServer(it)
+                    cancel()
+                    return@submit
+                }
+            }
         }
     }
 
@@ -167,19 +198,24 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
         playerZones.remove(this)
     }
 
-    init {
+    // 生成怪物.
+    fun spawnEntities() {
         // 生成怪物步骤.
         zone.data.entityMap.forEach { (zoneLoc, mobData) ->
             // 将 ZoneLocation 转换为 BukkitLocation.
-            val bukkitLoc = zoneLoc.toBukkitLocation(dungeonWorld.bukkitWorld)
+            val bukkitLoc = zoneLoc.toBukkitLocation(dungeonWorld.bukkitWorld).add(0.0, 1.0, 0.0)
             // 调用 MythicmobsAPI, 将怪物生成到世界坐标.
             repeat(mobData.amount) {
-                need2KillEntityList.add(KirraDungeonServer.mythicmobsAPI.spawnMythicMob(mobData.mobType, bukkitLoc) as? LivingEntity ?: return@repeat)
+                val randomLoc = bukkitLoc.add(Random.nextDouble(0.1, 1.0), 0.0, Random.nextDouble(0.1, 1.0))
+                val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(mobData.mobType, randomLoc) as? LivingEntity ?: return@repeat
+                need2KillEntityUUIDList.add(entity.uniqueId)
             }
         }
+    }
+
+    init {
         // 超时判断. (副本创建后长时间未进入)
         submit(async = true, delay = 1000) {
-            if (Zone.editingDungeonWorld != null) return@submit
             if (canDelete()) delete()
         }
     }

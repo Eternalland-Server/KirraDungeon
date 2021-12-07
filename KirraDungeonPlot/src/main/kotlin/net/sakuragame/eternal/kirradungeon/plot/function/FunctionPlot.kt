@@ -26,7 +26,7 @@ import taboolib.common.platform.function.submit
 @Suppress("SpellCheckingInspection")
 object FunctionPlot {
 
-    const val battleThemeBgmId = "nergigante_dragon"
+    const val battleThemeBgmId = "nergigante_dragon_battle_theme.ogg"
 
     val playerSpawnLoc by lazy {
         val strLoc = KirraDungeonPlot.conf.getString("settings.spawn-point.player")!!

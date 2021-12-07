@@ -1,8 +1,12 @@
 package net.sakuragame.eternal.kirradungeon.client
 
+import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
+import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
+import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirraparty.bukkit.party.Party
 import net.sakuragame.eternal.kirraparty.bukkit.party.Party.Companion.getParty
+import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -10,7 +14,9 @@ import org.spigotmc.SpigotConfig
 import taboolib.common.platform.command.*
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
+import taboolib.platform.util.asLangTextList
 import taboolib.platform.util.sendLang
+import java.util.*
 
 @Suppress("SpellCheckingInspection")
 @CommandHeader(name = "KirraDungeonClient", aliases = ["dungeon"], permissionDefault = PermissionDefault.NOT_OP)
@@ -55,6 +61,29 @@ object Commands {
         }
     }
 
+    @CommandBody(permission = "admin")
+    val joinTutorialDungeon = subCommand {
+        execute<Player> { player, _, _ ->
+            if (player.hasPermission("admin")) {
+                DungeonClientAPI.getClientManager().queryDungeon("nergigante_dragon", player, object : MapRequestHandler() {
+
+                    override fun onTimeout(serverID: String) = player.asLangTextList("message-noobie-dungeon-join-timed-out", serverID).forEach {
+                        MessageAPI.sendActionTip(player, it)
+                    }
+
+                    override fun onTeleportTimeout(serverID: String) = player.asLangTextList("message-noobie-dungeon-join-timed-out", serverID).forEach {
+                        MessageAPI.sendActionTip(player, it)
+                    }
+
+                    override fun handle(serverID: String, mapUUID: UUID) {
+                        KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverID, player.uniqueId)
+                    }
+                })
+            }
+            player.sendMessage(SpigotConfig.unknownCommandMessage)
+        }
+    }
+
     @CommandBody
     val list = subCommand {
         execute<CommandSender> { sender, _, _ ->
@@ -65,15 +94,12 @@ object Commands {
         }
     }
 
-    @CommandBody
+    @CommandBody(permission = "admin")
     val reload = subCommand {
         execute<CommandSender> { sender, _, _ ->
-            if (sender.hasPermission("admin")) {
-                Zone.load()
-                sender.sendMessage("&7已重载.".colored())
-                return@execute
-            }
-            sender.sendMessage(SpigotConfig.unknownCommandMessage)
+            Zone.load()
+            sender.sendMessage("&7已重载.".colored())
+            return@execute
         }
     }
 }

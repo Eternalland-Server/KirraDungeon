@@ -9,6 +9,7 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 import taboolib.platform.util.asLangTextList
+import kotlin.math.floor
 
 fun Player.playDeathAnimation() = world.strikeLightningEffect(location)!!
 
@@ -45,3 +46,11 @@ fun spawnArmorStand(loc: Location) = (loc.world.spawnEntity(loc, EntityType.ARMO
 fun getMobMaxHealth(type: String) = KirraDungeonServer.mythicmobsAPI.getMythicMob(type).health.get()
 
 fun getMobMaxHealth(entity: LivingEntity) = KirraDungeonServer.mythicmobsAPI.getMythicMobInstance(entity).type.health.get()
+
+fun formatSeconds(timeInSeconds: Int): String {
+    val secondsLeft = timeInSeconds % 3600 % 60
+    val minutes = floor((timeInSeconds % 3600 / 60).toDouble()).toInt()
+    val mM = (if (minutes < 10) "0" else "") + minutes
+    val sS = (if (secondsLeft < 10) "0" else "") + secondsLeft
+    return "${mM}分${sS}秒."
+}

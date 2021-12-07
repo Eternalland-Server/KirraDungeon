@@ -35,18 +35,17 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
             KirraDungeonServer.data.getKeys(false).forEach {
                 val id = it
                 val name = KirraDungeonServer.data.getString("$it.name") ?: return@forEach
-                updateZoneConditions(id)
                 zones += Zone(id, name.colored(), ZoneData(
                     getMobMap(id),
                     getMapSpawnLoc(id)!!,
                     getMapSkyData(id)
                 ))
+                updateZoneConditions(id)
             }
         }
 
         fun clearAll() {
             zones.clear()
-            ZoneCondition.doDataRecycle()
         }
 
         fun createZone(id: String, name: String) {
@@ -60,20 +59,20 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                 it.addAll(KirraDungeonServer.data.getStringList("${zone.id}.mobs"))
             }
             mobList.add("$loc; $mobType; $mobAmount")
-            KirraDungeonServer.data.set("${zone.id}.mobs", mobList)
+            KirraDungeonServer.data["${zone.id}.mobs"] = mobList
             init()
         }
 
         // 设置副本出生点坐标.
         fun setZoneLoc(zone: Zone, loc: ZoneLocation) {
-            KirraDungeonServer.data.set("${zone.id}.spawn-loc", loc.toString())
+            KirraDungeonServer.data["${zone.id}.spawn-loc"] = loc.toString()
             init()
         }
 
         // 设置副本天空颜色.
         fun setZoneSkyColor(zone: Zone, zoneSkyData: ZoneData.Companion.ZoneSkyData) {
-            KirraDungeonServer.data.set("${zone.id}.change-sky-color.enabled", true)
-            KirraDungeonServer.data.set("${zone.id}.change-sky-color.value", zoneSkyData.toString())
+            KirraDungeonServer.data["${zone.id}.change-sky-color.enabled"] = true
+            KirraDungeonServer.data["${zone.id}.change-sky-color.value"] = zoneSkyData.toString()
             init()
         }
 
@@ -111,19 +110,21 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
 
         // 从配置文件读取副本进入条件数据.
         private fun getZoneConditions(id: String): MutableMap<String, MutableList<ZoneCondition>> {
-            return mutableMapOf<String, MutableList<ZoneCondition>>().also { conditionMap ->
+            return mutableMapOf<String, MutableList<ZoneCondition>>().also dungeonMapAlso@{ conditionMap ->
                 conditionMap[id] = mutableListOf()
-                KirraDungeonServer.data.getConfigurationSection("$id.conditions")!!.getKeys(false).forEach { key ->
+                KirraDungeonServer.data.getConfigurationSection("$id.conditions")!!.getKeys(false).forEach sectionForeach@{ key ->
                     val dailyCounts = KirraDungeonServer.data.getInt("$id.conditions.$key.daily-count")
-                    val feeToTypeMap = mutableMapOf<String, Double>().also { feeToTypeMap ->
-                        KirraDungeonServer.data.getStringList("$id.conditions.$key.fee").forEach { feeString ->
+                    val feeToTypeMap = mutableMapOf<String, Double>().also feeToTypeAlso@{ feeToTypeMap ->
+                        KirraDungeonServer.data.getStringList("$id.conditions.$key.fee").forEach feeToTypeForeach@{ feeString ->
                             val splitString = feeString.splitWithNoSpace(";")
+                            if (splitString.size < 2) return@feeToTypeForeach
                             feeToTypeMap[splitString[0]] = splitString[1].toDouble()
                         }
                     }
-                    val itemIDToAmountMap = mutableMapOf<String, Int>().also { itemIDToAmountMap ->
-                        KirraDungeonServer.data.getStringList("$id.conditions.$key.items").forEach { itemString ->
+                    val itemIDToAmountMap = mutableMapOf<String, Int>().also itemIDToAmountAlso@{ itemIDToAmountMap ->
+                        KirraDungeonServer.data.getStringList("$id.conditions.$key.items").forEach itemIDToAmountForeach@{ itemString ->
                             val splitString = itemString.splitWithNoSpace(";")
+                            if (splitString.size < 2) return@itemIDToAmountForeach
                             itemIDToAmountMap[splitString[0]] = splitString[1].toInt()
                         }
                     }

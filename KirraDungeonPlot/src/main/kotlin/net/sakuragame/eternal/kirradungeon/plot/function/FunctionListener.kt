@@ -5,6 +5,7 @@ import net.luckperms.api.node.types.MetaNode
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
+import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
 import net.sakuragame.eternal.kirradungeon.plot.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.plot.function.FunctionPlot.playDome
@@ -15,6 +16,7 @@ import net.sakuragame.eternal.script.api.event.NSConversationEndEvent
 import net.sakuragame.eternal.script.api.event.NSConversationOptionEvent
 import net.sakuragame.eternal.script.api.event.NSFilmEndEvent
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -25,9 +27,13 @@ import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * KirraPlotZone
@@ -38,6 +44,26 @@ import taboolib.module.chat.colored
  */
 @Suppress("SpellCheckingInspection")
 object FunctionListener {
+
+    val countDownMap = ConcurrentHashMap<UUID, Int>()
+
+    @Awake(LifeCycle.ACTIVE)
+    fun init() {
+        submit(async = true, period = 20) {
+            if (countDownMap.isEmpty()) {
+                return@submit
+            }
+            countDownMap.forEach { (uuid, int) ->
+                val player = Bukkit.getPlayer(uuid)
+                if (player == null) {
+                    countDownMap.remove(uuid)
+                    return@forEach
+                }
+                BossBar.setTime(player, int - 1)
+                countDownMap[uuid] = int - 1
+            }
+        }
+    }
 
     private val firstStepNode by lazy {
         MetaNode
@@ -95,6 +121,7 @@ object FunctionListener {
                 FunctionPlot.spawnEntity(player, "nergigante_dragon")
                 FunctionPlot.showJoinHud(player, "&c&l战胜灭尽龙")
                 player.gameMode = GameMode.ADVENTURE
+                countDownMap[player.uniqueId] = 5 * 60
             }
             1 -> {
                 FunctionPlot.endBound(player)
@@ -122,6 +149,7 @@ object FunctionListener {
         val entityHalfMaxHealth = getMobMaxHealth(entity) / 2
         val player = e.player
         if (entity.name != "&c&l灭尽龙".colored()) return
+        BossBar.open(player, "&c&l灭尽龙", "", "black_sakura", entity.health * 0.01)
         if (!player.hasMetadata("NergiganteHalfHealth") && entity.health < entityHalfMaxHealth) {
             player.setMetadata("NergiganteHalfHealth", FixedMetadataValue(KirraDungeonPlot.plugin, ""))
             playDome(player)
@@ -163,5 +191,6 @@ object FunctionListener {
     private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {
         player.profile().dungeonWorld = dungeonWorld
         FunctionPlot.start(player)
+        BossBar.open(player, "&c&l灭尽龙", "", "black_sakura", 1.0)
     }
 }

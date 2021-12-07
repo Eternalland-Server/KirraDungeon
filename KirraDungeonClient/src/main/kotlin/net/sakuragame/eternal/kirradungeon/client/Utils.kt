@@ -1,6 +1,9 @@
 package net.sakuragame.eternal.kirradungeon.client
 
+import org.bukkit.Bukkit
 import java.util.*
+
+fun String.printDebug() = Bukkit.getLogger().info("[DEBUG] $this")
 
 private val date by lazy {
     Date().also {
