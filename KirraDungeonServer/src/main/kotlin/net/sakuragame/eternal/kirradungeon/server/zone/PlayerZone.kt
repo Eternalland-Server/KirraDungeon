@@ -11,6 +11,7 @@ import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
+import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -21,18 +22,18 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 import taboolib.platform.util.sendLang
-import java.time.Duration
-import java.time.Period
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.random.Random
 
 data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
 
-    val millis = System.currentTimeMillis()
+    val isClear = AtomicBoolean(false)
+
+    val createdTime = System.currentTimeMillis()
 
     val uuidList = mutableListOf<UUID>()
-
     val need2KillEntityUUIDList = mutableListOf<UUID>()
 
     companion object {
@@ -162,12 +163,22 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
 
     // 执行通关操作.
     fun clear() {
+        if (isClear.get()) {
+            return
+        }
+        isClear.set(true)
+        val players = mutableListOf<Player>()
+        uuidList.forEach {
+            val player = Bukkit.getPlayer(it) ?: return@forEach
+            players.add(player)
+            DungeonClearEvent(player, zone.id).call()
+        }
         val delay2BackSpawnServer = KirraDungeonServer.conf.getInt("settings.delay-back-spawn-server-secs")
-        sendClearMessage(uuidList.map { Bukkit.getPlayer(it) }, delay2BackSpawnServer)
+        sendClearMessage(players, delay2BackSpawnServer)
     }
 
     fun sendClearMessage(players: List<Player>, delaySecs: Int) {
-        val passedTime = formatSeconds(TimeUnit.SECONDS.convert((System.currentTimeMillis() - millis), TimeUnit.MILLISECONDS).toInt())
+        val passedTime = formatSeconds(TimeUnit.SECONDS.convert((System.currentTimeMillis() - createdTime), TimeUnit.MILLISECONDS).toInt())
         players.forEach {
             it.sendTitle("&a&l通关!".colored(), "&7通关时长: $passedTime".colored(), 20, 100, 20)
             it.sendLang("message-player-clear-dungeon", delaySecs)
@@ -180,7 +191,7 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
                 secs--
                 it.sendTitle("", "&a将在 &f&l$secs &a秒后传送回您到主城.".colored(), 10, 20, 0)
                 if (secs <= 0) {
-                    it.sendTitle("", "&e&l正在传送...".colored(), 10, 200, 0)
+                    it.sendTitle("", "&e&l正在传送.".colored(), 10, 200, 0)
                     KirraCoreBukkitAPI.teleportToSpawnServer(it)
                     cancel()
                     return@submit
@@ -216,7 +227,20 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
     init {
         // 超时判断. (副本创建后长时间未进入)
         submit(async = true, delay = 1000) {
-            if (canDelete()) delete()
+            if (canDelete()) {
+                delete()
+                cancel()
+                return@submit
+            }
+        }
+        // 检测是否有意外死亡并未计入事件的怪物.
+        submit(async = true, delay = 200L, period = 20L) {
+            need2KillEntityUUIDList.removeIf { Bukkit.getEntity(it) == null }
+            if (canClear()) {
+                clear()
+                cancel()
+                return@submit
+            }
         }
     }
 }

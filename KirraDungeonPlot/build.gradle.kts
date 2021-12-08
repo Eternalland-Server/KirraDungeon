@@ -42,9 +42,6 @@ repositories {
         }
         url = uri("https://maven.ycraft.cn/repository/maven-snapshots/")
     }
-    maven {
-        url = uri("https://repo1.maven.org/maven2/net/luckperms/api/")
-    }
     mavenCentral()
 }
 
@@ -52,19 +49,17 @@ dependencies {
     compileOnly("public:MythicMobs:4.12.0@jar")
 
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")
-    compileOnly("net.sakuragame:DataManager-Bukkit-API:1.3.2-SNAPSHOT@jar")
 
     compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.0.9-SNAPSHOT@jar")
-    compileOnly("net.luckperms:api:5.3")
 
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
 
-    implementation("net.sakuragame.eternal:JustMessage:1.0.1-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:JustMessage:1.0.2-SNAPSHOT@jar")
+
+    compileOnly("net.sakuragame.eternal:BetonQuest:1.13.0-SNAPSHOT@jar")
 
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
-
-    compileOnly("biz.paluch.redis:lettuce:4.1.1.Final@jar")
 
     compileOnly("ink.ptms.core:v11200:11200:all")
     compileOnly(kotlin("stdlib"))

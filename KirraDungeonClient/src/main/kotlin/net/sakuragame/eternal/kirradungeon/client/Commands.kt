@@ -1,25 +1,22 @@
 package net.sakuragame.eternal.kirradungeon.client
 
-import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
-import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
-import net.sakuragame.eternal.justmessage.api.MessageAPI
+import net.sakuragame.eternal.kirradungeon.client.compat.StoryDungeonCompat
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirraparty.bukkit.party.Party
 import net.sakuragame.eternal.kirraparty.bukkit.party.Party.Companion.getParty
-import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.spigotmc.SpigotConfig
-import taboolib.common.platform.command.*
+import taboolib.common.platform.command.CommandBody
+import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.mainCommand
+import taboolib.common.platform.command.subCommand
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
-import taboolib.platform.util.asLangTextList
 import taboolib.platform.util.sendLang
-import java.util.*
 
 @Suppress("SpellCheckingInspection")
-@CommandHeader(name = "KirraDungeonClient", aliases = ["dungeon"], permissionDefault = PermissionDefault.NOT_OP)
+@CommandHeader(name = "KirraDungeonClient", aliases = ["dungeon"])
 object Commands {
 
     @CommandBody
@@ -64,23 +61,10 @@ object Commands {
     @CommandBody(permission = "admin")
     val joinTutorialDungeon = subCommand {
         execute<Player> { player, _, _ ->
-            if (player.hasPermission("admin")) {
-                DungeonClientAPI.getClientManager().queryDungeon("nergigante_dragon", player, object : MapRequestHandler() {
-
-                    override fun onTimeout(serverID: String) = player.asLangTextList("message-noobie-dungeon-join-timed-out", serverID).forEach {
-                        MessageAPI.sendActionTip(player, it)
-                    }
-
-                    override fun onTeleportTimeout(serverID: String) = player.asLangTextList("message-noobie-dungeon-join-timed-out", serverID).forEach {
-                        MessageAPI.sendActionTip(player, it)
-                    }
-
-                    override fun handle(serverID: String, mapUUID: UUID) {
-                        KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverID, player.uniqueId)
-                    }
-                })
+            val isSucc = StoryDungeonCompat.join(player)
+            if (!isSucc) {
+                player.sendMessage("&7进入失败, 请检查服务器是否在线.".colored())
             }
-            player.sendMessage(SpigotConfig.unknownCommandMessage)
         }
     }
 

@@ -1,13 +1,14 @@
 package net.sakuragame.eternal.kirradungeon.plot.function
 
 import com.sakuragame.eternal.justattribute.api.event.JARoleAttackEvent
-import net.luckperms.api.node.types.MetaNode
+import eos.moe.armourers.api.DragonAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
 import net.sakuragame.eternal.kirradungeon.plot.Profile.Companion.profile
+import net.sakuragame.eternal.kirradungeon.plot.addNoobiePoints
 import net.sakuragame.eternal.kirradungeon.plot.function.FunctionPlot.playDome
 import net.sakuragame.eternal.kirradungeon.plot.getMobMaxHealth
 import net.sakuragame.eternal.kirradungeon.plot.sendBrokenTitleAnimation
@@ -65,14 +66,6 @@ object FunctionListener {
         }
     }
 
-    private val firstStepNode by lazy {
-        MetaNode
-            .builder()
-            .key("noobie_tutorial_step_1")
-            .value(true)
-            .build()
-    }
-
     @SubscribeEvent
     fun e(e: DungeonPlayerJoinEvent) {
         submit(delay = 3L) {
@@ -82,7 +75,7 @@ object FunctionListener {
 
     @SubscribeEvent
     fun e(e: EntityCombustEvent) {
-        if (e.entity.name == "&c&l灭尽龙".colored()) {
+        if (e.entity.name == "&6&l灭尽龙".colored()) {
             e.isCancelled = true
         }
     }
@@ -100,15 +93,10 @@ object FunctionListener {
 
     @SubscribeEvent
     fun e(e: NSFilmEndEvent) {
-        submit(delay = 10L) {
-            val player = e.player
-            KirraDungeonPlot.luckPermsAPI.userManager.getUser(player.uniqueId)!!.also { user ->
-                user.data().clear { data -> data.key == "noobie_tutorial_step_1" }
-                user.data().add(firstStepNode)
-                KirraDungeonPlot.luckPermsAPI.userManager.saveUser(user)
-            }
-            KirraCoreBukkitAPI.teleportToSpawnServer(player)
-        }
+        val player = e.player
+        BossBar.close(player)
+        player.addNoobiePoints(0)
+        KirraCoreBukkitAPI.teleportToSpawnServer(player)
     }
 
     @SubscribeEvent
@@ -133,11 +121,11 @@ object FunctionListener {
             2 -> {
                 submit(delay = 10) {
                     player.setMetadata("NergiganteClear", FixedMetadataValue(KirraDungeonPlot.plugin, ""))
-                    player.resetTitle()
                     player.removePotionEffect(PotionEffectType.BLINDNESS)
                     player.removePotionEffect(PotionEffectType.CONFUSION)
                     NergiganteAPI.startEnd(e.player)
                     PacketSender.sendStopSound(player, FunctionPlot.battleThemeBgmId)
+                    player.resetTitle()
                 }
             }
         }
@@ -148,8 +136,8 @@ object FunctionListener {
         val entity = e.victim ?: return
         val entityHalfMaxHealth = getMobMaxHealth(entity) / 2
         val player = e.player
-        if (entity.name != "&c&l灭尽龙".colored()) return
-        BossBar.open(player, "&c&l灭尽龙", "", "black_sakura", entity.health * 0.01)
+        if (entity.name != "&6&l灭尽龙".colored()) return
+        BossBar.setHealth(player, "&6&l灭尽龙", entity.health * 0.01)
         if (!player.hasMetadata("NergiganteHalfHealth") && entity.health < entityHalfMaxHealth) {
             player.setMetadata("NergiganteHalfHealth", FixedMetadataValue(KirraDungeonPlot.plugin, ""))
             playDome(player)
@@ -191,6 +179,14 @@ object FunctionListener {
     private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {
         player.profile().dungeonWorld = dungeonWorld
         FunctionPlot.start(player)
-        BossBar.open(player, "&c&l灭尽龙", "", "black_sakura", 1.0)
+        DragonAPI.setEntitySkin(player, listOf(
+            "冲田总司主手",
+            "冲田总司裤子",
+            "冲田总司上装",
+            "冲田总司翅膀",
+            "冲田总司头饰",
+            "冲田总司鞋子",
+            "冲田总司副手"))
+        BossBar.open(player, "&6&l灭尽龙", "", "black_sakura", 1.0)
     }
 }
