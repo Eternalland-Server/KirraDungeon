@@ -131,7 +131,7 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
                 playerZone.showJoinMessage(player)
                 playerZone.spawnEntities()
             }
-            DungeonJoinEvent(player, playerZone).call()
+            DungeonJoinEvent(player, playerZone.zone.id, playerZone).call()
         }
     }
 

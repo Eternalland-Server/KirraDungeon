@@ -1,6 +1,5 @@
 package net.sakuragame.eternal.kirradungeon.plot.function
 
-import com.sakuragame.eternal.justattribute.api.event.JARoleAttackEvent
 import eos.moe.armourers.api.DragonAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
@@ -21,8 +20,10 @@ import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Sound
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityCombustEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
@@ -31,6 +32,7 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
+import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
@@ -86,7 +88,7 @@ object FunctionListener {
                 "冲田总司头饰",
                 "冲田总司鞋子",
                 "冲田总司副手"))
-            BossBar.open(player, "&6&l灭尽龙", "", "black_sakura", 1.0, 300)
+            BossBar.open(player, "&6&l灭尽龙", "", "black_sakura", 1.0, 900)
             countDownMap[player.uniqueId] = 900
         }
     }
@@ -123,16 +125,14 @@ object FunctionListener {
             0 -> {
                 FunctionPlot.endBound(player)
                 FunctionPlot.dataRecycle(player)
-                FunctionPlot.spawnEntity(player, "nergigante_dragon")
+                FunctionPlot.spawnEntity(player, "dragon")
                 FunctionPlot.showJoinHud(player, "&c&l战胜灭尽龙")
-                player.gameMode = GameMode.ADVENTURE
-                countDownMap[player.uniqueId] = 5 * 60
             }
             1 -> {
                 FunctionPlot.endBound(player)
                 FunctionPlot.dataRecycle(player)
-                FunctionPlot.spawnEntity(player, "nergigante_dragon").also {
-                    it.health = (getMobMaxHealth("nergigante_dragon") / 2)
+                FunctionPlot.spawnEntity(player, "dragon").also {
+                    it.health = (getMobMaxHealth("dragon") / 2)
                 }
             }
             2 -> {
@@ -149,11 +149,11 @@ object FunctionListener {
         }
     }
 
-    @SubscribeEvent
-    fun e(e: JARoleAttackEvent) {
-        val entity = e.victim ?: return
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun e(e: EntityDamageByEntityEvent) {
+        val entity = e.entity as? LivingEntity ?: return
+        val player = e.damager as? Player ?: return
         val entityHalfMaxHealth = getMobMaxHealth(entity) / 2
-        val player = e.player
         if (entity.name != "&6&l灭尽龙".colored()) return
         if (player.hasMetadata("NergiganteHalfHealth") && e.damage >= entity.health) {
             e.isCancelled = true

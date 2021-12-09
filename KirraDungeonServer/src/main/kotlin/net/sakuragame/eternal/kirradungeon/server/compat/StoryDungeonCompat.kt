@@ -26,7 +26,7 @@ object StoryDungeonCompat {
     @SubscribeEvent
     fun e(e: DungeonJoinEvent) {
         val player = e.player
-        if (player.inventory.contents.isEmpty()) {
+        if (player.inventory.contents.isEmpty() && e.dungeonId == "noobie_dungeon") {
             player.inventory.addItem(ZaphkielAPI.getItem("destoryer_sword")!!.rebuildToItemStack(player))
         }
     }

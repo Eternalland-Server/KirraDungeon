@@ -42,7 +42,7 @@ object FunctionPlot {
         startBound(player, getPlayerSpawnLoc(player))
         KirraDungeonPlot.skyAPI.changeSky(SkyChanger.wrapPlayer(player), SkyPacket.RAIN_LEVEL_CHANGE, 4f)
         submit(delay = 40) {
-            spawnEntity(player, "nergigante_dragon_dome")
+            spawnEntity(player, "dragon_dome")
         }
         submit(delay = 60) {
             PacketSender.sendPlaySound(player,
@@ -70,6 +70,7 @@ object FunctionPlot {
         player.profile().entityList.add(armorStand)
         player.teleport(loc)
         submit(delay = 8) {
+            PacketSender.setThirdPersonView(player, 1)
             player.gameMode = GameMode.SPECTATOR
             player.spectatorTarget = armorStand
         }
@@ -78,12 +79,13 @@ object FunctionPlot {
     fun endBound(player: Player) {
         player.spectatorTarget = null
         player.gameMode = GameMode.ADVENTURE
+        PacketSender.setThirdPersonView(player, 3)
     }
 
     fun playDome(player: Player) {
         dataRecycle(player)
         startBound(player, getPlayerSpawnLoc(player))
-        spawnEntity(player, "nergigante_dragon_dome")
+        spawnEntity(player, "dragon_dome")
     }
 
     fun spawnEntity(player: Player, entityType: String): LivingEntity {

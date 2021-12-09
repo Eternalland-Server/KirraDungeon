@@ -11,4 +11,4 @@ import taboolib.platform.type.BukkitProxyEvent
  * @author kirraObj
  * @since 2021/12/9 17:57
  */
-class DungeonJoinEvent(val player: Player, val playerZone: PlayerZone) : BukkitProxyEvent()
+class DungeonJoinEvent(val player: Player, val dungeonId: String, val playerZone: PlayerZone) : BukkitProxyEvent()
