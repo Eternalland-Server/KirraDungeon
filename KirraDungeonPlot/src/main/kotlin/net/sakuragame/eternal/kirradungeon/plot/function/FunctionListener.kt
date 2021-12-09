@@ -4,6 +4,7 @@ import com.sakuragame.eternal.justattribute.api.event.JARoleAttackEvent
 import eos.moe.armourers.api.DragonAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
+import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
@@ -74,6 +75,23 @@ object FunctionListener {
     }
 
     @SubscribeEvent
+    fun e(e: YamlSendFinishedEvent) {
+        val player = e.player
+        submit(delay = 10L) {
+            DragonAPI.setEntitySkin(player, listOf(
+                "冲田总司主手",
+                "冲田总司裤子",
+                "冲田总司上装",
+                "冲田总司翅膀",
+                "冲田总司头饰",
+                "冲田总司鞋子",
+                "冲田总司副手"))
+            BossBar.open(player, "&6&l灭尽龙", "", "black_sakura", 1.0, 300)
+            countDownMap[player.uniqueId] = 900
+        }
+    }
+
+    @SubscribeEvent
     fun e(e: EntityCombustEvent) {
         if (e.entity.name == "&6&l灭尽龙".colored()) {
             e.isCancelled = true
@@ -94,8 +112,7 @@ object FunctionListener {
     @SubscribeEvent
     fun e(e: NSFilmEndEvent) {
         val player = e.player
-        BossBar.close(player)
-        player.addNoobiePoints(0)
+        player.addNoobiePoints(1)
         KirraCoreBukkitAPI.teleportToSpawnServer(player)
     }
 
@@ -126,6 +143,7 @@ object FunctionListener {
                     NergiganteAPI.startEnd(e.player)
                     PacketSender.sendStopSound(player, FunctionPlot.battleThemeBgmId)
                     player.resetTitle()
+                    BossBar.close(player)
                 }
             }
         }
@@ -137,15 +155,6 @@ object FunctionListener {
         val entityHalfMaxHealth = getMobMaxHealth(entity) / 2
         val player = e.player
         if (entity.name != "&6&l灭尽龙".colored()) return
-        BossBar.setHealth(player, "&6&l灭尽龙", entity.health * 0.01)
-        if (!player.hasMetadata("NergiganteHalfHealth") && entity.health < entityHalfMaxHealth) {
-            player.setMetadata("NergiganteHalfHealth", FixedMetadataValue(KirraDungeonPlot.plugin, ""))
-            playDome(player)
-            submit(delay = 30) {
-                NergiganteAPI.startConversation(player, 1)
-            }
-            return
-        }
         if (player.hasMetadata("NergiganteHalfHealth") && e.damage >= entity.health) {
             e.isCancelled = true
             playDome(player)
@@ -153,6 +162,14 @@ object FunctionListener {
                 NergiganteAPI.startConversation(player, 2)
             }
             return
+        }
+        BossBar.setHealth(player, "&c&l${entity.health}".colored(), entity.health / getMobMaxHealth(entity))
+        if (!player.hasMetadata("NergiganteHalfHealth") && entity.health < entityHalfMaxHealth) {
+            player.setMetadata("NergiganteHalfHealth", FixedMetadataValue(KirraDungeonPlot.plugin, ""))
+            playDome(player)
+            submit(delay = 30) {
+                NergiganteAPI.startConversation(player, 1)
+            }
         }
     }
 
@@ -179,14 +196,5 @@ object FunctionListener {
     private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {
         player.profile().dungeonWorld = dungeonWorld
         FunctionPlot.start(player)
-        DragonAPI.setEntitySkin(player, listOf(
-            "冲田总司主手",
-            "冲田总司裤子",
-            "冲田总司上装",
-            "冲田总司翅膀",
-            "冲田总司头饰",
-            "冲田总司鞋子",
-            "冲田总司副手"))
-        BossBar.open(player, "&6&l灭尽龙", "", "black_sakura", 1.0)
     }
 }

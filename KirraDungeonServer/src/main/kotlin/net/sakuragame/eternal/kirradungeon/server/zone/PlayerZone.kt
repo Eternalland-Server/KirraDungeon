@@ -12,6 +12,7 @@ import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
+import net.sakuragame.eternal.kirradungeon.server.event.DungeonJoinEvent
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -24,12 +25,11 @@ import taboolib.module.chat.colored
 import taboolib.platform.util.sendLang
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.random.Random
 
 data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
 
-    val isClear = AtomicBoolean(false)
+    var isClear = false
 
     val createdTime = System.currentTimeMillis()
 
@@ -131,6 +131,7 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
                 playerZone.showJoinMessage(player)
                 playerZone.spawnEntities()
             }
+            DungeonJoinEvent(player, playerZone).call()
         }
     }
 
@@ -159,14 +160,11 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
     fun removeEntity(entityUUID: UUID) = need2KillEntityUUIDList.removeIf { it == entityUUID }
 
     // 是否可以通关.
-    fun canClear() = need2KillEntityUUIDList.isEmpty()
+    fun canClear() = need2KillEntityUUIDList.isEmpty() && !isClear
 
     // 执行通关操作.
     fun clear() {
-        if (isClear.get()) {
-            return
-        }
-        isClear.set(true)
+        isClear = true
         val players = mutableListOf<Player>()
         uuidList.forEach {
             val player = Bukkit.getPlayer(it) ?: return@forEach
@@ -222,6 +220,15 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
                 need2KillEntityUUIDList.add(entity.uniqueId)
             }
         }
+        // 检测是否有意外死亡并未计入事件的怪物.
+        submit(async = true, delay = 20L, period = 20L) {
+            need2KillEntityUUIDList.removeIf { Bukkit.getEntity(it) == null }
+            if (canClear()) {
+                clear()
+                cancel()
+                return@submit
+            }
+        }
     }
 
     init {
@@ -229,15 +236,6 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
         submit(async = true, delay = 1000) {
             if (canDelete()) {
                 delete()
-                cancel()
-                return@submit
-            }
-        }
-        // 检测是否有意外死亡并未计入事件的怪物.
-        submit(async = true, delay = 200L, period = 20L) {
-            need2KillEntityUUIDList.removeIf { Bukkit.getEntity(it) == null }
-            if (canClear()) {
-                clear()
                 cancel()
                 return@submit
             }

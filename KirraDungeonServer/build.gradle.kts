@@ -63,6 +63,8 @@ dependencies {
 
     compileOnly("biz.paluch.redis:lettuce:4.1.1.Final@jar")
 
+    compileOnly("ink.ptms:Zaphkiel:1.7.0@jar")
+
     compileOnly("ink.ptms.core:v11200:11200:all")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))

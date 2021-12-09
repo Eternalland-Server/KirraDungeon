@@ -5,6 +5,7 @@ import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
 import net.sakuragame.dungeonsystem.common.exception.DungeonServerRunOutException
 import net.sakuragame.dungeonsystem.common.exception.UnknownDungeonException
 import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
+import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneFee
@@ -74,6 +75,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
 
                 override fun handle(serverId: String, mapUUID: UUID) {
                     players.forEach {
+                        MessageAPI.sendActionTip(it, "&6&l➱ &e正在将您传送至副本: $name")
                         it.teleportToAnotherServer(serverId)
                     }
                 }
