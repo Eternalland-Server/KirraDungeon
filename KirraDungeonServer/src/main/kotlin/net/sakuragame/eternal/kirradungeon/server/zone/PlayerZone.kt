@@ -18,6 +18,7 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
@@ -80,14 +81,19 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
                 it.playDeathAnimation()
                 it.health = it.maxHealth
                 it.gameMode = GameMode.SPECTATOR
-                it.sendTitle("&c&l菜", "", 0, 40, 10)
+                it.sendTitle("&c&l菜".colored(), "", 0, 40, 10)
                 it.sendLang("message-player-dead-dungeon", playerZone.zone.name)
             }
-            // 以下开始执行一些神奇的操作... (例: 数秒后可复活, 复活币判断...)
-            // 如果队伍全灭.
-            if (playerZone.isAllDead()) {
-                playerZone.allEntityRegen2MaxHealth()
+            submit(delay = 40) {
+                KirraCoreBukkitAPI.teleportToSpawnServer(player)
             }
+        }
+
+        @SubscribeEvent
+        fun e(e: BlockBreakEvent) {
+            if (!e.player.profile().isChallenging) return
+            if (e.player.gameMode != GameMode.CREATIVE)
+            e.isCancelled = true
         }
 
         // 副本怪物死亡判断.
@@ -130,8 +136,8 @@ data class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) {
             submit(delay = 40) {
                 playerZone.showJoinMessage(player)
                 playerZone.spawnEntities()
+                DungeonJoinEvent(player, playerZone.zone.id, playerZone).call()
             }
-            DungeonJoinEvent(player, playerZone.zone.id, playerZone).call()
         }
     }
 

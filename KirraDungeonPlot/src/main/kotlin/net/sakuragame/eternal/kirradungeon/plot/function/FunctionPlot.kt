@@ -51,9 +51,9 @@ object FunctionPlot {
                 1f,
                 1f,
                 true,
-                player.location.x.toFloat(),
-                player.location.z.toFloat(),
-                player.location.z.toFloat()
+                0f,
+                0f,
+                0f
             )
             NergiganteAPI.startConversation(player, 0)
         }

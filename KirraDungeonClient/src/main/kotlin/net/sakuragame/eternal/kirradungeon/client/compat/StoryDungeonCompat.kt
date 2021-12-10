@@ -5,14 +5,24 @@ import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
 import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.entity.Player
+import taboolib.common5.Baffle
 import taboolib.platform.util.asLangTextList
 import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Suppress("SpellCheckingInspection")
 object StoryDungeonCompat {
 
+    val baffle by lazy {
+        Baffle.of(10, TimeUnit.SECONDS)
+    }
+
     fun join(player: Player): Boolean {
+        if (!baffle.hasNext(player.name)) {
+            return true
+        }
+        baffle.next(player.name)
         val serverId = DungeonClientAPI.getClientManager().queryServer("rpg-story")
         if (serverId == null) {
             handleJoinFailed(player)

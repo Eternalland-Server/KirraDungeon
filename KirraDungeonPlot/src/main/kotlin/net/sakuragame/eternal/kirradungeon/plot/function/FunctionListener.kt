@@ -1,6 +1,5 @@
 package net.sakuragame.eternal.kirradungeon.plot.function
 
-import eos.moe.armourers.api.DragonAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
@@ -38,6 +37,7 @@ import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.roundToInt
 
 /**
  * KirraPlotZone
@@ -80,14 +80,6 @@ object FunctionListener {
     fun e(e: YamlSendFinishedEvent) {
         val player = e.player
         submit(delay = 10L) {
-            DragonAPI.setEntitySkin(player, listOf(
-                "冲田总司主手",
-                "冲田总司裤子",
-                "冲田总司上装",
-                "冲田总司翅膀",
-                "冲田总司头饰",
-                "冲田总司鞋子",
-                "冲田总司副手"))
             BossBar.open(player, "&6&l灭尽龙", "", "black_sakura", 1.0, 900)
             countDownMap[player.uniqueId] = 900
         }
@@ -153,9 +145,10 @@ object FunctionListener {
     fun e(e: EntityDamageByEntityEvent) {
         val entity = e.entity as? LivingEntity ?: return
         val player = e.damager as? Player ?: return
-        val entityHalfMaxHealth = getMobMaxHealth(entity) / 2
+        val entityMaxHealth = getMobMaxHealth(entity)
+        val entityHalfMaxHealth = entityMaxHealth / 2
         if (entity.name != "&6&l灭尽龙".colored()) return
-        if (player.hasMetadata("NergiganteHalfHealth") && e.damage >= entity.health) {
+        if (player.hasMetadata("NergiganteHalfHealth") && e.damage + 1000 >= entity.health) {
             e.isCancelled = true
             playDome(player)
             submit(delay = 30) {
@@ -163,7 +156,7 @@ object FunctionListener {
             }
             return
         }
-        BossBar.setHealth(player, "&c&l${entity.health}".colored(), entity.health / getMobMaxHealth(entity))
+        BossBar.setHealth(player, "&c&l${entity.health.roundToInt()} / $entityMaxHealth".colored(), entity.health / entityMaxHealth)
         if (!player.hasMetadata("NergiganteHalfHealth") && entity.health < entityHalfMaxHealth) {
             player.setMetadata("NergiganteHalfHealth", FixedMetadataValue(KirraDungeonPlot.plugin, ""))
             playDome(player)
