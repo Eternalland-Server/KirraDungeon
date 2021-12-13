@@ -133,7 +133,6 @@ object FunctionListener {
                     player.removePotionEffect(PotionEffectType.BLINDNESS)
                     player.removePotionEffect(PotionEffectType.CONFUSION)
                     NergiganteAPI.startEnd(e.player)
-                    PacketSender.sendStopSound(player, FunctionPlot.battleThemeBgmId)
                     player.resetTitle()
                     BossBar.close(player)
                 }
@@ -152,6 +151,7 @@ object FunctionListener {
             e.isCancelled = true
             playDome(player)
             submit(delay = 30) {
+                PacketSender.sendStopSound(player, FunctionPlot.battleThemeBgmId)
                 NergiganteAPI.startConversation(player, 2)
             }
             return

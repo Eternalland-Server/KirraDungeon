@@ -48,7 +48,7 @@ object FunctionPlot {
             PacketSender.sendPlaySound(player,
                 battleThemeBgmId,
                 "bgms/nergigante_dragon_battle_theme.ogg",
-                1f,
+                0.5f,
                 1f,
                 true,
                 0f,
