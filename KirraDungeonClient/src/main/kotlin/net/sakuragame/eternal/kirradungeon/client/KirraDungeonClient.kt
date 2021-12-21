@@ -6,10 +6,17 @@ import net.sakuragame.serversystems.manage.api.redis.RedisManager
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import org.bukkit.Bukkit
 import taboolib.common.platform.Plugin
+import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.SecuredFile
 import taboolib.platform.BukkitPlugin
 import java.util.concurrent.TimeUnit
 
 object KirraDungeonClient : Plugin() {
+
+    @Config
+    lateinit var conf: Configuration
+        private set
 
     val plugin by lazy {
         BukkitPlugin.getInstance()

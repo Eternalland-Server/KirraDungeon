@@ -31,7 +31,7 @@ class Profile(val player: Player) {
 
         val profiles = mutableMapOf<String, Profile>()
 
-        fun Player.profile() = profiles.values.first { it.player.uniqueId == uniqueId }
+        fun Player.profile() = profiles.values.firstOrNull { it.player.uniqueId == uniqueId }
 
         @SubscribeEvent(priority = HIGHEST)
         fun e(e: PlayerJoinEvent) {
@@ -49,10 +49,9 @@ class Profile(val player: Player) {
         }
 
         private fun dataRecycle(player: Player) {
-            player.profile().apply {
-                submit(delay = 3L) {
-                    drop()
-                }
+            submit(delay = 3L) {
+                val profile = player.profile() ?: return@submit
+                profile.drop()
             }
         }
     }
@@ -65,9 +64,11 @@ class Profile(val player: Player) {
     }
 
     fun drop() {
+        if (dungeonWorld != null) {
+            DungeonServerAPI.getWorldManager().dropDungeon(dungeonWorld)
+        }
         player.removeMetadata("NergiganteHalfHealth", KirraDungeonPlot.plugin)
         player.removeMetadata("NergiganteClear", KirraDungeonPlot.plugin)
-        DungeonServerAPI.getWorldManager().dropDungeon(dungeonWorld)
         profiles.remove(player.name)
     }
 }

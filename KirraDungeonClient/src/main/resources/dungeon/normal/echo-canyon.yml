@@ -1,0 +1,78 @@
+settings:
+  priority: 3
+  name: "&f&l回音峡谷"
+  first:
+    icon: "ui/dungeon/icon/normal/echo_canyon/ruins_1"
+    name: "&f&l废墟之地"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✮✮✩✩
+        &f&l推荐战斗力: &a1,0000
+        &f&l入场费用: &e6,000 &rΓ&e (金币)
+
+        &4&l副本怪物: &e蛇娓.
+        &4&l怪物首领: &c吞天怪.
+        
+        &7&o废墟之地。
+      bg: "ui/dungeon/preview/normal/echo_canyon/ruins_1"
+    lock-by-progress: false
+    second:
+      icon: "ui/dungeon/icon/normal/echo_canyon/abandon_temple_2"
+      name: "&f&l遗弃殿堂"
+      description:
+        text: |-
+          &f&l副本难度: &e✮✮✮✮✩
+          &f&l推荐战斗力: &a1,1000
+          &f&l入场费用: &e7,000 &rΓ&e (金币)
+
+          &4&l副本怪物: &e墨天兽.
+          &4&l怪物首领: &c天狗.
+          
+          &7&o遗弃殿堂
+        bg: "ui/dungeon/preview/normal/echo_canyon/abandon_temple_2"
+      lock-by-progress: true
+    third:
+      icon: "ui/dungeon/icon/normal/echo_canyon/monster_factory_3"
+      name: "&f&l炼兽工厂"
+      description:
+        text: |-
+          &f&l副本难度: &e✮✩✩✩✩
+          &f&l推荐战斗力: &a1,2000
+          &f&l入场费用: &e8,000 &rΓ&e (金币)
+
+          &4&l副本怪物: &e钦原.
+          &4&l怪物首领: &c肥遗.
+          
+          &7&o炼兽工厂.
+        bg: "ui/dungeon/preview/normal/echo_canyon/monster_factory_3"
+      lock-by-progress: true
+    fourth:
+      icon: "ui/dungeon/icon/normal/echo_canyon/monster_research_place_4"
+      name: "&f&l异兽研究所"
+      description:
+        text: |-
+          &f&l副本难度: &e✮✮✩✩✩
+          &f&l推荐战斗力: &a8,000
+          &f&l入场费用: &e3,000 &rΓ&e (金币)
+
+          &4&l副本怪物: &e狸力.
+          &4&l怪物首领: &c朱厌.
+          
+          &7&o异兽研究所
+        bg: "ui/dungeon/preview/normal/echo_canyon/monster_research_place_4"
+      lock-by-progress: true
+    fifth:
+      icon: "ui/dungeon/icon/normal/echo_canyon/spirit_beast_forest_5"
+      name: "&f&l灵兽森林"
+      description:
+        text: |-
+          &f&l副本难度: &e✮✮✮✩✩
+          &f&l推荐战斗力: &a10,000
+          &f&l入场费用: &e5,000 &rΓ&e (金币)
+
+          &4&l副本怪物: &c竹竿精.
+          &4&l怪物首领: &c树妖.
+          
+          &7&o灵兽森林.
+        bg: "ui/dungeon/preview/normal/echo_canyon/spirit_beast_forest_5"
+      lock-by-progress: true

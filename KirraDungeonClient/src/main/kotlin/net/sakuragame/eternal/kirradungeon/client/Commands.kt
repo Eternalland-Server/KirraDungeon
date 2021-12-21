@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.client
 
 import net.sakuragame.eternal.kirradungeon.client.compat.StoryDungeonCompat
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.function.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirraparty.bukkit.party.Party
 import net.sakuragame.eternal.kirraparty.bukkit.party.Party.Companion.getParty
@@ -75,6 +76,13 @@ object Commands {
             Zone.zones.forEach {
                 sender.sendMessage("&a$it".colored())
             }
+        }
+    }
+
+    @CommandBody
+    val openUI = subCommand {
+        execute<Player> { player, _, _ ->
+            FunctionDungeon.openMainGUI(player)
         }
     }
 

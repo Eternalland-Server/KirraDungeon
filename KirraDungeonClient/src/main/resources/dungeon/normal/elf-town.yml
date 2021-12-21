@@ -1,0 +1,80 @@
+settings:
+  priority: 2
+  name: "&f&l精灵城镇"
+  first:
+    icon: "ui/dungeon/icon/normal/elf_town/noobie_plains_1"
+    name: "&f&l新手平原"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✩✩✩✩
+        &f&l推荐战斗力: &a10
+        &f&l入场费用: &e免费
+
+        &4&l副本怪物: &e绿蜗牛, 红蜗牛.
+        &4&l怪物首领: &c蜗牛王.
+        
+        &7&o蜗牛浓汤似乎是一顿不错的开胃菜,
+        &7&o只要你不嫌弃... 呃, 它们很黏糊糊的话.
+      bg: "ui/dungeon/preview/normal/elf_town/noobie_plains_1"
+    lock-by-progress: false
+    second:
+      icon: "ui/dungeon/icon/normal/elf_town/eternal_land_2"
+      name: "&f&l亘古平原"
+      description:
+        text: |-
+          &f&l副本难度: &e✮✩✩✩✩
+          &f&l推荐战斗力: &a5,000
+          &f&l入场费用: &e1,000 &rΓ&e (金币)
+
+          &4&l副本怪物: &e独角仙.
+          &4&l怪物首领: &c皇马蜂.
+          
+          &7&o在这里逐渐辉煌文明的人早已离去.
+          &7&o但他们留下的痕迹, 历经千年也不会消散.
+        bg: "ui/dungeon/preview/normal/elf_town/eternal_land_2"
+      lock-by-progress: true
+    third:
+      icon: "ui/dungeon/icon/normal/elf_town/branch_road_3"
+      name: "&f&l分岔路"
+      description:
+        text: |-
+          &f&l副本难度: &e✮✩✩✩✩
+          &f&l推荐战斗力: &a7,000
+          &f&l入场费用: &e2,000 &rΓ&e (金币)
+
+          &4&l副本怪物: &e精灵鹿
+          &4&l怪物首领: &c雪路
+          
+          &7&o分岔路口.
+        bg: "ui/dungeon/preview/normal/elf_town/branch_road_3"
+      lock-by-progress: true
+    fourth:
+      icon: "ui/dungeon/icon/normal/elf_town/plains_highland_4.png"
+      name: "&f&l平原高地"
+      description:
+        text: |-
+          &f&l副本难度: &e✮✮✩✩✩
+          &f&l推荐战斗力: &a8,000
+          &f&l入场费用: &e3,000 &rΓ&e (金币)
+
+          &4&l副本怪物: &c矮野人
+          &4&l怪物首领: &c兽野人
+          
+          &7&o平原高地
+        bg: "ui/dungeon/preview/normal/elf_town/plains_highland_4.png"
+      lock-by-progress: false
+    fifth:
+      icon: "ui/dungeon/icon/normal/elf_town/middle_break_road_5.png"
+      name: "&f&l中断之路"
+      description:
+        text: |-
+          &f&l副本难度: &e✮✮✮✩✩
+          &f&l推荐战斗力: &a9,000
+          &f&l入场费用: &e4,000 &rΓ&e (金币)
+
+          &4&l副本怪物: &c冠突龙
+          &4&l怪物首领: &c&l突击龙
+          
+          &7&o分岔路口.
+        bg: "ui/dungeon/preview/normal/elf_town/middle_break_road_5.png"
+      lock-by-progress: false

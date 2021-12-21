@@ -39,7 +39,7 @@ object FunctionPlot {
     }
 
     fun start(player: Player) {
-        startBound(player, getPlayerSpawnLoc(player))
+        startBound(player, getPlayerSpawnLoc(player) ?: return)
         KirraDungeonPlot.skyAPI.changeSky(SkyChanger.wrapPlayer(player), SkyPacket.RAIN_LEVEL_CHANGE, 4f)
         submit(delay = 40) {
             spawnEntity(player, "dragon_dome")
@@ -48,7 +48,7 @@ object FunctionPlot {
             PacketSender.sendPlaySound(player,
                 battleThemeBgmId,
                 "bgms/nergigante_dragon_battle_theme.ogg",
-                0.5f,
+                0.2f,
                 1f,
                 true,
                 0f,
@@ -59,15 +59,24 @@ object FunctionPlot {
         }
     }
 
-    fun getPlayerSpawnLoc(player: Player) = playerSpawnLoc.toBukkitLocation(player.profile().dungeonWorld.bukkitWorld)
+    fun getPlayerSpawnLoc(player: Player): Location? {
+        val profile = player.profile() ?: return null
+        return playerSpawnLoc.toBukkitLocation(profile.dungeonWorld.bukkitWorld)
+    }
 
-    fun getMobSpawnLoc(player: Player) = mobSpawnLoc.toBukkitLocation(player.profile().dungeonWorld.bukkitWorld)
+    fun getMobSpawnLoc(player: Player): Location? {
+        val profile = player.profile() ?: return null
+        return mobSpawnLoc.toBukkitLocation(profile.dungeonWorld.bukkitWorld)
+    }
 
-    fun dataRecycle(player: Player) = player.profile().removeAllEntities()
+    fun dataRecycle(player: Player) {
+        player.profile()?.removeAllEntities()
+    }
 
     fun startBound(player: Player, loc: Location) {
         val armorStand = spawnArmorStand(loc)
-        player.profile().entityList.add(armorStand)
+        val profile = player.profile() ?: return
+        profile.entityList.add(armorStand)
         player.teleport(loc)
         submit(delay = 8) {
             PacketSender.setThirdPersonView(player, 1)
@@ -84,13 +93,14 @@ object FunctionPlot {
 
     fun playDome(player: Player) {
         dataRecycle(player)
-        startBound(player, getPlayerSpawnLoc(player))
+        startBound(player, getPlayerSpawnLoc(player) ?: return)
         spawnEntity(player, "dragon_dome")
     }
 
-    fun spawnEntity(player: Player, entityType: String): LivingEntity {
+    fun spawnEntity(player: Player, entityType: String): LivingEntity? {
         val entity = KirraDungeonPlot.mythicmobsAPI.spawnMythicMob(entityType, getMobSpawnLoc(player)) as LivingEntity
-        player.profile().entityList.add(entity)
+        val profile = player.profile() ?: return null
+        profile.entityList.add(entity)
         return entity
     }
 

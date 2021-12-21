@@ -80,14 +80,14 @@ object FunctionListener {
     fun e(e: YamlSendFinishedEvent) {
         val player = e.player
         submit(delay = 10L) {
-            BossBar.open(player, "&6&l灭尽龙", "", "black_sakura", 1.0, 900)
+            BossBar.open(player, "&6&l位面吞噬者", "", "black_sakura", 1.0, 900)
             countDownMap[player.uniqueId] = 900
         }
     }
 
     @SubscribeEvent
     fun e(e: EntityCombustEvent) {
-        if (e.entity.name == "&6&l灭尽龙".colored()) {
+        if (e.entity.name == "&6&l位面吞噬者".colored()) {
             e.isCancelled = true
         }
     }
@@ -118,13 +118,13 @@ object FunctionListener {
                 FunctionPlot.endBound(player)
                 FunctionPlot.dataRecycle(player)
                 FunctionPlot.spawnEntity(player, "dragon")
-                FunctionPlot.showJoinHud(player, "&c&l战胜灭尽龙")
+                FunctionPlot.showJoinHud(player, "&c&l战胜位面吞噬者")
             }
             1 -> {
                 FunctionPlot.endBound(player)
                 FunctionPlot.dataRecycle(player)
                 FunctionPlot.spawnEntity(player, "dragon").also {
-                    it.health = (getMobMaxHealth("dragon") / 2)
+                    it?.health = (getMobMaxHealth("dragon") / 2)
                 }
             }
             2 -> {
@@ -146,7 +146,7 @@ object FunctionListener {
         val player = e.damager as? Player ?: return
         val entityMaxHealth = getMobMaxHealth(entity)
         val entityHalfMaxHealth = entityMaxHealth / 2
-        if (entity.name != "&6&l灭尽龙".colored()) return
+        if (entity.name != "&6&l位面吞噬者".colored()) return
         if (player.hasMetadata("NergiganteHalfHealth") && e.damage + 1000 >= entity.health) {
             e.isCancelled = true
             playDome(player)
@@ -187,7 +187,8 @@ object FunctionListener {
     }
 
     private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {
-        player.profile().dungeonWorld = dungeonWorld
+        val profile = player.profile() ?: return
+        profile.dungeonWorld = dungeonWorld
         FunctionPlot.start(player)
     }
 }
