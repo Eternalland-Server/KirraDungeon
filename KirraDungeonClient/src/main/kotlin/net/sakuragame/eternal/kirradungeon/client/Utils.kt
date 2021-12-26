@@ -13,3 +13,5 @@ private val date by lazy {
 }
 
 fun getTodayTimeUnix() = date
+
+fun log(message: String) = Bukkit.getConsoleSender().sendMessage("[KirraDungeonClient] $message")

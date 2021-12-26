@@ -11,5 +11,5 @@ package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data
  *
  */
 enum class DungeonCategory {
-    NORMAL, TEAM, ACTIVITY, SPECIAL
+    NORMAL, TEAM, ACTIVITY, SPECIAL;
 }

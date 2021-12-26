@@ -1,0 +1,6 @@
+settings:
+  dungeon:
+    normal-display: "&f&l常规副本"
+    team-display: "&f&l团队副本"
+    activity-display: "&f&l活动副本"
+    special-display: "&f&l特殊副本"
