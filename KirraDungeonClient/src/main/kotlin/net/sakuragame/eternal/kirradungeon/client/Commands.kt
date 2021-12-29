@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.client
 
 import net.sakuragame.eternal.kirradungeon.client.compat.StoryDungeonCompat
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonLoader
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.function.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirraparty.bukkit.party.Party
@@ -90,6 +91,7 @@ object Commands {
     val reload = subCommand {
         execute<CommandSender> { sender, _, _ ->
             Zone.load()
+            DungeonLoader.i()
             sender.sendMessage("&7已重载.".colored())
             return@execute
         }

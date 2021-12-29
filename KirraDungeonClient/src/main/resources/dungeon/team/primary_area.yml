@@ -1,6 +1,6 @@
 settings:
-  priority: 4
-  name: "&f&l精灵城镇"
+  priority: 5
+  name: "&f&l初级区域"
   map-bg: "ui/dungeon/map/normal_dungeon.png"
   first:
     icon: "ui/dungeon/icon/normal/elf_town/noobie_plains_1"
@@ -55,37 +55,3 @@ settings:
     frame-visible: true
     is-single: false
     lock-by-progress: true
-  fourth:
-    icon: "ui/dungeon/icon/normal/elf_town/plains_highland_4.png"
-    name: "&f&l平原高地"
-    description:
-      text: |-
-        &f&l副本难度: &e✮✮✩✩✩
-        &f&l推荐战斗力: &a8,000
-        &f&l入场费用: &e3,000 &rΓ&e (金币)
-        
-        &4&l副本怪物: &c矮野人
-        &4&l怪物首领: &c兽野人
-        
-        &7&o平原高地
-      bg: "ui/dungeon/preview/normal/elf_town/plains_highland_4.png"
-    frame-visible: true
-    is-single: false
-    lock-by-progress: false
-  fifth:
-    icon: "ui/dungeon/icon/normal/elf_town/middle_break_road_5.png"
-    name: "&f&l中断之路"
-    description:
-      text: |-
-        &f&l副本难度: &e✮✮✮✩✩
-        &f&l推荐战斗力: &a9,000
-        &f&l入场费用: &e4,000 &rΓ&e (金币)
-        
-        &4&l副本怪物: &c冠突龙
-        &4&l怪物首领: &c&l突击龙
-        
-        &7&o分岔路口.
-      bg: "ui/dungeon/preview/normal/elf_town/middle_break_road_5.png"
-    frame-visible: true
-    is-single: false
-    lock-by-progress: false

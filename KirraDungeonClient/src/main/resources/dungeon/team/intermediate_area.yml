@@ -1,0 +1,55 @@
+settings:
+  priority: 4
+  name: "&f&l中级区域"
+  map-bg: "ui/dungeon/map/normal_dungeon.png"
+  first:
+    icon: "ui/dungeon/icon/normal/elf_town/plains_highland_4.png"
+    name: "&f&l平原高地"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✮✩✩✩
+        &f&l推荐战斗力: &a8,000
+        &f&l入场费用: &e3,000 &rΓ&e (金币)
+        
+        &4&l副本怪物: &c矮野人
+        &4&l怪物首领: &c兽野人
+        
+        &7&o平原高地
+      bg: "ui/dungeon/preview/normal/elf_town/plains_highland_4.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: false
+  second:
+    icon: "ui/dungeon/icon/normal/elf_town/middle_break_road_5.png"
+    name: "&f&l中断之路"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✮✮✩✩
+        &f&l推荐战斗力: &a9,000
+        &f&l入场费用: &e4,000 &rΓ&e (金币)
+        
+        &4&l副本怪物: &c冠突龙
+        &4&l怪物首领: &c&l突击龙
+        
+        &7&o分岔路口.
+      bg: "ui/dungeon/preview/normal/elf_town/middle_break_road_5.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: false
+  third:
+    icon: "ui/dungeon/icon/normal/echo_canyon/ruins_1"
+    name: "&f&l废墟之地"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✮✮✩✩
+        &f&l推荐战斗力: &a1,0000
+        &f&l入场费用: &e6,000 &rΓ&e (金币)
+
+        &4&l副本怪物: &e蛇娓.
+        &4&l怪物首领: &c吞天怪.
+        
+        &7&o废墟之地。
+      bg: "ui/dungeon/preview/normal/echo_canyon/ruins_1"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: false

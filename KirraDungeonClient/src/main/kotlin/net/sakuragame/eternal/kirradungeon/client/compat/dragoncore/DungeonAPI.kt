@@ -8,12 +8,12 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.
 object DungeonAPI {
 
     enum class ParamType {
-        UPDATE, JOIN
+        UPDATE, JOIN, CLOSE
     }
 
     fun getDefaultScreen() = DungeonLoader.normalParentScreen[0]!!
 
-    fun getDefaultSubScreen() = DungeonLoader.normalParentScreen[0].dungeonSubScreens[0]!!
+    fun getDefaultSubScreen(screen: DungeonScreen) = screen.dungeonSubScreens[0]!!
 
     fun getPluginParams(type: ParamType = ParamType.UPDATE) = SubmitParams().apply {
         addValue(KirraDungeonClient.plugin.name)

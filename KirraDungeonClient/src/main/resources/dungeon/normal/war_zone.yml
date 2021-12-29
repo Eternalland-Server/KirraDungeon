@@ -1,0 +1,16 @@
+settings:
+  priority: 4
+  name: "&f&l上古战场"
+  map-bg: "ui/dungeon/map/spawn.png"
+  first:
+    icon: "ui/dungeon/icon/general/sign.png"
+    name: "&6&l上古战场"
+    description:
+      text: |-
+        &7&o相当多的秘密隐藏在这里...
+        &7&o相当多的秘密隐藏在这里...
+        &7&o相当多的秘密隐藏在这里...
+      bg: "ui/dungeon/preview/spawn.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: false

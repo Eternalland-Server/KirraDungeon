@@ -32,19 +32,31 @@ object DungeonLoader {
     val teamParentScreen = arrayListOf<DungeonScreen>()
 
     @Awake(LifeCycle.ENABLE)
-    fun i() = submit(async = true) {
-        // 读取常规界面.
-        log("-- 正在读取常规界面...")
-        read(DungeonCategory.NORMAL)
-        // 读取团队界面.
-        log("-- 正在读取团队界面...")
-        read(DungeonCategory.TEAM)
-        // 读取活动界面.
-        log("-- 正在读取活动界面...")
-        read(DungeonCategory.ACTIVITY)
-        // 读取特殊界面.
-        log("-- 正在读取特殊界面...")
-        read(DungeonCategory.SPECIAL)
+    fun i() {
+        submit(async = true) {
+            // 清理变量.
+            log("-- 正在清理变量...")
+            clear()
+            // 读取常规界面.
+            log("-- 正在读取常规界面...")
+            read(DungeonCategory.NORMAL)
+            // 读取团队界面.
+            log("-- 正在读取团队界面...")
+            read(DungeonCategory.TEAM)
+            // 读取活动界面.
+            log("-- 正在读取活动界面...")
+            read(DungeonCategory.ACTIVITY)
+            // 读取特殊界面.
+            log("-- 正在读取特殊界面...")
+            read(DungeonCategory.SPECIAL)
+        }
+    }
+
+    fun clear() {
+        normalParentScreen.clear()
+        activityParentScreen.clear()
+        specialParentScreen.clear()
+        teamParentScreen.clear()
     }
 
     private fun read(category: DungeonCategory) {
@@ -96,12 +108,14 @@ object DungeonLoader {
         val frameVisible = section.getBoolean("frame-visible")
         val isSingle = section.getBoolean("is-single")
         val lockedByProgress = section.getBoolean("lock-by-progress")
+        val forceLock = section.getBoolean("force-lock", false)
         return DungeonSubScreen(
             name,
             iconPath,
             description,
             frameVisible = frameVisible,
             lockedByProgress = lockedByProgress,
+            forceLock = forceLock,
             isSingle = isSingle
         )
     }

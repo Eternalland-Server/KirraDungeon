@@ -22,3 +22,4 @@ message-unknown-dungeon-exception:
   - "&4&l➱ &c未知的副本名, 请向管理员反馈!"
 message-dungeon-server-ran-out-exception:
   - "&4&l➱ &c没有可用的副本服务器, 请向管理员反馈"
+message-screen-went-wrong-exception: "&4&l➱ &c切换界面时出现了一个错误, 请向管理员反馈."

@@ -1,6 +1,6 @@
 settings:
   priority: 5
-  name: "&f&l废弃之地"
+  name: "&f&l亘古主城"
   map-bg: "ui/dungeon/map/spawn.png"
   first:
     icon: "ui/dungeon/icon/general/sign.png"
@@ -62,3 +62,4 @@ settings:
     frame-visible: false
     is-single: true
     lock-by-progress: false
+    force-lock: true

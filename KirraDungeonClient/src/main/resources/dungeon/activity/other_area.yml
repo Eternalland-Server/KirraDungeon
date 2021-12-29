@@ -1,8 +1,25 @@
 settings:
-  priority: 2
-  name: "&f&l回音峡谷"
+  priority: 4
+  name: "&f&l其他区域"
   map-bg: "ui/dungeon/map/final_dungeon.png"
   first:
+    icon: "ui/dungeon/icon/normal/echo_canyon/spirit_beast_forest_5"
+    name: "&f&l灵兽森林"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✮✮✩✩
+        &f&l推荐战斗力: &a10,000
+        &f&l入场费用: &e5,000 &rΓ&e (金币)
+        
+        &4&l副本怪物: &c竹竿精.
+        &4&l怪物首领: &c树妖.
+        
+        &7&o灵兽森林.
+      bg: "ui/dungeon/preview/normal/echo_canyon/spirit_beast_forest_5"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: true
+  second:
     icon: "ui/dungeon/icon/normal/mirai_city/spirit_beast_palace_1"
     name: "&f&l灵兽殿堂"
     description:
@@ -19,7 +36,7 @@ settings:
     frame-visible: true
     is-single: false
     lock-by-progress: false
-  second:
+  third:
     icon: "ui/dungeon/icon/normal/mirai_city/colosseum_2"
     name: "&f&l斗兽台"
     description:
@@ -36,7 +53,7 @@ settings:
     frame-visible: true
     is-single: false
     lock-by-progress: true
-  third:
+  fourth:
     icon: "ui/dungeon/icon/normal/mirai_city/beast_jail_3"
     name: "&f&l异兽牢笼"
     description:
@@ -53,27 +70,3 @@ settings:
     frame-visible: true
     is-single: false
     lock-by-progress: true
-  fourth:
-    icon: "ui/dungeon/icon/general/sign_locked.png"
-    name: "&7&o暂未解锁 (???)"
-    description:
-      text: |-
-        &7&o相当多的秘密隐藏在这里...
-        &7&o相当多的秘密隐藏在这里...
-        &7&o相当多的秘密隐藏在这里...
-      bg: "ui/dungeon/preview/spawn.png"
-    frame-visible: true
-    is-single: false
-    lock-by-progress: false
-  fifth:
-    icon: "ui/dungeon/icon/general/sign_locked.png"
-    name: "&7&o暂未解锁 (???)"
-    description:
-      text: |-
-        &7&o相当多的秘密隐藏在这里...
-        &7&o相当多的秘密隐藏在这里...
-        &7&o相当多的秘密隐藏在这里...
-      bg: "ui/dungeon/preview/spawn.png"
-    frame-visible: true
-    is-single: false
-    lock-by-progress: false

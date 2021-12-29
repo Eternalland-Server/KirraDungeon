@@ -6,6 +6,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.*
 import org.bukkit.entity.Player
+import taboolib.common.platform.function.submit
 
 object FunctionDungeon {
 
@@ -31,6 +32,8 @@ object FunctionDungeon {
         if (needInitStatements) {
             PacketSender.sendRunFunction(player, "default", initStatements, false)
         }
-        PacketSender.sendOpenGui(player, Dungeon.screenId)
+        submit(async = true, delay = 3) {
+            PacketSender.sendOpenGui(player, Dungeon.screenId)
+        }
     }
 }
