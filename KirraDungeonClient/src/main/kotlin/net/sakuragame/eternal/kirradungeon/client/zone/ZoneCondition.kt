@@ -15,6 +15,7 @@ data class ZoneCondition(
     val dailyCounts: Int,
     val feeToTypeMap: MutableMap<String, Double>,
     val itemIDToAmountMap: MutableMap<String, Int>,
+    val number: Int
 ) {
 
     companion object {

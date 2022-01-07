@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.client.zone
 
+import net.sakuragame.eternal.gemseconomy.currency.EternalCurrency
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerKickEvent
@@ -11,7 +12,7 @@ class ZoneWithDraw {
 
     companion object {
 
-        val gemsMap = mutableMapOf<UUID, MutableMap<String, Double>>()
+        val gemsMap = mutableMapOf<UUID, MutableMap<EternalCurrency, Double>>()
 
         val itemsMap = mutableMapOf<UUID, MutableMap<String, Int>>()
 

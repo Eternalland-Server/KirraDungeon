@@ -6,6 +6,7 @@ import com.taylorswiftcn.megumi.uifactory.generate.ui.screen.ScreenUI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
+import org.bukkit.entity.Player
 
 /**
  * 副本分类显示实现层.
@@ -15,7 +16,7 @@ object DungeonCategory : IScreen {
     override val screenId: String
         get() = "dungeon_category"
 
-    override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen): ScreenUI {
+    override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen, player: Player): ScreenUI {
         return ScreenUI(screenId)
             .addComponent(TextureComp("category_normal_bg",
                 "(global.dungeon_category == 1) ? 'ui/dungeon/category/selected.png' : 'ui/dungeon/category/unselected.png'")
@@ -23,6 +24,8 @@ object DungeonCategory : IScreen {
                 .setWidth("(global.dungeon_category == 1) ? '79' : '61'")
                 .setHeight("46")
                 .addAction(ActionType.Left_Click, "global.dungeon_category = 1;")
+                .addAction(ActionType.Left_Click, "global.dungeon_sub_category = 1;")
+                .addAction(ActionType.Left_Click, "global.global_current_selected = 1;")
                 .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams())
             )
             .addComponent(TextureComp("category_normal_text", "ui/dungeon/category/normal_text.png")
@@ -45,6 +48,8 @@ object DungeonCategory : IScreen {
                 .setWidth("(global.dungeon_category == 2) ? '79' : '61'")
                 .setHeight("46")
                 .addAction(ActionType.Left_Click, "global.dungeon_category = 2;")
+                .addAction(ActionType.Left_Click, "global.dungeon_sub_category = 1;")
+                .addAction(ActionType.Left_Click, "global.global_current_selected = 1;")
                 .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams())
             )
             .addComponent(TextureComp("category_team_text", "ui/dungeon/category/team_text.png")
@@ -67,6 +72,8 @@ object DungeonCategory : IScreen {
                 .setWidth("(global.dungeon_category == 3) ? '79' : '61'")
                 .setHeight("46")
                 .addAction(ActionType.Left_Click, "global.dungeon_category = 3;")
+                .addAction(ActionType.Left_Click, "global.dungeon_sub_category = 1;")
+                .addAction(ActionType.Left_Click, "global.global_current_selected = 1;")
                 .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams())
             )
             .addComponent(TextureComp("category_activity_text", "ui/dungeon/category/activity_text.png")
@@ -89,6 +96,8 @@ object DungeonCategory : IScreen {
                 .setWidth("(global.dungeon_category == 4) ? '79' : '61'")
                 .setHeight("46")
                 .addAction(ActionType.Left_Click, "global.dungeon_category = 4;")
+                .addAction(ActionType.Left_Click, "global.dungeon_sub_category = 1;")
+                .addAction(ActionType.Left_Click, "global.global_current_selected = 1;")
                 .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams())
             )
             .addComponent(TextureComp("category_special_text", "ui/dungeon/category/special_text.png")

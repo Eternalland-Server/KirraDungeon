@@ -17,9 +17,9 @@ interface IScreen {
     val screenId: String
 
     fun send(player: Player, screen: DungeonScreen, subScreen: DungeonSubScreen) {
-        val screenYaml = build2Screen(screen, subScreen).build(player)
+        val screenYaml = build2Screen(screen, subScreen, player).build(player)
         PacketSender.sendYaml(player, FolderType.Gui, screenId, screenYaml)
     }
 
-    fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen): ScreenUI
+    fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen, player: Player): ScreenUI
 }

@@ -1,0 +1,52 @@
+settings:
+  priority: 4
+  name: "&f&l素材区域"
+  map-bg: "ui/dungeon/map/normal_dungeon.png"
+  first:
+    icon: "ui/dungeon/icon/material.png"
+    name: "&f&l材料工厂"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✩✩✩✩
+        &f&l推荐战斗力: &a10
+        &f&l入场费用: &e免费
+
+        &4&l副本怪物: &c矮野人
+        
+        &7&o材料工厂.
+      bg: "ui/dungeon/preview/spawn.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: false
+  second:
+    icon: "ui/dungeon/icon/material.png"
+    name: "&f&l材料工厂 (经验)"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✩✩✩✩
+        &f&l推荐战斗力: &a5,000
+        &f&l入场费用: &e1,000 &rΓ&e (金币)
+        
+        &4&l副本怪物: &c矮野人
+        
+        &7&o材料工厂 (经验)
+      bg: "ui/dungeon/preview/spawn.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: true
+  third:
+    icon: "ui/dungeon/icon/material.png"
+    name: "&f&l特殊副本 (金币)"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✩✩✩✩
+        &f&l推荐战斗力: &a5,000
+        &f&l入场费用: &e1,000 &rΓ&e (金币)
+        
+        &4&l副本怪物: &c兽野人
+        
+        &7&o特殊副本 (金币)
+      bg: "ui/dungeon/preview/spawn.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: true

@@ -7,6 +7,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.getParentScreen
+import org.bukkit.entity.Player
 import taboolib.module.chat.colored
 
 /**
@@ -19,7 +20,7 @@ object DungeonRegion : IScreen {
 
     private val notOpenText = "&f&l暂未开放".colored()
 
-    override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen): ScreenUI {
+    override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen, player: Player): ScreenUI {
         return ScreenUI(screenId).apply {
             for (index in 1..5) {
                 addRegion(index, screen)

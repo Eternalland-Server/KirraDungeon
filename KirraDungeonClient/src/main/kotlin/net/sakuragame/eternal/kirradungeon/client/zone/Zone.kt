@@ -5,16 +5,18 @@ import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
 import net.sakuragame.dungeonsystem.common.exception.DungeonServerRunOutException
 import net.sakuragame.dungeonsystem.common.exception.UnknownDungeonException
 import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
-import net.sakuragame.eternal.justmessage.api.MessageAPI
+import net.sakuragame.eternal.gemseconomy.api.GemsEconomyAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
+import net.sakuragame.eternal.kirradungeon.client.zone.util.getSymbolByIndex
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneFee
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneItems
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
+import taboolib.common.platform.function.submit
+import taboolib.module.chat.colored
 import taboolib.platform.util.*
 import java.util.*
 
@@ -61,21 +63,36 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
                 return
             }
             val playerSet = LinkedHashSet<Player>().also { it.addAll(players) }
+            var index = 0
+            val teleportRunnable = submit(async = true, delay = 0L, period = 10L) {
+                players.forEach {
+                    if (!it.isOnline) {
+                        cancel()
+                        return@submit
+                    }
+                    index++
+                    if (index >= 4) index = 0
+                    it.sendTitle("", "&6&l➱ &e正在前往: $name &7${getSymbolByIndex(index)}".colored(), 0, 20, 0)
+                }
+            }
             DungeonClientAPI.getClientManager().queryDungeon(name, serverId, playerSet, object : MapRequestHandler() {
 
-                override fun onTimeout(serverId: String) =
+                override fun onTimeout(serverId: String) {
+                    teleportRunnable.cancel()
                     players.forEach {
                         it.sendLang("message-dungeon-create-timed-out", serverId)
                     }
+                }
 
-                override fun onTeleportTimeout(serverID: String) =
+                override fun onTeleportTimeout(serverID: String) {
+                    teleportRunnable.cancel()
                     players.forEach {
                         it.sendLang("message-dungeon-teleport-timed-out", serverID)
                     }
+                }
 
                 override fun handle(serverId: String, mapUUID: UUID) {
                     players.forEach {
-                        MessageAPI.sendActionTip(it, "&6&l➱ &e正在将您传送至副本: $name")
                         it.teleportToAnotherServer(serverId)
                     }
                 }
@@ -105,7 +122,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
             val feeMap = it.getZoneFee(this@Zone)
             if (feeMap.isEmpty()) return true
             feeMap.forEach mapForeach@{ mapFee ->
-                val playerBal = KirraCoreBukkitAPI.getBalance(it, mapFee.key) ?: return@mapForeach
+                val playerBal = GemsEconomyAPI.getBalance(it.uniqueId, mapFee.key)
                 if (playerBal >= mapFee.value) {
                     if (ZoneWithDraw.gemsMap.containsKey(it.uniqueId)) {
                         ZoneWithDraw.gemsMap[it.uniqueId]!![mapFee.key] = mapFee.value
@@ -167,7 +184,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
             if (ZoneWithDraw.gemsMap.containsKey(player.uniqueId)) {
                 val gemPairList = ZoneWithDraw.gemsMap[player.uniqueId]!!
                 gemPairList.forEach {
-                    KirraCoreBukkitAPI.withDraw(player, it.value, it.key)
+                    GemsEconomyAPI.withdraw(player.uniqueId, it.value, it.key)
                 }
             }
             ZoneWithDraw.recycleVars(player)

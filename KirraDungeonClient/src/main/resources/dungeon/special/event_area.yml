@@ -1,0 +1,21 @@
+settings:
+  priority: 3
+  name: "&f&l练级区域"
+  map-bg: "ui/dungeon/map/normal_dungeon.png"
+  first:
+    icon: "ui/dungeon/icon/monster_attack_castle.png"
+    name: "&f&l怪物攻城"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✩✩✩✩
+        &f&l推荐战斗力: &a10
+        &f&l入场费用: &e免费
+
+        &4&l副本怪物: &c突击龙
+        &4&l怪物首领: &c灭尽龙
+        
+        &7&o怪物攻城.
+      bg: "ui/dungeon/preview/spawn.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: false

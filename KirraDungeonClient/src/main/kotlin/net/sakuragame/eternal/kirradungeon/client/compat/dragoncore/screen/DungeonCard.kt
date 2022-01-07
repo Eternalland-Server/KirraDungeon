@@ -8,6 +8,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.JOIN
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
+import org.bukkit.entity.Player
 
 
 /**
@@ -18,7 +19,7 @@ object DungeonCard : IScreen {
     override val screenId: String
         get() = "dungeon_card"
 
-    override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen): ScreenUI {
+    override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen, player: Player): ScreenUI {
         return ScreenUI(screenId).apply {
             addComponent(TextureComp("card_title")
                 .setText(subScreen.name)

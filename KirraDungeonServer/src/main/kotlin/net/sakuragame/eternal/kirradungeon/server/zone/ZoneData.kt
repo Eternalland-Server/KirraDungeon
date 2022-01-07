@@ -1,30 +1,27 @@
 package net.sakuragame.eternal.kirradungeon.server.zone
 
-import com.dscalzi.skychanger.core.api.SkyPacket
+import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneMonsterData
+import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 
 /**
- * KirraDungeons
- * net.sakuragame.KirraDungeons.server.zone.ZoneData
+ * 副本数据.
  *
- * @author kirraObj
- * @since 2021/11/8 9:26
+ * @property type 副本类型.
+ * @property maxLastTime 最多攻克副本的时间. (秒数)
+ * @property monsterData 怪物数据.
+ * @property spawnLoc 玩家出生坐标.
+ * @property zoneSkyData 天空数据.
+ *
  */
 data class ZoneData(
-    val entityMap: MutableMap<ZoneLocation, ZoneEntityPair>,
+    val type: ZoneType,
+    val maxLastTime: Int,
+    val monsterData: ZoneMonsterData,
     val spawnLoc: ZoneLocation,
-    val skyData: ZoneSkyData? = null,
+    val zoneSkyData: ZoneSkyData? = null,
+    val number: Int,
+    val iconNumber: Int
 ) {
 
-    fun isCustomSkyEnabled() = this.skyData != null
-
-    companion object {
-
-        data class ZoneEntityPair(val mobType: String, val amount: Int)
-
-        data class ZoneSkyData(val packetType: SkyPacket, val value: Float) {
-
-            override fun toString() = "${packetType.value}, $value"
-        }
-    }
+    fun isCustomSkyEnabled() = this.zoneSkyData != null
 }
-

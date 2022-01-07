@@ -1,0 +1,36 @@
+settings:
+  priority: 5
+  name: "&f&l练级区域"
+  map-bg: "ui/dungeon/map/normal_dungeon.png"
+  first:
+    icon: "ui/dungeon/icon/leveling.png"
+    name: "&f&l城邦边缘"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✩✩✩✩
+        &f&l推荐战斗力: &a10
+        &f&l入场费用: &e免费
+
+        &4&l副本怪物: &c矮野人
+        
+        &7&o城邦边缘.
+      bg: "ui/dungeon/preview/spawn.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: false
+  second:
+    icon: "ui/dungeon/icon/leveling.png"
+    name: "&f&l魔法密林"
+    description:
+      text: |-
+        &f&l副本难度: &e✮✩✩✩✩
+        &f&l推荐战斗力: &a5,000
+        &f&l入场费用: &e1,000 &rΓ&e (金币)
+        
+        &4&l副本怪物: &c矮野人
+        
+        &7&o魔法密林
+      bg: "ui/dungeon/preview/spawn.png"
+    frame-visible: true
+    is-single: false
+    lock-by-progress: true

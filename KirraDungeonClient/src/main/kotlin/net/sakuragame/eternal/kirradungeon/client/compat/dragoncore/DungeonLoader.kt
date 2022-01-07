@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore
 
+import net.sakuragame.eternal.dragoncore.api.CoreAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
@@ -49,6 +50,9 @@ object DungeonLoader {
             // 读取特殊界面.
             log("-- 正在读取特殊界面...")
             read(DungeonCategory.SPECIAL)
+            // 注册按键.
+            log("-- 正在注册按键...")
+            CoreAPI.registerKey(DungeonAPI.triggerKey)
         }
     }
 
@@ -109,6 +113,7 @@ object DungeonLoader {
         val isSingle = section.getBoolean("is-single")
         val lockedByProgress = section.getBoolean("lock-by-progress")
         val forceLock = section.getBoolean("force-lock", false)
+        val dungeonId = section.getString("dungeon-id")
         return DungeonSubScreen(
             name,
             iconPath,
@@ -116,7 +121,8 @@ object DungeonLoader {
             frameVisible = frameVisible,
             lockedByProgress = lockedByProgress,
             forceLock = forceLock,
-            isSingle = isSingle
+            isSingle = isSingle,
+            dungeonId = dungeonId
         )
     }
 }

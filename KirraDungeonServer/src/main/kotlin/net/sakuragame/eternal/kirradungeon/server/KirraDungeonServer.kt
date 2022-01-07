@@ -6,7 +6,6 @@ import io.lumine.xikage.mythicmobs.MythicMobs
 import net.sakuragame.serversystems.manage.api.redis.RedisManager
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import taboolib.common.platform.Plugin
-import taboolib.common.platform.function.getDataFolder
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type

@@ -4,8 +4,11 @@ import com.taylorswiftcn.megumi.uifactory.generate.function.SubmitParams
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
 
 object DungeonAPI {
+
+    const val triggerKey = "K"
 
     enum class ParamType {
         UPDATE, JOIN, CLOSE
@@ -13,7 +16,10 @@ object DungeonAPI {
 
     fun getDefaultScreen() = DungeonLoader.normalParentScreen[0]!!
 
-    fun getDefaultSubScreen(screen: DungeonScreen) = screen.dungeonSubScreens[0]!!
+    fun getDefaultSubScreen(screen: DungeonScreen?): DungeonSubScreen {
+        if (screen == null) return getDefaultScreen().dungeonSubScreens[0]!!
+        return screen.dungeonSubScreens[0]!!
+    }
 
     fun getPluginParams(type: ParamType = ParamType.UPDATE) = SubmitParams().apply {
         addValue(KirraDungeonClient.plugin.name)
@@ -34,5 +40,9 @@ object DungeonAPI {
     fun getDungeonScreen(category: DungeonCategory, index: Int): DungeonScreen? {
         val parent = category.getParentScreen()
         return parent.getOrNull(index - 1)
+    }
+
+    fun getDropItemsByDungeonId(dungeonId: String) {
+        
     }
 }

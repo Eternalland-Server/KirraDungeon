@@ -9,6 +9,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.display
+import org.bukkit.entity.Player
 
 /**
  * 副本主界面显示实现层.
@@ -18,7 +19,7 @@ object Dungeon : IScreen {
     override val screenId: String
         get() = "dungeon"
 
-    override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen): ScreenUI {
+    override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen, player: Player): ScreenUI {
         return ScreenUI(screenId)
             .addImports(listOf(DungeonCard.screenId, DungeonCategory.screenId, DungeonRegion.screenId, DungeonRoom.screenId))
             .addComponent(TextureComp("body", "ui/dungeon/background.png")
@@ -87,26 +88,36 @@ object Dungeon : IScreen {
                 .setXY("body.x + 208", "body.y + 189")
                 .setWidth("74")
                 .setHeight("102")
+                .addAction(ActionType.Enter, "dungeon_1.texture = 'ui/dungeon/hover.png';")
+                .addAction(ActionType.Leave, "dungeon_1.texture = 'ui/dungeon/default.png';")
             )
             .addComponent(TextureComp("dungeon_2", "ui/dungeon/default.png")
                 .setXY("body.x + 100", "body.y + 171")
                 .setWidth("74")
                 .setHeight("102")
+                .addAction(ActionType.Enter, "dungeon_2.texture = 'ui/dungeon/hover.png';")
+                .addAction(ActionType.Leave, "dungeon_2.texture = 'ui/dungeon/default.png';")
             )
             .addComponent(TextureComp("dungeon_3", "ui/dungeon/default.png")
                 .setXY("body.x + 46", "body.y + 72")
                 .setWidth("74")
                 .setHeight("102")
+                .addAction(ActionType.Enter, "dungeon_3.texture = 'ui/dungeon/hover.png';")
+                .addAction(ActionType.Leave, "dungeon_3.texture = 'ui/dungeon/default.png';")
             )
             .addComponent(TextureComp("dungeon_4", "ui/dungeon/default.png")
                 .setXY("body.x + 172", "body.y + 81")
                 .setWidth("74")
                 .setHeight("102")
+                .addAction(ActionType.Enter, "dungeon_4.texture = 'ui/dungeon/hover.png';")
+                .addAction(ActionType.Leave, "dungeon_4.texture = 'ui/dungeon/default.png';")
             )
             .addComponent(TextureComp("dungeon_5", "ui/dungeon/default.png")
                 .setXY("body.x + 280", "body.y + 45")
                 .setWidth("74")
                 .setHeight("102")
+                .addAction(ActionType.Enter, "dungeon_5.texture = 'ui/dungeon/hover.png';")
+                .addAction(ActionType.Leave, "dungeon_5.texture = 'ui/dungeon/default.png';")
             )
 
             .addComponent(TextureComp("desc_title", "ui/dungeon/desc_title.png")

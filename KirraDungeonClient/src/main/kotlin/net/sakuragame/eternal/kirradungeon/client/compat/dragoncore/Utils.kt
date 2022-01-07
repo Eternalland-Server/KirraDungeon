@@ -1,14 +1,25 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore
 
-import com.taylorswiftcn.megumi.uifactory.generate.function.SubmitParams
+import com.taylorswiftcn.megumi.uifactory.event.comp.UIFCompSubmitEvent
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.Dungeon
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonCard
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonRegion
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonRoom
 import taboolib.module.configuration.util.getStringColored
 
 private const val defaultNullName = "none"
 private const val defaultRoomIconPath = "ui/dungeon/icon/general/sign_deny.png"
 
-fun SubmitParams.isBelongDungeon() = getParam(0) == KirraDungeonClient.plugin.name
+fun UIFCompSubmitEvent.isBelongDungeon(): Boolean {
+    return when (screenID) {
+        Dungeon.screenId, DungeonCard.screenId, net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonCategory.screenId, DungeonRegion.screenId, DungeonRoom.screenId -> {
+            params.getParam(0) == KirraDungeonClient.plugin.name
+        }
+        else -> false
+    }
+}
 
 fun DungeonCategory.display() = when (this) {
     DungeonCategory.NORMAL -> KirraDungeonClient.conf.getStringColored("settings.dungeon.normal-display")!!

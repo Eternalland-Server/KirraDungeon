@@ -6,11 +6,12 @@ import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
-import net.sakuragame.eternal.kirradungeon.server.zone.PlayerZone
+import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone.Companion.editingDungeonWorld
-import net.sakuragame.eternal.kirradungeon.server.zone.ZoneData
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
+import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
+import net.sakuragame.eternal.kirradungeon.server.zone.player.PlayerZone
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
 import org.bukkit.WorldType
@@ -34,9 +35,23 @@ object Commands {
     @CommandBody
     val list = subCommand {
         execute<CommandSender> { sender, _, _ ->
-            sender.sendMessage("&7副本列表: ".colored())
+            sender.sendMessage("&c[System] &7目前可用的副本如下 ".colored())
             Zone.zones.forEach {
-                sender.sendMessage("&a$it".colored())
+                sender.sendMessage("&a${it.id} &7(${it.name}&7)".colored())
+            }
+        }
+    }
+
+    @CommandBody
+    val info = subCommand {
+        dynamic("dungeonID") {
+            execute<CommandSender> { sender, _, argument ->
+                val zone = Zone.getByID(argument)
+                if (zone == null) {
+                    sender.sendMessage("&c[System] &7当前副本不存在.".colored())
+                    return@execute
+                }
+                sender.sendMessage("&a${zone}".colored())
             }
         }
     }
@@ -52,7 +67,7 @@ object Commands {
                         return@execute
                     }
                     // argument = zoneName
-                    Zone.createZone(zoneId, argument)
+                    Zone.create(zoneId, argument)
                     DungeonServerAPI.getWorldManager().createEmptyDungeon(zoneId, getDefaultDungeonProperties(), object : RunnableVal<DungeonWorld>() {
 
                         override fun run(value: DungeonWorld?) {
@@ -81,7 +96,11 @@ object Commands {
 
                     override fun run(value: DungeonWorld?) {
                         if (value == null) return
+                        value.properties.isAllowMonsters
                         editingDungeonWorld = value
+                        value.bukkitWorld.also { world ->
+                            world.entities.forEach { it.remove() }
+                        }
                         player.teleport(zone.data.spawnLoc.toBukkitLocation(value.bukkitWorld))
                     }
                 })
@@ -98,7 +117,7 @@ object Commands {
                 return@execute
             }
             val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
-            Zone.setZoneLoc(zone, ZoneLocation.parseToZoneLocation(player.location))
+            FunctionZone.setLoc(zone, ZoneLocation.parseToZoneLocation(player.location))
             player.sendMessage("&a设置成功!".colored())
         }
     }
@@ -131,9 +150,25 @@ object Commands {
                     val mobType = context.argument(-1)
                     val amount = argument.toIntOrNull() ?: 1
                     val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
-                    Zone.addZoneMob(zone, zoneLoc, mobType, amount)
+                    FunctionZone.addMob(zone, zoneLoc, mobType, amount)
                     player.sendMessage("&a成功在 &f$zoneLoc &a添加怪物 = &f$mobType x $amount".colored())
                 }
+            }
+        }
+    }
+
+    @CommandBody
+    val setBoss = subCommand {
+        dynamic(commit = "mobType") {
+            execute<Player> { player, _, argument ->
+                if (editingDungeonWorld == null) {
+                    player.sendMessage("&c您没有在编辑一个世界.".colored())
+                    return@execute
+                }
+                val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
+                val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
+                FunctionZone.setBoss(zone, zoneLoc, argument)
+                player.sendMessage("&a成功在 &f$zoneLoc &a设置怪物首领 = &f$argument".colored())
             }
         }
     }
@@ -154,7 +189,7 @@ object Commands {
                         SkyPacket.THUNDER_LEVEL_CHANGE
                     }
                     val value = argument.toFloatOrNull() ?: 4f
-                    Zone.setZoneSkyColor(zone, ZoneData.Companion.ZoneSkyData(packetType, value))
+                    FunctionZone.setSkyColor(zone, ZoneSkyData(packetType, value))
                     player.sendMessage("&a您设置了副本 &f${zone.name} &a的天空颜色为: &f(${packetType.name}, $value)")
                 }
             }

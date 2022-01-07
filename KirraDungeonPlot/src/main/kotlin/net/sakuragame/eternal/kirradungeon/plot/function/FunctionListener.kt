@@ -63,6 +63,9 @@ object FunctionListener {
                     countDownMap.remove(uuid)
                     return@forEach
                 }
+                if (player.profile()?.dungeonWorld == null) {
+                    return@forEach
+                }
                 BossBar.setTime(player, int - 1)
                 countDownMap[uuid] = int - 1
             }
@@ -80,8 +83,10 @@ object FunctionListener {
     fun e(e: YamlSendFinishedEvent) {
         val player = e.player
         submit(delay = 10L) {
-            BossBar.open(player, "&6&l位面吞噬者", "", "black_sakura", 1.0, 900)
-            countDownMap[player.uniqueId] = 900
+            if (player.profile()?.dungeonWorld != null) {
+                BossBar.open(player, "&6&l位面吞噬者", "", "34", 1.0, 900)
+                countDownMap[player.uniqueId] = 900
+            }
         }
     }
 

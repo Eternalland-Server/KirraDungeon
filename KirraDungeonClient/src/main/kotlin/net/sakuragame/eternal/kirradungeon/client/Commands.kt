@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.client
 
+import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.StoryDungeonCompat
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonLoader
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.function.FunctionDungeon
@@ -82,6 +83,15 @@ object Commands {
 
     @CommandBody
     val openUI = subCommand {
+        dynamic(commit = "category") {
+            dynamic(commit = "subCategory") {
+                dynamic(commit = "currentSelected") {
+                    execute<Player> { player, context, _ ->
+                        FunctionDungeon.openMainGUI(player, Triple(context.get(1).toInt(), context.get(2).toInt(), context.get(3).toInt()))
+                    }
+                }
+            }
+        }
         execute<Player> { player, _, _ ->
             FunctionDungeon.openMainGUI(player)
         }
@@ -94,6 +104,32 @@ object Commands {
             DungeonLoader.i()
             sender.sendMessage("&7已重载.".colored())
             return@execute
+        }
+    }
+
+    @CommandBody
+    val debug = subCommand {
+        execute<Player> { player, _, _ ->
+            player.profile().debugMode.set(!player.profile().debugMode.get())
+            player.sendMessage("&c[System] &f${player.profile().debugMode.get().toString().uppercase()}".colored())
+        }
+    }
+
+    @CommandBody
+    val setNumber = subCommand {
+        dynamic(commit = "player") {
+            suggestion<CommandSender> { _, _ ->
+                Bukkit.getOnlinePlayers().map { it.name }
+            }
+            dynamic(commit = "number") {
+                execute<CommandSender> { sender, context, _ ->
+                    val player = Bukkit.getPlayer(context.get(1)) ?: return@execute
+                    val number = context.get(2).toIntOrNull() ?: 1
+                    player.profile().number.set(number)
+                    player.profile().save()
+                    sender.sendMessage("&c[System] &7已经把${player.name}的编号设置为${number}".colored())
+                }
+            }
         }
     }
 }
