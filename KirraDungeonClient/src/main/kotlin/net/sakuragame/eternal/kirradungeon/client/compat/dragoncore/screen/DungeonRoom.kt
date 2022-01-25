@@ -33,6 +33,10 @@ object DungeonRoom : IScreen {
         val originIndex = index - 1
         val room = screen.dungeonSubScreens[originIndex]!!
 
+        if (room.forceEmpty) {
+            return
+        }
+
         val name = Atomics.newReference<String>(room.name)
         val forceLock = AtomicBoolean(room.forceLock)
 
@@ -50,7 +54,6 @@ object DungeonRoom : IScreen {
                 .setExtend("dungeon_${index}")
             )
         }
-
         if (forceLock.get()) {
             addComponent(TextureComp("room_${index}_frame", "ui/dungeon/close.png")
                 .setExtend("dungeon_${index}")
@@ -70,11 +73,10 @@ object DungeonRoom : IScreen {
             )
             addComponent(TextureComp("room_${index}_card", "ui/dungeon/card.png")
                 .setExtend("dungeon_${index}")
-                .addAction(ActionType.Left_Click, "global.dungeon_current_selected = ${index};")
+                .addAction(ActionType.Left_Click, "global.dungeon_current_selected = $index;")
                 .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams())
             )
         }
-
         addComponent(TextureComp("room_${index}_name", "0,0,0,0")
             .setText(name.get())
             .setXY("dungeon_${index}.x", "dungeon_${index}.y + 73")

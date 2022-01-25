@@ -1,12 +1,14 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.player.function
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
+import com.taylorswiftcn.megumi.uifactory.event.screen.UIFScreenOpenEvent
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
+import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
@@ -136,9 +138,15 @@ object FunctionPlayerZone {
     fun e(e: YamlSendFinishedEvent) {
         val player = e.player
         PacketSender.sendYaml(player, FolderType.Gui, DragonCoreCompat.joinTitleHudID, DragonCoreCompat.joinTitleHudYaml)
-        submit(delay = 60L) {
-            val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return@submit
-            playerZone.updateBossBar(playerZone.zone.data.iconNumber.toString(), init = true)
-        }
+    }
+
+    // 血条监听.
+    @SubscribeEvent
+    fun e(e: UIFScreenOpenEvent) {
+        val player = e.player
+        val screenId = e.screenID
+        val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return
+        if (screenId != BossBar.screenID) return
+        playerZone.updateBossBar(playerZone.zone.data.iconNumber.toString(), init = true)
     }
 }

@@ -54,4 +54,12 @@ object FunctionDungeon {
             PacketSender.sendOpenGui(player, Dungeon.screenId)
         }
     }
+
+    fun sendItems(player: Player, dungeonId: String) {
+        submit(async = true, delay = 3L) {
+            DungeonAPI.getDropItemsByDungeonId(player, dungeonId).forEach { (slotId, item) ->
+                PacketSender.putClientSlotItem(player, slotId, item)
+            }
+        }
+    }
 }

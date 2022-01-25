@@ -137,9 +137,9 @@ object FunctionZone {
                 val splitString = string.splitWithNoSpace(";")
                 if (splitString.size < 3) return@string
                 val loc = ZoneLocation.parseToZoneLocation(splitString[0])!!
-                val id = splitString[1]
+                val monsterId = splitString[1]
                 val amount = splitString[2].toInt()
-                mobDataList += ZoneMobData(loc, id, amount)
+                mobDataList += ZoneMobData(loc, monsterId, amount)
             }
         }
         val bossData = ZoneBossData(

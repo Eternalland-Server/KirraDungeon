@@ -1,8 +1,8 @@
 package net.sakuragame.eternal.kirradungeon.plot.function
 
+import com.taylorswiftcn.megumi.uifactory.event.screen.UIFScreenOpenEvent
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
@@ -80,13 +80,13 @@ object FunctionListener {
     }
 
     @SubscribeEvent
-    fun e(e: YamlSendFinishedEvent) {
+    fun e(e: UIFScreenOpenEvent) {
         val player = e.player
-        submit(delay = 10L) {
-            if (player.profile()?.dungeonWorld != null) {
-                BossBar.open(player, "&6&l位面吞噬者", "", "34", 1.0, 900)
-                countDownMap[player.uniqueId] = 900
-            }
+        val screenId = e.screenID
+        if (screenId != BossBar.screenID) return
+        if (player.profile()?.dungeonWorld != null) {
+            BossBar.open(player, "&6&l位面吞噬者", "", "34", 1.0, 900)
+            countDownMap[player.uniqueId] = 900
         }
     }
 
@@ -149,7 +149,7 @@ object FunctionListener {
     fun e(e: EntityDamageByEntityEvent) {
         val entity = e.entity as? LivingEntity ?: return
         val player = e.damager as? Player ?: return
-        val entityMaxHealth = getMobMaxHealth(entity)
+        val entityMaxHealth = getMobMaxHealth("dragon")
         val entityHalfMaxHealth = entityMaxHealth / 2
         if (entity.name != "&6&l位面吞噬者".colored()) return
         if (player.hasMetadata("NergiganteHalfHealth") && e.damage + 1000 >= entity.health) {

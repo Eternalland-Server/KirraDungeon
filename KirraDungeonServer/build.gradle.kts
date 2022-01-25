@@ -2,8 +2,9 @@ val libVersion: String by project
 val projectVersion: String by project
 
 plugins {
-    java
-    id("io.izzel.taboolib") version "1.33"
+    `java-library`
+    `maven-publish`
+    id("io.izzel.taboolib") version "1.34"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
 }
 
@@ -29,7 +30,7 @@ taboolib {
     install("module-chat")
     install("platform-bukkit")
     install("expansion-command-helper")
-    install("module-database-shaded")
+    install("module-database")
     classifier = null
     version = libVersion
 }

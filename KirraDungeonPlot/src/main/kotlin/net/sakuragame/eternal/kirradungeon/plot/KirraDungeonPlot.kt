@@ -4,13 +4,14 @@ import com.dscalzi.skychanger.bukkit.api.SkyChanger
 import io.lumine.xikage.mythicmobs.MythicMobs
 import taboolib.common.platform.Plugin
 import taboolib.module.configuration.Config
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
 import taboolib.platform.BukkitPlugin
 
+@Suppress("SpellCheckingInspection")
 object KirraDungeonPlot : Plugin() {
 
     @Config
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     val plugin by lazy {

@@ -58,7 +58,7 @@ class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) : IZone {
             }
         }
         // 倒计时逻辑.
-        submit(async = true, delay = 60L, period = 20L) {
+        submit(async = true, delay = 20L, period = 20L) {
             if (canDel() || isClear || isFail) {
                 cancel()
                 return@submit

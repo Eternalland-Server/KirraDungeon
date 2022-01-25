@@ -51,7 +51,7 @@ object DungeonCard : IScreen {
             } else {
                 addComponent(TextureComp("join_button", "ui/dungeon/button/join.png")
                     .setXY("body.x + 397", "body.y + 279")
-                    .setWidth("160")
+                    .setWidth("163")
                     .setHeight("44")
                     .addAction(ActionType.Left_Click, "join_button.texture = 'ui/dungeon/button/join_press.png';")
                     .addAction(ActionType.Left_Release, "join_button.texture = 'ui/dungeon/button/join.png';")

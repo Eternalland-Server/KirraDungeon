@@ -97,6 +97,11 @@ object FunctionDungeonListener {
     }
 
     private fun doUpdate(player: Player, paramData: ParamData) {
+        if (paramData.subScreen.isSingle) {
+            FunctionDungeon.sendItems(player, "EMPTY")
+        } else {
+            FunctionDungeon.sendItems(player, paramData.subScreen.dungeonId ?: "")
+        }
         FunctionDungeon.sendScreen(player, paramData.screen, paramData.subScreen)
         FunctionDungeon.openMainGUI(player, false)
     }

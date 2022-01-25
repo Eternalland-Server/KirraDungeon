@@ -23,7 +23,7 @@ import taboolib.common.platform.function.submit
 @Suppress("SpellCheckingInspection")
 class Profile(val player: Player) {
 
-    lateinit var dungeonWorld: DungeonWorld
+    var dungeonWorld: DungeonWorld? = null
 
     val entityList = ConcurrentSet<LivingEntity>()
 
@@ -65,7 +65,7 @@ class Profile(val player: Player) {
 
     fun drop() {
         if (dungeonWorld != null) {
-            DungeonServerAPI.getWorldManager().dropDungeon(dungeonWorld)
+            DungeonServerAPI.getWorldManager().dropDungeon(dungeonWorld!!)
         }
         player.removeMetadata("NergiganteHalfHealth", KirraDungeonPlot.plugin)
         player.removeMetadata("NergiganteClear", KirraDungeonPlot.plugin)

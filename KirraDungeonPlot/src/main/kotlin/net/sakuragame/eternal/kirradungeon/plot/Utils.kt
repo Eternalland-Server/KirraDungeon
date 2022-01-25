@@ -4,7 +4,6 @@ import org.apache.commons.lang.RandomStringUtils
 import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
-import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import pl.betoncraft.betonquest.BetonQuest
 import taboolib.common.platform.function.submit
@@ -30,8 +29,6 @@ fun String.splitWithNoSpace(regex: String): List<String> {
 }
 
 fun getMobMaxHealth(type: String) = KirraDungeonPlot.mythicmobsAPI.getMythicMob(type).health.get()
-
-fun getMobMaxHealth(entity: LivingEntity) = KirraDungeonPlot.mythicmobsAPI.getMythicMobInstance(entity).type.health.get()
 
 fun spawnArmorStand(loc: Location) = (loc.world.spawnEntity(loc, EntityType.ARMOR_STAND) as ArmorStand).also {
     it.setGravity(false)

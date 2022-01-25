@@ -41,32 +41,24 @@ object FunctionPlot {
     fun start(player: Player) {
         startBound(player, getPlayerSpawnLoc(player) ?: return)
         KirraDungeonPlot.skyAPI.changeSky(SkyChanger.wrapPlayer(player), SkyPacket.RAIN_LEVEL_CHANGE, 4f)
+        player.health = player.maxHealth
         submit(delay = 40) {
             spawnEntity(player, "dragon_dome")
         }
         submit(delay = 60) {
-            PacketSender.sendPlaySound(player,
-                battleThemeBgmId,
-                "bgms/nergigante_dragon_battle_theme.ogg",
-                0.2f,
-                1f,
-                true,
-                0f,
-                0f,
-                0f
-            )
+            PacketSender.sendPlaySound(player, battleThemeBgmId, "bgms/nergigante_dragon_battle_theme.ogg", 0.2f, 1f, true, 0f, 0f, 0f)
             NergiganteAPI.startConversation(player, 0)
         }
     }
 
     fun getPlayerSpawnLoc(player: Player): Location? {
         val profile = player.profile() ?: return null
-        return playerSpawnLoc.toBukkitLocation(profile.dungeonWorld.bukkitWorld)
+        return playerSpawnLoc.toBukkitLocation(profile.dungeonWorld!!.bukkitWorld)
     }
 
     fun getMobSpawnLoc(player: Player): Location? {
         val profile = player.profile() ?: return null
-        return mobSpawnLoc.toBukkitLocation(profile.dungeonWorld.bukkitWorld)
+        return mobSpawnLoc.toBukkitLocation(profile.dungeonWorld!!.bukkitWorld)
     }
 
     fun dataRecycle(player: Player) {
@@ -78,10 +70,12 @@ object FunctionPlot {
         val profile = player.profile() ?: return
         profile.entityList.add(armorStand)
         player.teleport(loc)
-        submit(delay = 8) {
+        submit(delay = 8L) {
             PacketSender.setThirdPersonView(player, 1)
             player.gameMode = GameMode.SPECTATOR
-            player.spectatorTarget = armorStand
+            submit(delay = 5L) {
+                player.spectatorTarget = armorStand
+            }
         }
     }
 

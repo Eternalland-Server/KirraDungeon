@@ -5,7 +5,6 @@ import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.player.PlayerZone
-import org.bukkit.Difficulty
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
@@ -28,25 +27,8 @@ object FunctionCommonListener {
         }
         val copyZoneData = Zone.getByID(e.dungeonWorld.worldIdentifier)!!.data.copy()
         val copyZone = Zone.getByID(e.dungeonWorld.worldIdentifier)!!.copy(data = copyZoneData)
+        e.dungeonWorld.bukkitWorld.isAutoSave = false
         // 初始化.
-        e.dungeonWorld.bukkitWorld.also { world ->
-            world.pvp = false
-            world.isAutoSave = false
-            world.difficulty = Difficulty.HARD;
-            world.animalSpawnLimit = 0
-            world.ambientSpawnLimit = 0
-            world.waterAnimalSpawnLimit = 0
-            world.monsterSpawnLimit = 0
-            world.fullTime = 2400000L
-            world.setGameRuleValue("doFireTick", "false")
-            world.setGameRuleValue("doMobSpawning", "false")
-            world.setGameRuleValue("doMobLoot", "false")
-            world.setGameRuleValue("mobGriefing", "false")
-            world.setGameRuleValue("doEntityDrops", "false")
-            world.setGameRuleValue("doWeatherCycle", "false")
-            world.setGameRuleValue("doDaylightCycle", "false")
-            world.setGameRuleValue("keepInventory", "true")
-        }
         PlayerZone.create(copyZone, e.dungeonWorld)
     }
 

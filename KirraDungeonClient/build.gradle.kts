@@ -2,8 +2,8 @@ val libVersion: String by project
 val projectVersion: String by project
 
 plugins {
-    java
-    id("io.izzel.taboolib") version "1.33"
+    `java-library`
+    id("io.izzel.taboolib") version "1.34"
     id("org.jetbrains.kotlin.jvm") version "1.5.30"
 }
 
@@ -25,9 +25,9 @@ taboolib {
     install("module-lang")
     install("module-configuration")
     install("module-chat")
+    install("module-database")
     install("platform-bukkit")
     install("expansion-command-helper")
-    install("module-database-shaded")
     classifier = null
     version = libVersion
 }
@@ -40,12 +40,8 @@ repositories {
         }
         url = uri("https://maven.ycraft.cn/repository/maven-snapshots/")
     }
-    maven {
-        url = uri("https://repo.tabooproject.org/repository/maven-releases/")
-    }
-    maven {
-        url = uri("https://repo1.maven.org/maven2/net/luckperms/api/")
-    }
+    maven { url = uri("https://repo.tabooproject.org/repository/maven-releases/") }
+    maven { url = uri("https://repo1.maven.org/maven2/net/luckperms/api/") }
     mavenCentral()
 }
 

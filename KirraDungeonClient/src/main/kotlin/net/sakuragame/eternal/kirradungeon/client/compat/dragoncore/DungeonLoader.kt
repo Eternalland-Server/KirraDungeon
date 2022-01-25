@@ -21,16 +21,16 @@ import java.io.File
 object DungeonLoader {
 
     // "常规" 大栏界面.
-    val normalParentScreen = arrayListOf<DungeonScreen>()
+    val normalParentScreen = mutableListOf<DungeonScreen>()
 
     // "活动" 大栏界面.
-    val activityParentScreen = arrayListOf<DungeonScreen>()
+    val activityParentScreen = mutableListOf<DungeonScreen>()
 
     // "特殊" 大栏界面.
-    val specialParentScreen = arrayListOf<DungeonScreen>()
+    val specialParentScreen = mutableListOf<DungeonScreen>()
 
     // "团队" 大栏界面.
-    val teamParentScreen = arrayListOf<DungeonScreen>()
+    val teamParentScreen = mutableListOf<DungeonScreen>()
 
     @Awake(LifeCycle.ENABLE)
     fun i() {
@@ -69,7 +69,7 @@ object DungeonLoader {
             folder.mkdirs()
             return
         }
-        val yamlFiles = folder.listFiles().map { loadFromFile(it, Type.YAML) }
+        val yamlFiles = folder.listFiles()!!.map { loadFromFile(it, Type.YAML) }
         val dungeonScreens = mutableListOf<DungeonScreen>().also { screenList ->
             yamlFiles.forEachIndexed { index, file ->
                 if (index > 4) return
@@ -89,6 +89,7 @@ object DungeonLoader {
     }
 
     private fun readScreen(category: DungeonCategory, conf: ConfigFile): DungeonScreen {
+        val defaultIndex = conf.getInt("settings.default-index")
         val priority = conf.getInt("settings.priority")
         val name = conf.getStringColored("settings.name")!!
         val mapBgPath = conf.getString("settings.map-bg")!!
@@ -98,7 +99,7 @@ object DungeonLoader {
         val fourthSubScreen = readSubScreen(conf.getConfigurationSection("settings.fourth"))
         val fifthSubScreen = readSubScreen(conf.getConfigurationSection("settings.fifth"))
         val dungeonSubScreens = arrayOf(firstSubScreen, secondSubScreen, thirdSubScreen, fourthSubScreen, fifthSubScreen)
-        return DungeonScreen(category, priority, name, mapBgPath, dungeonSubScreens = dungeonSubScreens)
+        return DungeonScreen(defaultIndex, category, priority, name, mapBgPath, dungeonSubScreens = dungeonSubScreens)
     }
 
     private fun readSubScreen(section: ConfigurationSection?): DungeonSubScreen? {
@@ -111,16 +112,16 @@ object DungeonLoader {
         )
         val frameVisible = section.getBoolean("frame-visible")
         val isSingle = section.getBoolean("is-single")
-        val lockedByProgress = section.getBoolean("lock-by-progress")
         val forceLock = section.getBoolean("force-lock", false)
+        val forceEmpty = section.getBoolean("force-empty", false)
         val dungeonId = section.getString("dungeon-id")
         return DungeonSubScreen(
             name,
             iconPath,
             description,
             frameVisible = frameVisible,
-            lockedByProgress = lockedByProgress,
             forceLock = forceLock,
+            forceEmpty = forceEmpty,
             isSingle = isSingle,
             dungeonId = dungeonId
         )

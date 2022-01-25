@@ -41,7 +41,6 @@ object DungeonCategory : IScreen {
                 .setHeight("32")
                 .setExtend("category_normal_bg")
             )
-
             .addComponent(TextureComp("category_team_bg",
                 "(global.dungeon_category == 2) ? 'ui/dungeon/category/selected.png' : 'ui/dungeon/category/unselected.png'")
                 .setXY("body.x - category_team_bg.width", "category_normal_bg.y + 55")
