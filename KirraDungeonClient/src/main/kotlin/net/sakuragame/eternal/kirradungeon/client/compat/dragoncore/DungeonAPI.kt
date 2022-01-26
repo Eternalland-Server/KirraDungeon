@@ -22,7 +22,7 @@ object DungeonAPI {
 
     fun getDefaultSubScreen(screen: DungeonScreen?): DungeonSubScreen {
         if (screen == null) return getDefaultScreen().dungeonSubScreens[0]!!
-        return screen.dungeonSubScreens[0]!!
+        return screen.dungeonSubScreens[screen.defaultIndex]!!
     }
 
     fun getPluginParams(type: ParamType = ParamType.UPDATE) = SubmitParams().apply {
@@ -33,6 +33,7 @@ object DungeonAPI {
         add("global.dungeon_current_selected")
     }
 
+    @Suppress("UNREACHABLE_CODE")
     fun getDungeonCategory(index: Int) = when (index) {
         1 -> DungeonCategory.NORMAL
         2 -> DungeonCategory.TEAM

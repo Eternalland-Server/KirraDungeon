@@ -11,7 +11,7 @@ import taboolib.common.platform.function.submit
 
 object FunctionDungeon {
 
-    val initStatements by lazy {
+    private val initStatements by lazy {
         Statements()
             .add("global.dungeon_category = 1;")
             .add("global.dungeon_sub_category = 1;")
@@ -29,7 +29,7 @@ object FunctionDungeon {
         }
     }
 
-    fun openMainGUI(player: Player, init: Boolean = true) {
+    fun openGUI(player: Player, init: Boolean = true) {
         submit(async = true, delay = 3L) {
             if (init) {
                 PacketSender.sendRunFunction(player, "default", initStatements, false)
@@ -39,7 +39,7 @@ object FunctionDungeon {
         }
     }
 
-    fun openMainGUI(player: Player, statementsTriple: Triple<Int, Int, Int>) {
+    fun openAssignGUI(player: Player, statementsTriple: Triple<Int, Int, Int>) {
         val statements = Statements()
             .add("global.dungeon_category = ${statementsTriple.first};")
             .add("global.dungeon_sub_category =  ${statementsTriple.second};")

@@ -10,11 +10,11 @@ import taboolib.module.database.getHost
 @Suppress("SpellCheckingInspection")
 object Database {
 
-    const val PREFIX = "kirradungeon"
+    private const val PREFIX = "kirradungeon"
 
-    val host = KirraDungeonClient.conf.getHost("settings.database")
+    private val host = KirraDungeonClient.conf.getHost("settings.database")
 
-    val tableNumber = Table("${PREFIX}_table_number", host) {
+    private val tableNumber = Table("${PREFIX}_table_number", host) {
         add { id() }
         add("uid") {
             type(ColumnTypeSQL.INT) {
@@ -26,7 +26,7 @@ object Database {
         }
     }
 
-    val dataSource = host.createDataSource()
+    private val dataSource = host.createDataSource()
 
     init {
         tableNumber.createTable(dataSource)

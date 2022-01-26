@@ -7,9 +7,11 @@ import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.*
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.getParentScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.isBelongDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.event.ZoneJoinEvent
 import org.bukkit.Material
@@ -24,21 +26,8 @@ import java.util.concurrent.TimeUnit
 
 object FunctionDungeonListener {
 
-    val baffle by lazy {
+    private val baffle by lazy {
         Baffle.of(3, TimeUnit.SECONDS)
-    }
-
-    private data class ParamData(val category: DungeonCategory, val screen: DungeonScreen, val subScreen: DungeonSubScreen)
-
-    @SubscribeEvent
-    fun e(e: PlayerMoveEvent) {
-        val block = e.to.block
-        val player = e.player
-        if (block != null && block.type == Material.END_GATEWAY) {
-            if (!baffle.hasNext(player.name)) return
-            baffle.next(player.name)
-            FunctionDungeon.openMainGUI(player, init = true)
-        }
     }
 
     @SubscribeEvent
@@ -51,6 +40,20 @@ object FunctionDungeonListener {
         if (baffle.hasNext(e.player.name)) baffle.reset(e.player.name)
     }
 
+    private data class ParamData(val category: DungeonCategory, val screen: DungeonScreen, val subScreen: DungeonSubScreen, val originParam1: Int, val originParam2: Int, val originParam3: Int)
+
+    // 主城末地门监听.
+    @SubscribeEvent
+    fun e(e: PlayerMoveEvent) {
+        val block = e.to.block
+        val player = e.player
+        if (block != null && block.type == Material.END_GATEWAY) {
+            if (!baffle.hasNext(player.name)) return
+            baffle.next(player.name)
+            FunctionDungeon.openGUI(player, init = true)
+        }
+    }
+
     @SubscribeEvent
     fun e(e: UIFCompSubmitEvent) {
         if (!e.isBelongDungeon()) return
@@ -61,7 +64,7 @@ object FunctionDungeonListener {
     fun onHudSubmitCompatEvent(e: UIFCompSubmitEvent) {
         if (e.screenID != "function_hud") return
         if (e.compID != "dungeon") return
-        FunctionDungeon.openMainGUI(e.player, init = true)
+        FunctionDungeon.openGUI(e.player, init = true)
     }
 
     @SubscribeEvent
@@ -74,16 +77,16 @@ object FunctionDungeonListener {
     @SubscribeEvent
     fun e(e: KeyPressEvent) {
         if (e.key == DungeonAPI.triggerKey) {
-            FunctionDungeon.openMainGUI(e.player, true)
+            FunctionDungeon.openGUI(e.player, true)
         }
     }
 
     private fun execCompSubmit(player: Player, compId: String, params: SubmitParams) {
         val paramData = getParamData(player, params) ?: return
-        when (DungeonAPI.ParamType.valueOf(params.getParam(1))) {
-            DungeonAPI.ParamType.UPDATE -> doUpdate(player, paramData)
-            DungeonAPI.ParamType.JOIN -> doJoin(player, compId, paramData)
-            DungeonAPI.ParamType.CLOSE -> doClose(player)
+        when (valueOf(params.getParam(1))) {
+            UPDATE -> doUpdate(player, paramData)
+            JOIN -> doJoin(player, compId, paramData)
+            CLOSE -> doClose(player)
         }
     }
 
@@ -97,13 +100,22 @@ object FunctionDungeonListener {
     }
 
     private fun doUpdate(player: Player, paramData: ParamData) {
+        val profile = player.profile()
+        var screen = paramData.screen
+        var subScreen = paramData.subScreen
+        if (profile.currentDungeonCategory.get() != paramData.originParam1) {
+            screen = paramData.category.getParentScreen()[0]
+        }
+        if (profile.currentDungeonScreen.get() != paramData.originParam2) {
+            subScreen = DungeonAPI.getDefaultSubScreen(screen)
+        }
         if (paramData.subScreen.isSingle) {
             FunctionDungeon.sendItems(player, "EMPTY")
         } else {
             FunctionDungeon.sendItems(player, paramData.subScreen.dungeonId ?: "")
         }
         FunctionDungeon.sendScreen(player, paramData.screen, paramData.subScreen)
-        FunctionDungeon.openMainGUI(player, false)
+        FunctionDungeon.openGUI(player, false)
     }
 
     private fun getParamData(player: Player, params: SubmitParams): ParamData? {
@@ -117,6 +129,6 @@ object FunctionDungeonListener {
         if (player.profile().debugMode.get()) {
             player.sendMessage("&c[DEBUG] ${params.getParamI(2)}, ${params.getParamI(3)}, ${params.getParamI(4)}")
         }
-        return ParamData(category, screen, subScreen)
+        return ParamData(category, screen, subScreen, params.getParamI(2), params.getParamI(3), params.getParamI(4))
     }
 }

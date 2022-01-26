@@ -10,7 +10,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.Dungeon
  * @property priority 优先级.
  * @property name 显示名称.
  * @property mapBgPath 地图路径.
- * @property dungeonSubScreens 龙核界面列表.
+ * @property dungeonSubScreens 龙核子界面列表.
  */
 data class DungeonScreen(
     val defaultIndex: Int = 1,

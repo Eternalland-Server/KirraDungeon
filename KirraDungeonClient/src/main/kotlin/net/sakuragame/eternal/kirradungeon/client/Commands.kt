@@ -87,13 +87,13 @@ object Commands {
             dynamic(commit = "subCategory") {
                 dynamic(commit = "currentSelected") {
                     execute<Player> { player, context, _ ->
-                        FunctionDungeon.openMainGUI(player, Triple(context.get(1).toInt(), context.get(2).toInt(), context.get(3).toInt()))
+                        FunctionDungeon.openAssignGUI(player, Triple(context.get(1).toInt(), context.get(2).toInt(), context.get(3).toInt()))
                     }
                 }
             }
         }
         execute<Player> { player, _, _ ->
-            FunctionDungeon.openMainGUI(player)
+            FunctionDungeon.openGUI(player)
         }
     }
 

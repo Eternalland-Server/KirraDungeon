@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Suppress("SpellCheckingInspection")
 object StoryDungeonCompat {
 
-    val baffle by lazy {
+    private val baffle by lazy {
         Baffle.of(10, TimeUnit.SECONDS)
     }
 

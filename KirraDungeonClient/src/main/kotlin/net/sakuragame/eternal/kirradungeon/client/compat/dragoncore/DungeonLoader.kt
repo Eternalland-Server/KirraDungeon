@@ -56,7 +56,7 @@ object DungeonLoader {
         }
     }
 
-    fun clear() {
+    private fun clear() {
         normalParentScreen.clear()
         activityParentScreen.clear()
         specialParentScreen.clear()

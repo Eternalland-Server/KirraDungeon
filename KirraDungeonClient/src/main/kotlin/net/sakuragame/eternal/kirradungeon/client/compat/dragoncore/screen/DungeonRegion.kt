@@ -28,7 +28,7 @@ object DungeonRegion : IScreen {
         }
     }
 
-    fun ScreenUI.addRegion(index: Int, screen: DungeonScreen) {
+    private fun ScreenUI.addRegion(index: Int, screen: DungeonScreen) {
         val parentScreen = screen.category.getParentScreen()
         val originIndex = index - 1
         if (parentScreen.getOrNull(originIndex) == null) {

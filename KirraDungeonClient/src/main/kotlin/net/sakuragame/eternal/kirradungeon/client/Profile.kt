@@ -23,6 +23,12 @@ class Profile(val player: Player) {
 
     val debugMode = AtomicBoolean(false)
 
+    val currentDungeonCategory = AtomicInteger(1)
+
+    val currentDungeonScreen = AtomicInteger(1)
+
+    val currentSubScreen = AtomicInteger(1)
+
     companion object {
 
         val profiles = mutableMapOf<String, Profile>()

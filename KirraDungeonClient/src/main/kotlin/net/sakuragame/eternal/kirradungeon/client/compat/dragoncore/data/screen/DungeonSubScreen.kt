@@ -8,8 +8,8 @@ package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen
  * @property description 描述.
  * @property frameVisible 是否显示边框.
  * @property isSingle 副本类型是否为单个, 若为单个仅会渲染
- * @property forceLock
- * @property dungeonId
+ * @property forceLock 是否强制锁定.
+ * @property dungeonId 与 KirraDungeon Hook 的 ID.
  */
 data class DungeonSubScreen(
     val name: String,
