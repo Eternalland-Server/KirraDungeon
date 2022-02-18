@@ -115,9 +115,9 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverId, this)
     }
 
-    fun List<Player>.sendMessage(message: String) = forEach { it.sendMessage(message) }
+    private fun List<Player>.sendMessage(message: String) = forEach { it.sendMessage(message) }
 
-    fun List<Player>.checkFee(): Boolean {
+    private fun List<Player>.checkFee(): Boolean {
         forEach {
             val feeMap = it.getZoneFee(this@Zone)
             if (feeMap.isEmpty()) return true
@@ -138,7 +138,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         return true
     }
 
-    fun List<Player>.checkCounts(): Boolean {
+    private fun List<Player>.checkCounts(): Boolean {
         forEach {
             if (it.getFeeJoinCounts(this@Zone) < 0) {
                 sendMessage(it.asLangText("message-dungeon-count-not-enough", it.name))
@@ -148,7 +148,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         return true
     }
 
-    fun List<Player>.checkItems(): Boolean {
+    private fun List<Player>.checkItems(): Boolean {
         forEach {
             val itemMap = it.getZoneItems(this@Zone)
             if (itemMap.isEmpty()) return true
@@ -173,7 +173,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         return true
     }
 
-    fun List<Player>.withDraw() {
+    private fun List<Player>.withDraw() {
         forEach { player ->
             if (ZoneWithDraw.itemsMap.containsKey(player.uniqueId)) {
                 val itemMapList = ZoneWithDraw.itemsMap[player.uniqueId]!!

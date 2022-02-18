@@ -16,6 +16,7 @@ object FunctionDungeon {
             .add("global.dungeon_category = 1;")
             .add("global.dungeon_sub_category = 1;")
             .add("global.dungeon_current_selected = 1;")
+            .add("global.dungeon_page = 1;")
             .build()!!
     }
 
@@ -52,14 +53,6 @@ object FunctionDungeon {
             val subScreen = screen.dungeonSubScreens[statementsTriple.third - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
             sendScreen(player, screen, subScreen)
             PacketSender.sendOpenGui(player, Dungeon.screenId)
-        }
-    }
-
-    fun sendItems(player: Player, dungeonId: String) {
-        submit(async = true, delay = 3L) {
-            DungeonAPI.getDropItemsByDungeonId(player, dungeonId).forEach { (slotId, item) ->
-                PacketSender.putClientSlotItem(player, slotId, item)
-            }
         }
     }
 }

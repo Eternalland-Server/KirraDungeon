@@ -86,7 +86,7 @@ object DungeonRoom : IScreen {
     }
 
     private fun getNumber(subScreen: DungeonSubScreen): Int {
-        val dungeonId = subScreen.dungeonId ?: return 0
+        val dungeonId = subScreen.teleportData
         return Zone.getByID(dungeonId)?.condition?.first()?.number ?: return 0
     }
 }

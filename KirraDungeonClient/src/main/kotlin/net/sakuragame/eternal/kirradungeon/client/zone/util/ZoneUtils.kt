@@ -17,7 +17,6 @@ fun getSymbolByIndex(index: Int) =
         else -> ""
     }
 
-
 fun Player.getFeeMaxJoinCounts(zone: Zone, player: Player): Int {
     if (isOp) return -1
     return zone.condition.firstOrNull { player.hasPermission(it.permissionName) }?.dailyCounts ?: 0

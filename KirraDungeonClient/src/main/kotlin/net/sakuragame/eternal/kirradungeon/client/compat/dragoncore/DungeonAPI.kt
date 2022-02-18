@@ -1,7 +1,9 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore
 
+import com.google.common.collect.Lists
 import com.taylorswiftcn.megumi.uifactory.generate.function.SubmitParams
 import ink.ptms.zaphkiel.ZaphkielAPI
+import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
@@ -15,7 +17,7 @@ object DungeonAPI {
     const val triggerKey = "K"
 
     enum class ParamType {
-        UPDATE, JOIN, CLOSE
+        UPDATE, JOIN, CLOSE, PAGE
     }
 
     fun getDefaultScreen() = DungeonLoader.normalParentScreen[0]
@@ -25,21 +27,23 @@ object DungeonAPI {
         return screen.dungeonSubScreens[screen.defaultIndex]!!
     }
 
-    fun getPluginParams(type: ParamType = ParamType.UPDATE) = SubmitParams().apply {
+    fun getPluginParams(type: ParamType = ParamType.UPDATE, categoryChanged: Boolean = false, screenChanged: Boolean = false) = SubmitParams().apply {
         addValue(KirraDungeonClient.plugin.name)
         addValue(type.name)
+        addValue(categoryChanged.toString())
+        addValue(screenChanged.toString())
         add("global.dungeon_category")
         add("global.dungeon_sub_category")
         add("global.dungeon_current_selected")
+        add("global.dungeon_page")
     }
 
-    @Suppress("UNREACHABLE_CODE")
     fun getDungeonCategory(index: Int) = when (index) {
         1 -> DungeonCategory.NORMAL
         2 -> DungeonCategory.TEAM
         3 -> DungeonCategory.ACTIVITY
         4 -> DungeonCategory.SPECIAL
-        else -> throw error("out of dungeon category index, max is 4.")
+        else -> error("out of dungeon category index, max is 4.")
     }
 
     fun getDungeonScreen(category: DungeonCategory, index: Int): DungeonScreen? {
@@ -47,14 +51,18 @@ object DungeonAPI {
         return parent.getOrNull(index - 1)
     }
 
-    fun getDropItemsByDungeonId(player: Player, dungeonId: String): HashMap<String, ItemStack> {
-        val originList = ZaphkielAPI.registeredItem.values
-            .filter { it.group?.name == dungeonId }
-            .map { it.buildItemStack(player) }
-        return HashMap<String, ItemStack>().also {
-            for (index in 1..6) {
-                it["dungeon_drop_${index}"] = originList.getOrNull(index - 1) ?: ItemStack(Material.AIR)
-            }
+    fun getMaxPage(droppedItems: List<String>): Int {
+        return Lists.partition(droppedItems, 6).size
+    }
+
+    fun sendDroppedItems(player: Player, droppedItems: List<String>, page: Int) {
+        val partition = Lists.partition(droppedItems, 6)
+        val split = partition.getOrNull(page - 1) ?: partition.getOrNull(0)
+        for (index in 1..6) {
+            val slotId = "dungeon_drop_$index"
+            val indexStr = split?.getOrNull(index - 1) ?: "null"
+            val item = ZaphkielAPI.getItemStack(indexStr) ?: ItemStack(Material.AIR)
+            PacketSender.putClientSlotItem(player, slotId, item)
         }
     }
 }

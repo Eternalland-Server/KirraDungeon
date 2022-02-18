@@ -6,6 +6,8 @@ import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.SlotComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.TextureComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.screen.ScreenUI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.CLOSE
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.PAGE
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.display
@@ -42,7 +44,7 @@ object Dungeon : IScreen {
                 .setHeight("24")
                 .addAction(ActionType.Left_Click, "close.texture = 'ui/dungeon/button/close_press.png';")
                 .addAction(ActionType.Left_Release, "close.texture = 'ui/dungeon/button/close.png';")
-                .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(DungeonAPI.ParamType.CLOSE))
+                .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(CLOSE))
             )
             .addComponent(TextureComp("map_bg", screen.mapBgPath)
                 .setXY("body.x + 5", "body.y + 39")
@@ -145,8 +147,10 @@ object Dungeon : IScreen {
                 .setXY("desc_bg.x + 1.5", "desc_bg.y + 101")
                 .setWidth("10")
                 .setHeight("22")
-                .addAction(ActionType.Left_Click, " page_up.texture = 'ui/dungeon/button/page_up_press.png';")
+                .addAction(ActionType.Left_Click, "page_up.texture = 'ui/dungeon/button/page_up_press.png';")
                 .addAction(ActionType.Left_Release, "page_up.texture = 'ui/dungeon/button/page_up.png';")
+                .addAction(ActionType.Left_Click, "global.dungeon_page = global.dungeon_page - 1;")
+                .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(PAGE))
             )
             .addComponent(TextureComp("page_next", "ui/dungeon/button/page_next.png")
                 .setXY("drop_6_bg.x + 23", "page_up.y")
@@ -154,6 +158,8 @@ object Dungeon : IScreen {
                 .setHeight("22")
                 .addAction(ActionType.Left_Click, "page_next.texture = 'ui/dungeon/button/page_next_press.png';")
                 .addAction(ActionType.Left_Release, "page_next.texture = 'ui/dungeon/button/page_next.png';")
+                .addAction(ActionType.Left_Click, "global.dungeon_page = global.dungeon_page + 1;")
+                .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(PAGE))
             )
             .addComponent(TextureComp("drop_1_bg", "ui/dungeon/slot_bg.png")
                 .setXY("desc_bg.x + 12", "desc_bg.y + 101")

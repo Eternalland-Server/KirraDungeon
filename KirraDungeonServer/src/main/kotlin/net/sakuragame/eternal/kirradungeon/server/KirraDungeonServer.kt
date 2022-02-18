@@ -13,6 +13,7 @@ import taboolib.module.configuration.createLocal
 import taboolib.platform.BukkitPlugin
 import java.util.concurrent.TimeUnit
 
+@Suppress("SpellCheckingInspection")
 object KirraDungeonServer : Plugin() {
 
     @Config("config.yml", autoReload = true)

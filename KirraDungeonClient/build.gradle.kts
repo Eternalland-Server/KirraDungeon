@@ -18,6 +18,7 @@ taboolib {
             name("KirraCoreBukkit")
             name("DungeonClient")
             name("DataManager")
+            name("KirraCoreBukkit")
         }
     }
     install("common")
@@ -47,6 +48,7 @@ repositories {
 
 dependencies {
     compileOnly("net.luckperms:api:5.3")
+    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.1.3-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:GemsEconomy:4.9.4-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:BetonQuest:1.13.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.0-SNAPSHOT@jar")

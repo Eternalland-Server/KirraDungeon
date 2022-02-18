@@ -98,10 +98,12 @@ object DungeonLoader {
         val thirdSubScreen = readSubScreen(conf.getConfigurationSection("settings.third"))
         val fourthSubScreen = readSubScreen(conf.getConfigurationSection("settings.fourth"))
         val fifthSubScreen = readSubScreen(conf.getConfigurationSection("settings.fifth"))
-        val dungeonSubScreens = arrayOf(firstSubScreen, secondSubScreen, thirdSubScreen, fourthSubScreen, fifthSubScreen)
+        val dungeonSubScreens =
+            arrayOf(firstSubScreen, secondSubScreen, thirdSubScreen, fourthSubScreen, fifthSubScreen)
         return DungeonScreen(defaultIndex, category, priority, name, mapBgPath, dungeonSubScreens = dungeonSubScreens)
     }
 
+    @Suppress("FoldInitializerAndIfToElvis")
     private fun readSubScreen(section: ConfigurationSection?): DungeonSubScreen? {
         if (section == null) return null
         val name = section.getStringColored("name") ?: return null
@@ -114,7 +116,14 @@ object DungeonLoader {
         val isSingle = section.getBoolean("is-single")
         val forceLock = section.getBoolean("force-lock", false)
         val forceEmpty = section.getBoolean("force-empty", false)
-        val dungeonId = section.getString("dungeon-id")
+        val teleportType = DungeonSubScreen.ScreenTeleportType
+            .values()
+            .find { section.getString("teleport.type")?.uppercase() == it.name }
+        if (teleportType == null) {
+            return null
+        }
+        val teleportData = section.getString("teleport.data") ?: return null
+        val droppedItems = section.getStringList("dropped-item")
         return DungeonSubScreen(
             name,
             iconPath,
@@ -123,7 +132,9 @@ object DungeonLoader {
             forceLock = forceLock,
             forceEmpty = forceEmpty,
             isSingle = isSingle,
-            dungeonId = dungeonId
+            teleportType = teleportType,
+            teleportData = teleportData,
+            droppedItems = droppedItems
         )
     }
 }
