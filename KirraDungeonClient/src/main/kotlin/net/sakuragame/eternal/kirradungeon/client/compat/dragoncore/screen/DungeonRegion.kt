@@ -46,8 +46,7 @@ object DungeonRegion : IScreen {
             .setExtend("area_${index}")
             .addAction(ActionType.Left_Click, "region_${index}.texture = 'ui/common/button_normal_a_press.png';")
             .addAction(ActionType.Left_Release, "region_${index}.texture = 'ui/common/button_normal_a.png';")
-            .addAction(ActionType.Left_Click, "global.dungeon_sub_category = ${index};")
-            .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(screenChanged = true))
+            .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(toScreenData = "sub_category = $index"))
         )
     }
 }

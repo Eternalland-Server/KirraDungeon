@@ -24,14 +24,18 @@ object DungeonAPI {
 
     fun getDefaultSubScreen(screen: DungeonScreen?): DungeonSubScreen {
         if (screen == null) return getDefaultScreen().dungeonSubScreens[0]!!
-        return screen.dungeonSubScreens[screen.defaultIndex]!!
+        return screen.dungeonSubScreens.find { it?.forceEmpty == false } ?: getDefaultScreen().dungeonSubScreens[0]!!
     }
 
-    fun getPluginParams(type: ParamType = ParamType.UPDATE, categoryChanged: Boolean = false, screenChanged: Boolean = false) = SubmitParams().apply {
+    fun getPluginParams(
+        type: ParamType = ParamType.UPDATE,
+        toScreenData: String = "",
+    ) = SubmitParams().apply {
         addValue(KirraDungeonClient.plugin.name)
         addValue(type.name)
-        addValue(categoryChanged.toString())
-        addValue(screenChanged.toString())
+        // toScreenData
+        addValue(toScreenData)
+        // fromScreenData
         add("global.dungeon_category")
         add("global.dungeon_sub_category")
         add("global.dungeon_current_selected")

@@ -89,7 +89,7 @@ object DungeonLoader {
     }
 
     private fun readScreen(category: DungeonCategory, conf: ConfigFile): DungeonScreen {
-        val defaultIndex = conf.getInt("settings.default-index")
+        val defaultSelectScreen = conf.getInt("default-select-screen", 1)
         val priority = conf.getInt("settings.priority")
         val name = conf.getStringColored("settings.name")!!
         val mapBgPath = conf.getString("settings.map-bg")!!
@@ -98,9 +98,8 @@ object DungeonLoader {
         val thirdSubScreen = readSubScreen(conf.getConfigurationSection("settings.third"))
         val fourthSubScreen = readSubScreen(conf.getConfigurationSection("settings.fourth"))
         val fifthSubScreen = readSubScreen(conf.getConfigurationSection("settings.fifth"))
-        val dungeonSubScreens =
-            arrayOf(firstSubScreen, secondSubScreen, thirdSubScreen, fourthSubScreen, fifthSubScreen)
-        return DungeonScreen(defaultIndex, category, priority, name, mapBgPath, dungeonSubScreens = dungeonSubScreens)
+        val dungeonSubScreens = arrayOf(firstSubScreen, secondSubScreen, thirdSubScreen, fourthSubScreen, fifthSubScreen)
+        return DungeonScreen(defaultSelectScreen, category, priority, name, mapBgPath, dungeonSubScreens = dungeonSubScreens)
     }
 
     @Suppress("FoldInitializerAndIfToElvis")

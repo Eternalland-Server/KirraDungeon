@@ -9,15 +9,11 @@ import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
-import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
+import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonJoinEvent
-import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
-import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
-import net.sakuragame.eternal.kirradungeon.server.reset
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
-import net.sakuragame.eternal.kirradungeon.server.zone.player.FailType
 import net.sakuragame.eternal.kirradungeon.server.zone.player.PlayerZone
 import net.sakuragame.eternal.kirradungeon.server.zone.player.PlayerZone.Companion.playerZones
 import org.bukkit.GameMode
@@ -99,10 +95,11 @@ object FunctionPlayerZone {
             it.health = it.maxHealth
             it.gameMode = GameMode.SPECTATOR
             it.sendTitle("&c&l菜".colored(), "", 0, 40, 10)
+            it.sendRedHud()
         }
         submit(async = false, delay = 10L) {
-            if (playerZone.isAllPlayersDead()) {
-                playerZone.fail(FailType.ALL_DIED)
+            if (playerZone.isAllPlayersDead() && playerZone.failThread == null) {
+                playerZone.startFailThread()
             }
         }
     }

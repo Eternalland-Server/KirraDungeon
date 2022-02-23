@@ -32,7 +32,7 @@ object KirraDungeonServer : Plugin() {
         MythicMobs.inst().apiHelper!!
     }
 
-    val redisManager: RedisManager by lazy {
+    private val redisManager: RedisManager by lazy {
         ClientManagerAPI.clientPlugin.redisManager
     }
 

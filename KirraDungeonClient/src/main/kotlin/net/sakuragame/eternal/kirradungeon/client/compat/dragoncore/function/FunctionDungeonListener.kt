@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.function
 
+import com.google.common.util.concurrent.Atomics
 import com.taylorswiftcn.megumi.uifactory.event.comp.UIFCompSubmitEvent
 import com.taylorswiftcn.megumi.uifactory.generate.function.SubmitParams
 import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
@@ -9,14 +10,11 @@ import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.*
-import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
-import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
-import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamData
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamNumData
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen.ScreenTeleportType.*
-import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.getParentScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.isBelongDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.event.ZoneJoinEvent
-import net.sakuragame.kirracoords.KirraCoordsAPI
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -25,26 +23,20 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common5.Baffle
 import taboolib.platform.util.asLangText
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.regex.Pattern
 
 object FunctionDungeonListener {
 
     private const val PAGE_RESET_FUNCTION = "global.dungeon_page = 1;"
 
+    private val REGEX_FOR_PARAMS by lazy {
+        Pattern.compile("([a-zA-Z_]+) = (.*)", Pattern.CASE_INSENSITIVE)
+    }
+
     private val baffle by lazy {
         Baffle.of(3, TimeUnit.SECONDS)
     }
-
-    private data class ParamData(
-        val categoryChanged: Boolean,
-        val screenChanged: Boolean,
-        val category: DungeonCategory,
-        val screen: DungeonScreen,
-        val subScreen: DungeonSubScreen,
-        val originParam1: Int,
-        val originParam2: Int,
-        val originParam3: Int,
-        val originParam4: Int,
-    )
 
     // 主城末地门监听.
     @SubscribeEvent
@@ -112,32 +104,40 @@ object FunctionDungeonListener {
                     KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], player)
                     return
                 }
-                KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], split[1], player)
+                KirraCoreBukkitAPI.teleportPlayerToAnotherWorld(split[0], split[1], player)
             }
-            COORD -> KirraCoordsAPI.tpCoord(player, paramData.subScreen.teleportData)
+            COORD -> {
+                val split = paramData.subScreen.teleportData.split("@")
+                KirraCoreBukkitAPI.teleportPlayerToAnotherCoord(split[0], split[1], player)
+            }
         }
     }
 
     private fun doUpdate(player: Player, paramData: ParamData) {
-        var screen = paramData.screen
-        var subScreen = paramData.subScreen
-        if (paramData.categoryChanged) {
+        if (paramData.fromData.isSame(paramData.toData)) {
+            return
+        }
+        val toData = paramData.toData
+        if (paramData.fromData.isCategoryChanged(toData)) {
             PacketSender.sendRunFunction(player, "default", "global.dungeon_sub_category = 1;", true)
             PacketSender.sendRunFunction(player, "default", "global.dungeon_current_selected = 1;", true)
-            screen = paramData.category.getParentScreen()[0]
-            subScreen = DungeonAPI.getDefaultSubScreen(screen)
+            toData.param2 = 1
+            toData.param3 = 1
         }
-        if (paramData.screenChanged) {
+        if (paramData.fromData.isScreenChanged(toData)) {
             PacketSender.sendRunFunction(player, "default", "global.dungeon_current_selected = 1;", true)
-            subScreen = DungeonAPI.getDefaultSubScreen(screen)
+            toData.param3 = 1
         }
-        FunctionDungeon.sendScreen(player, screen, subScreen)
-        FunctionDungeon.openGUI(player, false)
+        if (paramData.screen.defaultSelectScreen != 1) {
+            PacketSender.sendRunFunction(player, "default", "global.dungeon_current_selected = ${paramData.screen.defaultSelectScreen};", true)
+            toData.param3 = paramData.screen.defaultSelectScreen
+        }
+        FunctionDungeon.openAssignGUI(player, toData)
         doPage(player, paramData)
     }
 
     private fun doPage(player: Player, paramData: ParamData) {
-        val page = paramData.originParam4
+        val page = paramData.toData.param4
         val droppedItems = paramData.subScreen.droppedItems
         if (page > DungeonAPI.getMaxPage(droppedItems) || page < 1) {
             PacketSender.sendRunFunction(player, "default", PAGE_RESET_FUNCTION, false)
@@ -145,35 +145,77 @@ object FunctionDungeonListener {
             return
         }
         DungeonAPI.sendDroppedItems(player, droppedItems, page)
+
     }
 
     private fun getParamData(player: Player, params: SubmitParams): ParamData? {
-        val categoryChanged = params.getParam(2) == "true"
-        val screenChanged = params.getParam(3) == "true"
-        val category = DungeonAPI.getDungeonCategory(params.getParamI(4))
-        val screen = DungeonAPI.getDungeonScreen(category, params.getParamI(5)) ?: kotlin.run {
+        val fromNumData = getFromNumDataFromParams(params)
+        val toNumData = getToNumDataFromParams(fromNumData, params)
+        val category = DungeonAPI.getDungeonCategory(toNumData.param1)
+        val screen = DungeonAPI.getDungeonScreen(category, toNumData.param2) ?: kotlin.run {
             player.closeInventory()
             MessageAPI.sendActionTip(player, player.asLangText("message-screen-went-wrong-exception"))
             return null
         }
-        val subScreen = screen.dungeonSubScreens[params.getParamI(6) - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
+        val subScreen = screen.dungeonSubScreens[toNumData.param3 - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
         if (player.profile().debugMode.get()) {
-            player.sendMessage("&c[DEBUG]")
-            player.sendMessage("${params.getParamI(4)}")
-            player.sendMessage("${params.getParamI(5)}")
-            player.sendMessage("${params.getParamI(6)}")
-            player.sendMessage("${params.getParamI(7)}")
+            printParamDataDebugMessage(player, params)
         }
-        return ParamData(
-            categoryChanged,
-            screenChanged,
-            category,
-            screen,
-            subScreen,
-            params.getParamI(4),
-            params.getParamI(5),
-            params.getParamI(6),
-            params.getParamI(7)
-        )
+        return ParamData(fromNumData, toNumData, category, screen, subScreen)
+    }
+
+    private fun getFromNumDataFromParams(params: SubmitParams): ParamNumData {
+        val category = params.getParamI(3)
+        val screen = params.getParamI(4)
+        val subScreen = params.getParamI(5)
+        val page = params.getParamI(6)
+        return ParamNumData(category, screen, subScreen, page)
+    }
+
+    private fun getToNumDataFromParams(fromData: ParamNumData, params: SubmitParams): ParamNumData {
+        val input = params.getParam(2)
+        if (input.isNullOrEmpty()) {
+            return fromData
+        }
+        val type = Atomics.newReference<String>()
+        val value = AtomicInteger(0)
+        val matcher = REGEX_FOR_PARAMS.matcher(input)
+        while (matcher.find()) {
+            type.set(matcher.group(1))
+            value.set(matcher.group(2).toInt())
+        }
+        return when (type.get()) {
+            "category" ->
+                ParamNumData(
+                    value.get(),
+                    fromData.param2,
+                    fromData.param3,
+                    fromData.param4
+                )
+            "sub_category" -> {
+                ParamNumData(
+                    fromData.param1,
+                    value.get(),
+                    fromData.param3,
+                    fromData.param4
+                )
+            }
+            "current_selected" ->
+                ParamNumData(
+                    fromData.param1,
+                    fromData.param2,
+                    value.get(),
+                    fromData.param4
+                )
+            else -> fromData
+        }
+    }
+
+    private fun printParamDataDebugMessage(player: Player, params: SubmitParams) {
+        player.sendMessage("&c[DEBUG]")
+        player.sendMessage("${params.getParamI(5)}")
+        player.sendMessage("${params.getParamI(6)}")
+        player.sendMessage("${params.getParamI(7)}")
+        player.sendMessage("${params.getParamI(8)}")
     }
 }

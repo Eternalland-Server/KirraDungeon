@@ -5,7 +5,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.Dungeon
 /**
  * DungeonScreen
  *
- * @property defaultIndex 默认排序.
+ * @property defaultSelectScreen 默认选择的 DungeonSubScreen.
  * @property category 分类.
  * @property priority 优先级.
  * @property name 显示名称.
@@ -13,7 +13,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.Dungeon
  * @property dungeonSubScreens 龙核子界面列表.
  */
 data class DungeonScreen(
-    val defaultIndex: Int = 1,
+    val defaultSelectScreen: Int = 1,
     val category: DungeonCategory,
     val priority: Int,
     val name: String,

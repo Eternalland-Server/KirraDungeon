@@ -53,7 +53,7 @@ dependencies {
     compileOnly("net.sakuragame.eternal:BetonQuest:1.13.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DungeonSystem-Client-API:1.1.3-SNAPSHOT@jar")
-    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.1.2-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.1.5-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DataManager-Bukkit-API:1.3.2-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")

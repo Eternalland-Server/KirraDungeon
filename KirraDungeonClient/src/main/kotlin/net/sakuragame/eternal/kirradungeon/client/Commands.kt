@@ -3,6 +3,7 @@ package net.sakuragame.eternal.kirradungeon.client
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.StoryDungeonCompat
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonLoader
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamNumData
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.function.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirraparty.bukkit.party.Party
@@ -87,7 +88,8 @@ object Commands {
             dynamic(commit = "subCategory") {
                 dynamic(commit = "currentSelected") {
                     execute<Player> { player, context, _ ->
-                        FunctionDungeon.openAssignGUI(player, Triple(context.get(1).toInt(), context.get(2).toInt(), context.get(3).toInt()))
+                        val numData = ParamNumData(context.get(1).toInt(), context.get(2).toInt(), context.get(3).toInt(), 1)
+                        FunctionDungeon.openAssignGUI(player, numData)
                     }
                 }
             }

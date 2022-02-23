@@ -9,6 +9,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
 import taboolib.common.platform.function.submit
+import taboolib.common.platform.service.PlatformExecutor
 import taboolib.platform.util.sendLang
 import java.util.*
 import kotlin.random.Random
@@ -43,6 +44,10 @@ class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) : IZone {
 
     override var bossUUID: UUID = UUID.randomUUID()!!
 
+    override var failTime: Int = 60
+
+    override var failThread: PlatformExecutor.PlatformTask? = null
+
     override fun runTimer() {
         // 移除未经过 EntityDeathEvent 死亡的实体。
         submit(async = true, delay = 0L, period = 20L) {
@@ -74,6 +79,7 @@ class PlayerZone(val zone: Zone, val dungeonWorld: DungeonWorld) : IZone {
         }
     }
 
+    @Suppress("SpellCheckingInspection")
     override fun spawnEntities() {
         val monsterData = zone.data.monsterData
         val mobData = monsterData.mobList

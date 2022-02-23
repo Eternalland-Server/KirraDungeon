@@ -43,8 +43,9 @@ object FunctionCommonListener {
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
         val player = e.entity as? Player ?: return
+        val profile = player.profile()
         val playerZone = PlayerZone.getByPlayer(player.uniqueId)
-        if (playerZone == null) {
+        if (playerZone == null || !profile.isChallenging) {
             e.isCancelled = true
         }
     }

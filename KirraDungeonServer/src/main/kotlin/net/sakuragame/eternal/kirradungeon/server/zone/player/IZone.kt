@@ -11,6 +11,7 @@ import org.bukkit.GameMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
+import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored
 import taboolib.platform.util.sendLang
 import java.util.*
@@ -62,9 +63,20 @@ interface IZone {
     var bossUUID: UUID
 
     /**
+     * 失败时间, 与 failThread 挂钩.
+     */
+    var failTime: Int
+
+    /**
+     * 失败线程.
+     * 它会在全部玩家死亡后触发, 若所有实体没在规定时间内复活, 则副本挑战失败.
+     * 判断死亡的依据为玩家是否为 SPECTATOR 模式.
+     */
+    var failThread: PlatformExecutor.PlatformTask?
+
+    /**
      * 根据 UUID 获取当前所有副本玩家.
      */
-
     fun getPlayers() = playerUUIDList.mapNotNull { Bukkit.getPlayer(it) }
 
     /**
@@ -183,6 +195,31 @@ interface IZone {
     }
 
     /**
+     * 开始失败线程运行.
+     */
+    fun startFailThread() {
+        getPlayers().forEach {
+            it.sendLang("message-fail-thread-started", failTime)
+        }
+        failThread = submit(async = true, period = 20) {
+            if (!isAllPlayersDead()) {
+                cancel()
+                return@submit
+            }
+            getPlayers().forEach {
+                it.sendTitle("&4&l全员死亡".colored(), "&7将会在 $failTime &7秒后自动退出.".colored(), 5, 20, 5)
+            }
+            failTime--
+            if (failTime <= 0) {
+                fail(FailType.ALL_DIED)
+                failThread = null
+                cancel()
+                return@submit
+            }
+        }
+    }
+
+    /**
      * 为副本增加一个玩家 UUID.
      */
     fun addPlayerUUID(uuid: UUID) = playerUUIDList.add(uuid)
@@ -227,4 +264,23 @@ interface IZone {
      * 执行副本删除操作.
      */
     fun del()
+
+    /**
+     * 是否可以复活.
+     */
+    fun canResurgence() = failThread != null
+
+    /**
+     * 执行复活操作.
+     */
+    fun resurgence(player: Player) {
+        val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return
+        failThread?.cancel()
+        failThread = null
+        failTime = 60
+        player.teleport(playerZone.zone.data.spawnLoc.toBukkitLocation(player.world))
+        getMonsters(true).forEach {
+            it.health = getMobMaxHealth(it)
+        }
+    }
 }

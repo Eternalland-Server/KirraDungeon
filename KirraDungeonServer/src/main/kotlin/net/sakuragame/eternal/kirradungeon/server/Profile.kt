@@ -27,7 +27,7 @@ class Profile(val player: Player) {
 
     companion object {
 
-        val profiles = mutableMapOf<String, Profile>()
+        private val profiles = mutableMapOf<String, Profile>()
 
         fun Player.profile() = profiles.values.first { it.player.uniqueId == uniqueId }
 

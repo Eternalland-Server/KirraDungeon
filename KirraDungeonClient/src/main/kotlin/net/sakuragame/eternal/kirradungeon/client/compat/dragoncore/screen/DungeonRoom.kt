@@ -46,7 +46,8 @@ object DungeonRoom : IScreen {
         }
 
         if (room.frameVisible) {
-            val framePath = "(global.dungeon_current_selected == $index) ? 'ui/dungeon/selected.png' : 'ui/dungeon/open.png'"
+            val framePath =
+                "(global.dungeon_current_selected == $index) ? 'ui/dungeon/selected.png' : 'ui/dungeon/open.png'"
             addComponent(TextureComp("room_${index}_frame", framePath)
                 .setExtend("dungeon_${index}")
             )
@@ -73,8 +74,8 @@ object DungeonRoom : IScreen {
             )
             addComponent(TextureComp("room_${index}_card", "ui/dungeon/card.png")
                 .setExtend("dungeon_${index}")
-                .addAction(ActionType.Left_Click, "global.dungeon_current_selected = $index;")
-                .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams())
+                .addAction(ActionType.Left_Click,
+                    DungeonAPI.getPluginParams(toScreenData = "current_selected = $index"))
             )
         }
         addComponent(TextureComp("room_${index}_name", "0,0,0,0")
