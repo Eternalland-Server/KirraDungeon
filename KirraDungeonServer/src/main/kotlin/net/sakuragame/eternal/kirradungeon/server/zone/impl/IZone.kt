@@ -1,22 +1,33 @@
-package net.sakuragame.eternal.kirradungeon.server.zone.player
+package net.sakuragame.eternal.kirradungeon.server.zone.impl
 
+import com.dscalzi.skychanger.bukkit.api.SkyChanger
+import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
+import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
+import net.sakuragame.eternal.kirradungeon.server.*
+import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
-import net.sakuragame.eternal.kirradungeon.server.formatSeconds
-import net.sakuragame.eternal.kirradungeon.server.getMobMaxHealth
+import net.sakuragame.eternal.kirradungeon.server.event.DungeonJoinEvent
+import net.sakuragame.eternal.kirradungeon.server.zone.Zone
+import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialZone
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
-import org.bukkit.GameMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored
+import taboolib.platform.util.asLangText
 import taboolib.platform.util.sendLang
+import taboolib.platform.util.takeItem
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 @JvmDefaultWithoutCompatibility
 interface IZone {
@@ -31,6 +42,17 @@ interface IZone {
      * 副本创建时间.
      */
     val createdTime: Long
+        get() = System.currentTimeMillis()
+
+    /**
+     * 原副本信息.
+     */
+    val zone: Zone
+
+    /**
+     * 副本世界实例.
+     */
+    val dungeonWorld: DungeonWorld
 
     /**
      * 是否通关.
@@ -80,6 +102,11 @@ interface IZone {
     fun getPlayers() = playerUUIDList.mapNotNull { Bukkit.getPlayer(it) }
 
     /**
+     * 根据 UUID 获取单个玩家.
+     */
+    fun getSinglePlayer() = Bukkit.getPlayer(playerUUIDList.first())!!
+
+    /**
      * 根据 UUID 获取当前所有副本怪物.
      * @param containsBoss 是否包含怪物首领
      */
@@ -93,7 +120,7 @@ interface IZone {
     /**
      * 是否全部玩家阵亡.
      */
-    fun isAllPlayersDead() = getPlayers().find { it.gameMode != GameMode.SPECTATOR } == null
+    fun isAllPlayersDead() = getPlayers().find { !it.isSpectator() } == null
 
     /**
      * 设置所有副本怪物的血量为满.
@@ -125,9 +152,55 @@ interface IZone {
     fun runTimer()
 
     /**
+     * 处理玩家进入.
+     */
+    fun handleJoin(player: Player, spawnBoss: Boolean, spawnMob: Boolean) {
+        val data = zone.data
+        val loc = data.spawnLoc.toBukkitLocation(dungeonWorld.bukkitWorld)
+        player.teleport(loc)
+        player.profile().isChallenging = true
+        player.reset()
+        if (data.isCustomSkyEnabled()) {
+            data.zoneSkyData!!.apply {
+                val skyChangerPlayer = SkyChanger.wrapPlayer(player)
+                KirraDungeonServer.skyAPI.changeSky(skyChangerPlayer, packetType, value)
+            }
+        }
+        submit(delay = 40) {
+            showJoinMessage(player, zone.name)
+            spawnEntities(zone, dungeonWorld, spawnBoss, spawnMob)
+            runTimer()
+            DungeonJoinEvent(player, zone.id, this@IZone).call()
+        }
+    }
+
+    /**
      * 生成副本怪物.
      */
-    fun spawnEntities()
+    fun spawnEntities(zone: Zone, world: DungeonWorld, spawnBoss: Boolean, spawnEntity: Boolean) {
+        if (!spawnEntity && !spawnBoss) return
+        val monsterData = zone.data.monsterData
+        val mobData = monsterData.mobList
+        val bossData = monsterData.boss
+        if (spawnEntity) {
+            mobData.forEach { monster ->
+                // 将 ZoneLocation 转换为 BukkitLocation.
+                val bukkitLoc = monster.loc.toBukkitLocation(world.bukkitWorld).add(0.0, 1.0, 0.0)
+                // 调用 MythicmobsAPI, 将怪物生成到世界坐标.
+                repeat(monster.amount) {
+                    val randomLoc = bukkitLoc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
+                    val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(monster.type, randomLoc) as? LivingEntity ?: return@repeat
+                    entity.isGlowing = true
+                    monsterUUIDList.add(entity.uniqueId)
+                }
+            }
+        }
+        if (spawnBoss) {
+            val bossEntity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(bossData.type, bossData.loc.toBukkitLocation(world.bukkitWorld)) as LivingEntity
+            bossEntity.isGlowing = true
+            bossUUID = bossEntity.uniqueId
+        }
+    }
 
     /**
      * 向玩家展示副本进入信息.
@@ -206,12 +279,16 @@ interface IZone {
                 cancel()
                 return@submit
             }
-            getPlayers().forEach {
-                it.sendTitle("&4&l全员死亡".colored(), "&7将会在 $failTime &7秒后自动退出.".colored(), 5, 20, 5)
-            }
             failTime--
+            getPlayers().forEach {
+                val profile = it.profile()
+                if (profile.isQuitting) {
+                    return@forEach
+                }
+                it.sendTitle("&4&l全员死亡".colored(), "&7将会在 $failTime &7秒后自动退出.".colored(), 0, 40, 0)
+            }
             if (failTime <= 0) {
-                fail(FailType.ALL_DIED)
+                fail(ALL_DIED)
                 failThread = null
                 cancel()
                 return@submit
@@ -253,7 +330,21 @@ interface IZone {
      * 玩家挑战失败.
      * @param type 失败类型.
      */
-    fun fail(type: FailType)
+    fun fail(type: FailType) {
+        isFail = true
+        val failText = when (type) {
+            OVERTIME -> Bukkit.getServer().consoleSender.asLangText("message-player-over-time")
+            ALL_DIED -> Bukkit.getServer().consoleSender.asLangText("message-player-over-time")
+            CUSTOM -> ""
+        }
+        removeAllMonsters(true)
+        getPlayers().forEach {
+            it.sendTitle(failText, "", 3, 60, 3)
+            it.turnToSpectator()
+            it.sendLang("message-player-lose-dungeon", zone.name)
+        }
+        teleportToSpawn()
+    }
 
     /**
      * 是否可以删除副本.
@@ -263,7 +354,14 @@ interface IZone {
     /**
      * 执行副本删除操作.
      */
-    fun del()
+    fun del() {
+        DungeonServerAPI.getWorldManager().dropDungeon(dungeonWorld)
+        when (zone.data.type) {
+            DEFAULT -> DefaultZone.defaultZones.remove(this)
+            SPECIAL -> SpecialZone.specialZones.remove(this)
+            UNLIMITED -> TODO()
+        }
+    }
 
     /**
      * 是否可以复活.
@@ -274,13 +372,17 @@ interface IZone {
      * 执行复活操作.
      */
     fun resurgence(player: Player) {
-        val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return
         failThread?.cancel()
         failThread = null
         failTime = 60
-        player.teleport(playerZone.zone.data.spawnLoc.toBukkitLocation(player.world))
-        getMonsters(true).forEach {
-            it.health = getMobMaxHealth(it)
+        player.teleport(zone.data.spawnLoc.toBukkitLocation(player.world))
+        player.reset()
+        player.sendTitle("&6&l复活".colored(), "&7尽全力打败怪物们!".colored(), 3, 40, 0)
+        player.inventory.takeItem { it.itemMeta.displayName.contains("复活币") }
+        player.health = player.maxHealth / 2
+        setAllMonsterHealth2Max(true)
+        getPlayers().forEach {
+            it.sendLang("message-player-resurgence", player.displayName)
         }
     }
 }

@@ -8,15 +8,12 @@ import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
 import net.sakuragame.eternal.gemseconomy.api.GemsEconomyAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
-import net.sakuragame.eternal.kirradungeon.client.zone.util.getSymbolByIndex
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneFee
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneItems
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
-import taboolib.common.platform.function.submit
-import taboolib.module.chat.colored
 import taboolib.platform.util.*
 import java.util.*
 
@@ -63,30 +60,21 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
                 return
             }
             val playerSet = LinkedHashSet<Player>().also { it.addAll(players) }
-            var index = 0
-            val teleportRunnable = submit(async = true, delay = 0L, period = 10L) {
-                players.forEach {
-                    if (!it.isOnline) {
-                        cancel()
-                        return@submit
-                    }
-                    index++
-                    if (index >= 4) index = 0
-                    it.sendTitle("", "&6&l➱ &e正在前往: $name &7${getSymbolByIndex(index)}".colored(), 0, 20, 0)
-                }
+            players.forEach {
+                KirraCoreBukkitAPI.showLoadingTitle(it, "&6&l➱ &e正在前往: $name &7@", false)
             }
             DungeonClientAPI.getClientManager().queryDungeon(name, serverId, playerSet, object : MapRequestHandler() {
 
                 override fun onTimeout(serverId: String) {
-                    teleportRunnable.cancel()
                     players.forEach {
+                        KirraCoreBukkitAPI.cancelLoadingTitle(it)
                         it.sendLang("message-dungeon-create-timed-out", serverId)
                     }
                 }
 
                 override fun onTeleportTimeout(serverID: String) {
-                    teleportRunnable.cancel()
                     players.forEach {
+                        KirraCoreBukkitAPI.cancelLoadingTitle(it)
                         it.sendLang("message-dungeon-teleport-timed-out", serverID)
                     }
                 }

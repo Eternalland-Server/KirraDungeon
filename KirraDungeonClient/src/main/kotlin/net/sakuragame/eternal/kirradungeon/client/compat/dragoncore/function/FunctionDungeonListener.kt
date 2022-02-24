@@ -145,7 +145,6 @@ object FunctionDungeonListener {
             return
         }
         DungeonAPI.sendDroppedItems(player, droppedItems, page)
-
     }
 
     private fun getParamData(player: Player, params: SubmitParams): ParamData? {

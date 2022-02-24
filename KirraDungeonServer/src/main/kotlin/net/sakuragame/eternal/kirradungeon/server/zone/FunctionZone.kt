@@ -127,6 +127,10 @@ object FunctionZone {
         return data.getInt("$id.icon")
     }
 
+    fun readResurgenceTime(id: String): Int {
+        return data.getInt("$id.resurgence-time", 0)
+    }
+
     // 从配置文件读取副本出生点.
     fun readSpawnLoc(id: String) = ZoneLocation.parseToZoneLocation(data.getString("$id.spawn-loc")!!)
 

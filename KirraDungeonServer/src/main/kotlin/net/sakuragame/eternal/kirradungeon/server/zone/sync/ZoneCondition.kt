@@ -25,7 +25,7 @@ data class ZoneCondition(
 
     companion object {
 
-        val conditionMap = mutableMapOf<String, List<ZoneCondition>>()
+        private val conditionMap = mutableMapOf<String, List<ZoneCondition>>()
 
         fun getConditionByName(zoneId: String): List<ZoneCondition>? {
             if (!conditionMap.containsKey(zoneId)) {

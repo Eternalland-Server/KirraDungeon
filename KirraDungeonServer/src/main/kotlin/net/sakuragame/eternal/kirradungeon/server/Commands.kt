@@ -10,8 +10,9 @@ import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone.Companion.editingDungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
+import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
-import net.sakuragame.eternal.kirradungeon.server.zone.player.PlayerZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
 import org.bukkit.WorldType
@@ -36,7 +37,16 @@ object Commands {
     val list = subCommand {
         execute<CommandSender> { sender, _, _ ->
             sender.sendMessage("&c[System] &7目前可用的副本如下 ".colored())
-            Zone.zones.forEach {
+            sender.sendMessage("&c[System] &7默认类型:".colored())
+            Zone.zones.filter { it.data.type == ZoneType.DEFAULT }.forEach {
+                sender.sendMessage("&a${it.id} &7(${it.name}&7)".colored())
+            }
+            sender.sendMessage("&c[System] &7特殊类型:".colored())
+            Zone.zones.filter { it.data.type == ZoneType.SPECIAL }.forEach {
+                sender.sendMessage("&a${it.id} &7(${it.name}&7)".colored())
+            }
+            sender.sendMessage("&c[System] &7无限制 (武神塔) 类型:".colored())
+            Zone.zones.filter { it.data.type == ZoneType.UNLIMITED }.forEach {
                 sender.sendMessage("&a${it.id} &7(${it.name}&7)".colored())
             }
         }
@@ -199,7 +209,7 @@ object Commands {
     @CommandBody
     val openDragonCoreUI = subCommand {
         execute<Player> { player, _, _ ->
-            val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return@execute
+            val playerZone = DefaultZone.getByPlayer(player.uniqueId) ?: return@execute
             DragonCoreCompat.updateDragonVars(player, playerZone.zone.name)
             PacketSender.sendOpenHud(player, DragonCoreCompat.joinTitleHud.id)
         }

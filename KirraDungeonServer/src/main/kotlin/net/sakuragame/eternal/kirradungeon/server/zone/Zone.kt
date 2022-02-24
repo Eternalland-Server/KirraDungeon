@@ -44,7 +44,8 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         spawnLoc = FunctionZone.readSpawnLoc(id)!!,
                         zoneSkyData = FunctionZone.readSkyData(id),
                         number = FunctionZone.readNumber(id),
-                        iconNumber = FunctionZone.readIcon(id)
+                        iconNumber = FunctionZone.readIcon(id),
+                        resurgenceTime = FunctionZone.readResurgenceTime(id)
                     )
                 )
             }

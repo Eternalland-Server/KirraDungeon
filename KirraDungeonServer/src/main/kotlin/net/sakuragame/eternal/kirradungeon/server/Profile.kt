@@ -1,7 +1,10 @@
 package net.sakuragame.eternal.kirradungeon.server
 
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
-import net.sakuragame.eternal.kirradungeon.server.zone.player.PlayerZone
+import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
+import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialZone
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerKickEvent
@@ -10,6 +13,7 @@ import taboolib.common.platform.event.EventPriority.HIGHEST
 import taboolib.common.platform.event.EventPriority.LOWEST
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -24,6 +28,11 @@ class Profile(val player: Player) {
     val number = AtomicInteger(1)
 
     var isChallenging = false
+
+    var isQuitting = false
+
+    lateinit var zoneType: ZoneType
+    lateinit var zoneUUID: UUID
 
     companion object {
 
@@ -58,10 +67,24 @@ class Profile(val player: Player) {
 
     fun drop() {
         if (isChallenging) {
-            val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return
-            playerZone.removePlayerUUID(player.uniqueId)
-            submit(delay = 3, async = true) {
-                if (playerZone.playerUUIDList.size <= 0) playerZone.del()
+            when (zoneType) {
+                DEFAULT -> {
+                    val defaultZone = DefaultZone.getByPlayer(player.uniqueId) ?: return
+                    defaultZone.removePlayerUUID(player.uniqueId)
+                    submit(delay = 3, async = true) {
+                        if (defaultZone.playerUUIDList.size <= 0) defaultZone.del()
+                    }
+                }
+                SPECIAL -> {
+                    val specialZone = SpecialZone.getByPlayer(player.uniqueId) ?: return
+                    specialZone.removePlayerUUID(player.uniqueId)
+                    submit(delay = 3, async = true) {
+                        if (specialZone.playerUUIDList.size <= 0) specialZone.del()
+                    }
+                }
+                UNLIMITED -> {
+                    // TODO: UNLIMITED.
+                }
             }
             BossBar.close(player)
         }

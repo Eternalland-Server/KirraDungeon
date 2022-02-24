@@ -1,4 +1,4 @@
-package net.sakuragame.eternal.kirradungeon.server.zone.player
+package net.sakuragame.eternal.kirradungeon.server.zone.impl
 
 /**
  * 副本失败类型.

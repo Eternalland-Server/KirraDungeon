@@ -2,36 +2,47 @@ package net.sakuragame.eternal.kirradungeon.server.function
 
 import net.sakuragame.eternal.dragoncore.api.CoreAPI
 import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
+import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.justmessage.api.common.NotifyBox
 import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxConfirmEvent
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
-import net.sakuragame.eternal.kirradungeon.server.zone.player.PlayerZone
-import org.bukkit.GameMode
+import net.sakuragame.eternal.kirradungeon.server.function.baffle.FunctionBaffle
+import net.sakuragame.eternal.kirradungeon.server.isSpectator
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.platform.util.asLangText
 import taboolib.platform.util.hasItem
 
 object FunctionResurgence {
 
     private const val RESURGENCE_BOX_KEY = "RESURGENCE_BOX"
 
-    @Awake(LifeCycle.ACTIVE)
+    private const val TRIGGER_KEY = "M"
+
+    @Awake(LifeCycle.ENABLE)
     fun e() {
-        CoreAPI.registerKey("M")
+        CoreAPI.registerKey(TRIGGER_KEY)
     }
 
     @SubscribeEvent
     fun e(e: KeyPressEvent) {
-        if (e.key.uppercase() != "M") {
+        if (e.key != TRIGGER_KEY) {
             return
         }
         val player = e.player
-        val profile = e.player.profile()
-        val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return
-        if (player.gameMode == GameMode.SPECTATOR && playerZone.canResurgence()) {
+        val profile = player.profile()
+        if (profile.isQuitting) return
+        if (!FunctionBaffle.functionBaffle.hasNext(player.name)) {
+            return
+        }
+        FunctionBaffle.functionBaffle.next(player.name)
+        val playerZone = DefaultZone.getByPlayer(player.uniqueId) ?: return
+        if (player.isSpectator() && playerZone.canResurgence()) {
             if (!player.isPlayerHasResurgenceItem()) {
+                MessageAPI.sendActionTip(player, player.asLangText("message-player-not-has-resurgence-item"))
                 return
             }
             NotifyBox(RESURGENCE_BOX_KEY, "&6&l副本", listOf("是否花费一复活币复活?")).open(player, false)
@@ -44,9 +55,9 @@ object FunctionResurgence {
             return
         }
         val player = e.player
-        val playerZone = PlayerZone.getByPlayer(player.uniqueId) ?: return
+        val defaultZone = DefaultZone.getByPlayer(player.uniqueId) ?: return
         player.closeInventory()
-        playerZone.resurgence(player)
+        defaultZone.resurgence(player)
     }
 
     private fun Player.isPlayerHasResurgenceItem(): Boolean {

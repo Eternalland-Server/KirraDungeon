@@ -20,7 +20,8 @@ data class ZoneData(
     val spawnLoc: ZoneLocation,
     val zoneSkyData: ZoneSkyData? = null,
     val number: Int,
-    val iconNumber: Int
+    val iconNumber: Int,
+    val resurgenceTime: Int,
 ) {
 
     fun isCustomSkyEnabled() = this.zoneSkyData != null

@@ -1,6 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.event
 
-import net.sakuragame.eternal.kirradungeon.server.zone.player.PlayerZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.IZone
 import org.bukkit.entity.Player
 import taboolib.platform.type.BukkitProxyEvent
 
@@ -11,4 +11,4 @@ import taboolib.platform.type.BukkitProxyEvent
  * @author kirraObj
  * @since 2021/12/9 17:57
  */
-class DungeonJoinEvent(val player: Player, val dungeonId: String, val playerZone: PlayerZone) : BukkitProxyEvent()
+class DungeonJoinEvent(val player: Player, val dungeonId: String, val zone: IZone) : BukkitProxyEvent()

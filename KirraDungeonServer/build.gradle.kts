@@ -3,7 +3,6 @@ val projectVersion: String by project
 
 plugins {
     `java-library`
-    `maven-publish`
     id("io.izzel.taboolib") version "1.34"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
 }
@@ -31,6 +30,7 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper")
     install("module-database")
+    install("module-nms", "module-nms-util")
     classifier = null
     version = libVersion
 }
@@ -54,7 +54,7 @@ dependencies {
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DataManager-Bukkit-API:1.3.2-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:BetonQuest:1.13.0-SNAPSHOT@jar")
-    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.1.2-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.1.6-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.2-SNAPSHOT@jar")
