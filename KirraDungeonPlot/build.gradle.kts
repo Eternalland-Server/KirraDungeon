@@ -49,6 +49,7 @@ repositories {
 
 dependencies {
     compileOnly("public:MythicMobs:4.12.0@jar")
+    compileOnly("net.sakuragame.eternal:NergiganteScript:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.0.9-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")

@@ -20,4 +20,10 @@ message-player-lose-dungeon:
   - "&4&l➱ &c您可以等待您的队友通关, 或是再次回到主城服进行挑战."
 message-player-over-time: "&4&l超时!"
 message-player-all-dead: "&4&l全灭!"
-message-player-succ-to-next-floor: "&6&l➱ &e成功击杀 BOSS, 当前层数: {0} &a(+1)"
+message-player-succ-to-next-floor:
+  - "&6&l➱ &e成功击杀 BOSS, 当前层数: {0} &a(+1)"
+  - "&6&l➱ &e将自动跳转到下一层..."
+message-player-start-to-fight:
+  - "&6&l➱ &e开始战斗! "
+message-player-lifted-from-void:
+  - "&6&l➱ &eOpps! 请不要在这里做极限运动! "

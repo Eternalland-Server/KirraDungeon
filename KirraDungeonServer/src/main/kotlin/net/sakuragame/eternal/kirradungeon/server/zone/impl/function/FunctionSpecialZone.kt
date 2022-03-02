@@ -1,8 +1,8 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl.function
 
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
+import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
@@ -45,11 +45,12 @@ object FunctionSpecialZone {
         specialZone.removeMonsterUUID(entity.uniqueId)
         val loc = specialZone.zone.data.monsterData.mobList.map { it.loc.toBukkitLocation(entity.world) }.random()
         val resurgenceTime = specialZone.zone.data.resurgenceTime
+        // 无脑刷类型, 怪物死亡之后让它在数秒后重生.
         submit(delay = resurgenceTime * 20L) {
             if (Bukkit.getWorlds().none { it.uid == loc.world.uid }) {
                 return@submit
             }
-            val mob = mobType.spawn(BukkitAdapter.adapt(loc), 1.0)
+            val mob = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(mobType, loc, 1)
             specialZone.addMonsterUUID(mob.uniqueId)
         }
     }

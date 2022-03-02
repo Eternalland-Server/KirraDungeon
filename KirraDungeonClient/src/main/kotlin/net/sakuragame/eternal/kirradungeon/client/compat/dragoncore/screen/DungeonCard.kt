@@ -8,7 +8,12 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.JOIN
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
+import net.sakuragame.eternal.kirradungeon.client.zone.Zone
+import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
+import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeMaxJoinCounts
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import taboolib.module.chat.colored
 
 
 /**
@@ -28,7 +33,12 @@ object DungeonCard : IScreen {
             addComponent(TextureComp("card_img", subScreen.description.bgPath)
                 .setExtend("desc_img")
             )
-            addComponent(LabelComp("card_contents", subScreen.description.text)
+            val newList = arrayListOf<String>().also {
+                it.addAll(subScreen.description.text)
+                it.add("")
+                it.add(getJoinCountsData(player, subScreen.teleportData) ?: "")
+            }
+            addComponent(LabelComp("card_contents", newList)
                 .setExtend("desc_contents")
             )
             if (!subScreen.isSingle) {
@@ -59,5 +69,25 @@ object DungeonCard : IScreen {
                 )
             }
         }
+    }
+
+    private fun getJoinCountsData(player: Player, dungeonId: String): String? {
+        val zone = Zone.getByID(dungeonId) ?: return null
+        val maxCounts = player.getFeeMaxJoinCounts(zone)
+        val currentCounts = player.getFeeJoinCounts(zone)
+        Bukkit.broadcastMessage("maxCounts: $maxCounts, currentCounts: $currentCounts")
+        // 无限副本次数.
+        if (currentCounts >= 999 || currentCounts == -1) {
+            return "&6&l副本次数: &a无限/无限".colored()
+        }
+        // 次数不满.
+        if (currentCounts < maxCounts) {
+            return "&6&l副本次数: &e$currentCounts/$maxCounts".colored()
+        }
+        // 次数为零.
+        if (currentCounts <= 0) {
+            return "&6&l副本次数: &c$currentCounts/0".colored()
+        }
+        return ""
     }
 }

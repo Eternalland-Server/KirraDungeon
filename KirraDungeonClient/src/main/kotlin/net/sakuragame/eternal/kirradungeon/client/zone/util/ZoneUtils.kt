@@ -4,38 +4,34 @@ import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
 import net.sakuragame.eternal.gemseconomy.currency.EternalCurrency
 import net.sakuragame.eternal.kirradungeon.client.getTodayTimeUnix
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
+import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition
 import org.bukkit.entity.Player
-import taboolib.common.platform.function.submit
-import java.util.concurrent.atomic.AtomicInteger
 
-fun getSymbolByIndex(index: Int) =
-    when (index) {
-        0 -> "|"
-        1 -> "/"
-        2 -> "-"
-        3 -> "\\"
-        else -> ""
-    }
+fun getNonDefaultZoneCondition(player: Player, zone: Zone): ZoneCondition {
+    return zone.condition
+        .firstOrNull { it.permissionName != "default" && player.hasPermission(it.permissionName) }
+        ?: getDefaultZoneConditions(zone)
+}
 
-fun Player.getFeeMaxJoinCounts(zone: Zone, player: Player): Int {
+fun getDefaultZoneConditions(zone: Zone): ZoneCondition {
+    return zone.condition.first()
+}
+
+fun Player.getFeeMaxJoinCounts(zone: Zone): Int {
     if (isOp) return -1
-    return zone.condition.firstOrNull { player.hasPermission(it.permissionName) }?.dailyCounts ?: 0
+    return getNonDefaultZoneCondition(this, zone).dailyCounts
 }
 
 fun Player.getFeeJoinCounts(zone: Zone): Int {
-    val maxJoinCounts = getFeeMaxJoinCounts(zone, this)
-    if (maxJoinCounts == -1) return 1
-    val joinCounts = AtomicInteger(0)
-    submit(async = true) {
-        val userLogs = DungeonClientAPI.getLogManager().getUserLogs(uniqueId, zone.name, false, getTodayTimeUnix(), -1) ?: return@submit
-        joinCounts.set(maxJoinCounts - userLogs.size)
-    }
-    return joinCounts.get()
+    val maxJoinCounts = getFeeMaxJoinCounts(zone)
+    if (maxJoinCounts == -1) return -1
+    val userLogs = DungeonClientAPI.getLogManager().getUserLogs(uniqueId, zone.name, false, getTodayTimeUnix(), -1).size
+    return maxJoinCounts - userLogs
 }
 
 fun Player.getZoneFee(zone: Zone): MutableMap<EternalCurrency, Double> {
     val emptyFeeData = mutableMapOf<EternalCurrency, Double>()
-    val condition = zone.condition.firstOrNull { player.hasPermission(it.permissionName) } ?: return emptyFeeData
+    val condition = getNonDefaultZoneCondition(this, zone)
     if (isOp) return emptyFeeData
     condition.feeToTypeMap.forEach { (currencyString, value) ->
         val currency = EternalCurrency.values().find { currencyString.lowercase() == it.identifier } ?: EternalCurrency.Coins
@@ -47,5 +43,5 @@ fun Player.getZoneFee(zone: Zone): MutableMap<EternalCurrency, Double> {
 fun Player.getZoneItems(zone: Zone): MutableMap<String, Int> {
     val emptyItemsData = mutableMapOf<String, Int>()
     if (isOp) return emptyItemsData
-    return zone.condition.firstOrNull { player.hasPermission(it.permissionName) }?.itemIDToAmountMap ?: emptyItemsData
+    return getNonDefaultZoneCondition(this, zone).itemIDToAmountMap
 }

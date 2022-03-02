@@ -13,11 +13,11 @@ message-dungeon-teleport-timed-out:
   - "&4&l➱ &c执行传送操作时超时, 目标服务器: {0}."
   - "&4&l➱ &c若频繁出现该信息, 请截图联系管理员."
 message-dungeon-count-not-enough:
-  - "&4&l➱ &c玩家 &r{0}&c 的进入次数不够了."
+  - "抱歉... 但玩家 &r{0}&f 没有足够的进入次数."
 message-dungeon-economy-not-enough:
-  - "&4&l➱ &c玩家 &r{0}&c 没有足额的 {1} 货币."
+  - "抱歉... 但玩家 &r{0}&f 没有足额的货币."
 message-dungeon-item-not-enough:
-  - "&4&l➱ &c玩家 &r{1}&c 没有足够的物品."
+  - "抱歉... 但玩家 &r{0}&f 没有足够的物品."
 message-unknown-dungeon-exception:
   - "&4&l➱ &c未知的副本名, 请向管理员反馈!"
 message-dungeon-server-ran-out-exception:

@@ -19,7 +19,7 @@ class DefaultZone(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     init {
         // 超时判断. (副本创建后长时间未进入)
-        submit(async = true, delay = 1000) {
+        submit(async = true, delay = 2000) {
             if (canDel()) {
                 del()
                 cancel()
@@ -27,6 +27,8 @@ class DefaultZone(override val zone: Zone, override val dungeonWorld: DungeonWor
             }
         }
     }
+
+    override val createdTime = System.currentTimeMillis()
 
     override var isClear = false
 

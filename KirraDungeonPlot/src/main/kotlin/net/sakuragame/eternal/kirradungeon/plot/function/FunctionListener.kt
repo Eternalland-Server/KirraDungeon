@@ -49,7 +49,7 @@ import kotlin.math.roundToInt
 @Suppress("SpellCheckingInspection")
 object FunctionListener {
 
-    val countDownMap = ConcurrentHashMap<UUID, Int>()
+    private val countDownMap = ConcurrentHashMap<UUID, Int>()
 
     @Awake(LifeCycle.ACTIVE)
     fun init() {

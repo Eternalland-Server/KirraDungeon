@@ -8,7 +8,7 @@ import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxConfirmEvent
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.function.baffle.FunctionBaffle
 import net.sakuragame.eternal.kirradungeon.server.isSpectator
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.getIZone
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -39,8 +39,8 @@ object FunctionResurgence {
             return
         }
         FunctionBaffle.functionBaffle.next(player.name)
-        val playerZone = DefaultZone.getByPlayer(player.uniqueId) ?: return
-        if (player.isSpectator() && playerZone.canResurgence()) {
+        val zone = profile.getIZone() ?: return
+        if (player.isSpectator() && zone.canResurgence()) {
             if (!player.isPlayerHasResurgenceItem()) {
                 MessageAPI.sendActionTip(player, player.asLangText("message-player-not-has-resurgence-item"))
                 return
@@ -55,9 +55,10 @@ object FunctionResurgence {
             return
         }
         val player = e.player
-        val defaultZone = DefaultZone.getByPlayer(player.uniqueId) ?: return
+        val profile = player.profile()
         player.closeInventory()
-        defaultZone.resurgence(player)
+        val zone = profile.getIZone() ?: return
+        zone.resurgence(player)
     }
 
     private fun Player.isPlayerHasResurgenceItem(): Boolean {

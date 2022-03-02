@@ -132,11 +132,10 @@ object FunctionDungeonListener {
             PacketSender.sendRunFunction(player, "default", "global.dungeon_current_selected = ${paramData.screen.defaultSelectScreen};", true)
             toData.param3 = paramData.screen.defaultSelectScreen
         }
-        FunctionDungeon.openAssignGUI(player, toData)
-        doPage(player, paramData)
+        FunctionDungeon.openAssignGUI(player, toData, paramData)
     }
 
-    private fun doPage(player: Player, paramData: ParamData) {
+     fun doPage(player: Player, paramData: ParamData) {
         val page = paramData.toData.param4
         val droppedItems = paramData.subScreen.droppedItems
         if (page > DungeonAPI.getMaxPage(droppedItems) || page < 1) {

@@ -1,20 +1,22 @@
 package net.sakuragame.eternal.kirradungeon.client.zone
 
-import ink.ptms.zaphkiel.ZaphkielAPI
 import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
 import net.sakuragame.dungeonsystem.common.exception.DungeonServerRunOutException
 import net.sakuragame.dungeonsystem.common.exception.UnknownDungeonException
 import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
-import net.sakuragame.eternal.gemseconomy.api.GemsEconomyAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
-import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
-import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneFee
-import net.sakuragame.eternal.kirradungeon.client.zone.util.getZoneItems
+import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkCounts
+import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkFee
+import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkItems
+import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.withDraw
+import net.sakuragame.eternal.kirraparty.bukkit.party.Party
+import net.sakuragame.eternal.kirraparty.bukkit.party.Party.Companion.getParty
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
-import taboolib.platform.util.*
+import taboolib.platform.util.sendLang
 import java.util.*
 
 data class Zone(val name: String, val condition: List<ZoneCondition>) {
@@ -39,15 +41,44 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
         }
 
         private fun clearAll() = zones.clear()
+
+        fun preJoin(player: Player, name: String) {
+            if (name == "nergigante_dragon" && !player.hasPermission("admin")) {
+                player.sendLang("command-cant-join-story-zone")
+                return
+            }
+            val zone = getByID(name)
+            if (zone == null) {
+                player.sendLang("command-not-found-zone")
+                return
+            }
+            // 与组队系统挂钩.
+            val party = player.getParty()
+            if (party == null) {
+                zone.join(listOf(player))
+                return
+            }
+            if (party.getTeamPosition(player.uniqueId) != Party.Position.LEADER) {
+                player.sendLang("command-member-try-join-zone")
+                return
+            } else {
+                zone.join(party.getWholeMembers().map {
+                    Bukkit.getPlayer(it) ?: kotlin.run {
+                        player.sendLang("command-party-member-not-found")
+                        return
+                    }
+                })
+            }
+        }
     }
 
     fun join(players: List<Player>) {
         // 检查玩家进入是否拥有足额进入次数.
-        if (!players.checkCounts()) return
+        if (!players.checkCounts(this)) return
         // 检查玩家是否拥有目标金额.
-        if (!players.checkFee()) return
+        if (!players.checkFee(this)) return
         // 检查玩家是否拥有目标物品.
-        if (!players.checkItems()) return
+        if (!players.checkItems(this)) return
         // 进行扣除操作. (物品 & 金额)
         players.withDraw()
         // 进行传送操作, 之后转交由 Server 端处理.
@@ -101,82 +132,6 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
 
     fun Player.teleportToAnotherServer(serverId: String) {
         KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverId, this)
-    }
-
-    private fun List<Player>.sendMessage(message: String) = forEach { it.sendMessage(message) }
-
-    private fun List<Player>.checkFee(): Boolean {
-        forEach {
-            val feeMap = it.getZoneFee(this@Zone)
-            if (feeMap.isEmpty()) return true
-            feeMap.forEach mapForeach@{ mapFee ->
-                val playerBal = GemsEconomyAPI.getBalance(it.uniqueId, mapFee.key)
-                if (playerBal >= mapFee.value) {
-                    if (ZoneWithDraw.gemsMap.containsKey(it.uniqueId)) {
-                        ZoneWithDraw.gemsMap[it.uniqueId]!![mapFee.key] = mapFee.value
-                        return@mapForeach
-                    }
-                    ZoneWithDraw.gemsMap[it.uniqueId] = mutableMapOf(Pair(mapFee.key, mapFee.value))
-                } else {
-                    sendMessage(it.asLangText("message-dungeon-economy-not-enough", it.name, mapFee.key))
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    private fun List<Player>.checkCounts(): Boolean {
-        forEach {
-            if (it.getFeeJoinCounts(this@Zone) < 0) {
-                sendMessage(it.asLangText("message-dungeon-count-not-enough", it.name))
-                return false
-            }
-        }
-        return true
-    }
-
-    private fun List<Player>.checkItems(): Boolean {
-        forEach {
-            val itemMap = it.getZoneItems(this@Zone)
-            if (itemMap.isEmpty()) return true
-            itemMap.forEach mapForeach@{ mapItem ->
-                if (!ZaphkielAPI.registeredItem.containsKey(mapItem.key)) {
-                    return@mapForeach
-                }
-                val item = ZaphkielAPI.registeredItem[mapItem.key]!!.buildItemStack(it)
-                if (item.isAir()) return@mapForeach
-                if (!it.checkItem(item, mapItem.value, remove = false)) {
-                    sendMessage(it.asLangText(it.asLangText("message-dungeon-item-not-enough", it.name, item.itemMeta.displayName)))
-                    return false
-                } else {
-                    if (ZoneWithDraw.itemsMap.containsKey(it.uniqueId)) {
-                        ZoneWithDraw.itemsMap[it.uniqueId]!![mapItem.key] = mapItem.value
-                        return@mapForeach
-                    }
-                    ZoneWithDraw.itemsMap[it.uniqueId] = mutableMapOf(Pair(mapItem.key, mapItem.value))
-                }
-            }
-        }
-        return true
-    }
-
-    private fun List<Player>.withDraw() {
-        forEach { player ->
-            if (ZoneWithDraw.itemsMap.containsKey(player.uniqueId)) {
-                val itemMapList = ZoneWithDraw.itemsMap[player.uniqueId]!!
-                itemMapList.forEach { itemMap ->
-                    player.inventory.takeItem(itemMap.value) { it.isSimilar(ZaphkielAPI.registeredItem[itemMap.key]!!.buildItemStack(player)) }
-                }
-            }
-            if (ZoneWithDraw.gemsMap.containsKey(player.uniqueId)) {
-                val gemPairList = ZoneWithDraw.gemsMap[player.uniqueId]!!
-                gemPairList.forEach {
-                    GemsEconomyAPI.withdraw(player.uniqueId, it.value, it.key)
-                }
-            }
-            ZoneWithDraw.recycleVars(player)
-        }
     }
 
     override fun toString() = "Zone($name, $condition)"

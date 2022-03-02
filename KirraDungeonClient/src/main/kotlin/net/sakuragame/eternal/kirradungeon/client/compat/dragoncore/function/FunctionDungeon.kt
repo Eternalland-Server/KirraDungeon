@@ -3,6 +3,7 @@ package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.function
 import com.taylorswiftcn.megumi.uifactory.generate.function.Statements
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamData
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamNumData
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
@@ -22,12 +23,12 @@ object FunctionDungeon {
     }
 
     fun sendScreen(player: Player, screen: DungeonScreen, subScreen: DungeonSubScreen) {
-        player.apply {
-            DungeonCard.send(this, screen, subScreen)
-            DungeonCategory.send(this, screen, subScreen)
-            DungeonRegion.send(this, screen, subScreen)
-            DungeonRoom.send(this, screen, subScreen)
-            Dungeon.send(this, screen, subScreen)
+        player.also {
+            DungeonCard.send(it, screen, subScreen)
+            DungeonCategory.send(it, screen, subScreen)
+            DungeonRegion.send(it, screen, subScreen)
+            DungeonRoom.send(it, screen, subScreen)
+            Dungeon.send(it, screen, subScreen)
         }
     }
 
@@ -41,7 +42,7 @@ object FunctionDungeon {
         }
     }
 
-    fun openAssignGUI(player: Player, numData: ParamNumData) {
+    fun openAssignGUI(player: Player, numData: ParamNumData, paramData: ParamData? = null) {
         val statements = Statements()
             .add("global.dungeon_category = ${numData.param1};")
             .add("global.dungeon_sub_category =  ${numData.param2};")
@@ -51,7 +52,12 @@ object FunctionDungeon {
         val category = DungeonAPI.getDungeonCategory(numData.param1)
         val screen = DungeonAPI.getDungeonScreen(category, numData.param2) ?: return
         val subScreen = screen.dungeonSubScreens[numData.param3 - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
-        sendScreen(player, screen, subScreen)
-        PacketSender.sendOpenGui(player, Dungeon.screenId)
+        submit(async = true, delay = 3L) {
+            sendScreen(player, screen, subScreen)
+            PacketSender.sendOpenGui(player, Dungeon.screenId)
+            if (paramData != null) {
+                FunctionDungeonListener.doPage(player, paramData)
+            }
+        }
     }
 }

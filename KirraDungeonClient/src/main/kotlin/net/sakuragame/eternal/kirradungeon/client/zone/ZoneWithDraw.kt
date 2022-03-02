@@ -17,16 +17,18 @@ class ZoneWithDraw {
         val itemsMap = mutableMapOf<UUID, MutableMap<String, Int>>()
 
         @EventHandler
-        fun e(e: PlayerQuitEvent) =
+        fun e(e: PlayerQuitEvent) {
             submit(async = true) {
                 recycleVars(e.player)
             }
+        }
 
         @EventHandler
-        fun e(e: PlayerKickEvent) =
+        fun e(e: PlayerKickEvent) {
             submit(async = true) {
                 recycleVars(e.player)
             }
+        }
 
         fun recycleVars(player: Player) {
             if (gemsMap.containsKey(player.uniqueId)) gemsMap.remove(player.uniqueId)

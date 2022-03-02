@@ -4,6 +4,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerKickEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
@@ -26,6 +27,13 @@ class Profile(val player: Player) {
     companion object {
 
         val profiles = mutableMapOf<String, Profile>()
+
+        @Schedule(async = true, period = 20 * 60 * 5)
+        fun s() {
+            profiles.values.forEach {
+                it.save()
+            }
+        }
 
         fun Player.profile() = profiles.values.first { it.player.uniqueId == uniqueId }
 
@@ -55,7 +63,7 @@ class Profile(val player: Player) {
     }
 
     fun read() {
-        submit(async = true, delay = 40L) {
+        submit(async = true, delay = 3L) {
             val num = Database.getNumber(player) ?: return@submit
             number.set(num)
         }

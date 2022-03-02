@@ -8,15 +8,25 @@ import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.isSpectator
+import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
+import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.getIZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedZone
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.submit
+import taboolib.module.chat.colored
+import taboolib.platform.util.sendLang
 
 /**
  * KirraDungeons
@@ -39,9 +49,7 @@ object FunctionCommonListener {
         when (copyZoneData.type) {
             DEFAULT -> DefaultZone.create(copyZone, e.dungeonWorld)
             SPECIAL -> SpecialZone.create(copyZone, e.dungeonWorld)
-            UNLIMITED -> {
-                // TODO: fill it
-            }
+            UNLIMITED -> UnlimitedZone.create(copyZone, e.dungeonWorld)
         }
     }
 
@@ -62,8 +70,45 @@ object FunctionCommonListener {
     fun e(e: EntityDamageEvent) {
         val player = e.entity as? Player ?: return
         val profile = player.profile()
-        val playerZone = DefaultZone.getByPlayer(player.uniqueId)
-        if (playerZone == null || !profile.isChallenging) {
+        if (!profile.isChallenging) {
+            e.isCancelled = true
+            return
+        }
+        if (e.cause == EntityDamageEvent.DamageCause.VOID) {
+            e.isCancelled = true
+            val iZone = profile.getIZone() ?: return
+            player.teleport(iZone.zone.data.spawnLoc.toBukkitLocation(player.world))
+            player.sendLang("message-player-lifted-from-void")
+        }
+    }
+
+    // 玩家死亡判断.
+    @SubscribeEvent
+    fun e(e: PlayerDeathEvent) {
+        val player = e.entity
+        if (!player.profile().isChallenging) return
+        val zone = when (player.profile().zoneType) {
+            DEFAULT -> DefaultZone.getByPlayer(e.entity.uniqueId) ?: return
+            SPECIAL -> SpecialZone.getByPlayer(e.entity.uniqueId) ?: return
+            UNLIMITED -> UnlimitedZone.getByPlayer(e.entity.uniqueId) ?: return
+        }
+        player.apply {
+            playDeathAnimation()
+            health = maxHealth
+            turnToSpectator()
+            sendTitle("&c&l菜".colored(), "", 0, 40, 10)
+        }
+        submit(async = false, delay = 10L) {
+            if (zone.isAllPlayersDead() && zone.failThread == null) {
+                zone.startFailThread()
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: BlockBreakEvent) {
+        if (!e.player.profile().isChallenging) return
+        if (e.player.gameMode != GameMode.CREATIVE) {
             e.isCancelled = true
         }
     }

@@ -14,6 +14,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedZone
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
@@ -42,7 +43,6 @@ interface IZone {
      * 副本创建时间.
      */
     val createdTime: Long
-        get() = System.currentTimeMillis()
 
     /**
      * 原副本信息.
@@ -91,7 +91,7 @@ interface IZone {
 
     /**
      * 失败线程.
-     * 它会在全部玩家死亡后触发, 若所有实体没在规定时间内复活, 则副本挑战失败.
+     * 它会在全部玩家死亡后触发, 若所有玩家没在规定时间内复活, 则副本挑战失败.
      * 判断死亡的依据为玩家是否为 SPECTATOR 模式.
      */
     var failThread: PlatformExecutor.PlatformTask?
@@ -168,7 +168,7 @@ interface IZone {
         }
         submit(delay = 40) {
             showJoinMessage(player, zone.name)
-            spawnEntities(zone, dungeonWorld, spawnBoss, spawnMob)
+            spawnEntities(spawnBoss, spawnMob)
             runTimer()
             DungeonJoinEvent(player, zone.id, this@IZone).call()
         }
@@ -177,15 +177,14 @@ interface IZone {
     /**
      * 生成副本怪物.
      */
-    fun spawnEntities(zone: Zone, world: DungeonWorld, spawnBoss: Boolean, spawnEntity: Boolean) {
-        if (!spawnEntity && !spawnBoss) return
+    fun spawnEntities(spawnBoss: Boolean, spawnEntity: Boolean, bossLevel: Int = 1) {
         val monsterData = zone.data.monsterData
         val mobData = monsterData.mobList
         val bossData = monsterData.boss
         if (spawnEntity) {
             mobData.forEach { monster ->
                 // 将 ZoneLocation 转换为 BukkitLocation.
-                val bukkitLoc = monster.loc.toBukkitLocation(world.bukkitWorld).add(0.0, 1.0, 0.0)
+                val bukkitLoc = monster.loc.toBukkitLocation(dungeonWorld.bukkitWorld).add(0.0, 1.0, 0.0)
                 // 调用 MythicmobsAPI, 将怪物生成到世界坐标.
                 repeat(monster.amount) {
                     val randomLoc = bukkitLoc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
@@ -196,7 +195,7 @@ interface IZone {
             }
         }
         if (spawnBoss) {
-            val bossEntity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(bossData.type, bossData.loc.toBukkitLocation(world.bukkitWorld)) as LivingEntity
+            val bossEntity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(bossData.type, bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld), bossLevel) as LivingEntity
             bossEntity.isGlowing = true
             bossUUID = bossEntity.uniqueId
         }
@@ -246,7 +245,7 @@ interface IZone {
     /**
      * 更新 BOSS 血条为所有队伍玩家.
      */
-    fun updateBossBar(bossIcon: String = "21", init: Boolean = false) {
+    fun updateBossBar(init: Boolean = false) {
         submit(delay = 3L) {
             val bossEntity = getBoss() ?: return@submit
             val healthPercent = bossEntity.health / getMobMaxHealth(bossEntity)
@@ -256,7 +255,7 @@ interface IZone {
                         it,
                         bossEntity.name,
                         "",
-                        bossIcon,
+                        zone.data.iconNumber.toString(),
                         healthPercent,
                         lastTime
                     )
@@ -359,7 +358,7 @@ interface IZone {
         when (zone.data.type) {
             DEFAULT -> DefaultZone.defaultZones.remove(this)
             SPECIAL -> SpecialZone.specialZones.remove(this)
-            UNLIMITED -> TODO()
+            UNLIMITED -> UnlimitedZone.unlimitedZones.remove(this)
         }
     }
 

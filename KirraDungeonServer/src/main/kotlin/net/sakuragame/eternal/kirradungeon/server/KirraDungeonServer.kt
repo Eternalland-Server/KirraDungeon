@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 @Suppress("SpellCheckingInspection")
 object KirraDungeonServer : Plugin() {
 
-    @Config("config.yml", autoReload = true)
+    @Config("config.yml")
     lateinit var conf: Configuration
         private set
 

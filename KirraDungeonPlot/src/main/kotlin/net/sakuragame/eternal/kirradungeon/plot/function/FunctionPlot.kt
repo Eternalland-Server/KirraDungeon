@@ -28,12 +28,12 @@ object FunctionPlot {
 
     const val battleThemeBgmId = "nergigante_dragon_battle_theme.ogg"
 
-    val playerSpawnLoc by lazy {
+    private val playerSpawnLoc by lazy {
         val strLoc = KirraDungeonPlot.conf.getString("settings.spawn-point.player")!!
         requireNotNull(ZoneLocation.parseToZoneLocation(strLoc))
     }
 
-    val mobSpawnLoc by lazy {
+    private val mobSpawnLoc by lazy {
         val strLoc = KirraDungeonPlot.conf.getString("settings.spawn-point.mob")!!
         requireNotNull(ZoneLocation.parseToZoneLocation(strLoc))
     }
@@ -51,12 +51,12 @@ object FunctionPlot {
         }
     }
 
-    fun getPlayerSpawnLoc(player: Player): Location? {
+    private fun getPlayerSpawnLoc(player: Player): Location? {
         val profile = player.profile() ?: return null
         return playerSpawnLoc.toBukkitLocation(profile.dungeonWorld!!.bukkitWorld)
     }
 
-    fun getMobSpawnLoc(player: Player): Location? {
+    private fun getMobSpawnLoc(player: Player): Location? {
         val profile = player.profile() ?: return null
         return mobSpawnLoc.toBukkitLocation(profile.dungeonWorld!!.bukkitWorld)
     }
@@ -65,7 +65,7 @@ object FunctionPlot {
         player.profile()?.removeAllEntities()
     }
 
-    fun startBound(player: Player, loc: Location) {
+    private fun startBound(player: Player, loc: Location) {
         val armorStand = spawnArmorStand(loc)
         val profile = player.profile() ?: return
         profile.entityList.add(armorStand)

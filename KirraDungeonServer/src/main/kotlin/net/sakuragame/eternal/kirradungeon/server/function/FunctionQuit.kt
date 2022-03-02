@@ -7,7 +7,6 @@ import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxConfirmEvent
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.function.baffle.FunctionBaffle
 import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -47,7 +46,7 @@ object FunctionQuit {
         val profile = player.profile()
         player.closeInventory()
         player.turnToSpectator()
-        if (DefaultZone.getByPlayer(player.uniqueId) == null) {
+        if (!profile.isChallenging) {
             return
         }
         KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在将您传送回大厅 &f@", false)

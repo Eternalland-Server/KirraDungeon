@@ -20,7 +20,9 @@ fun kickPlayerByNotFoundData(player: Player) {
     player.kickPlayer(strBuilder.toString())
 }
 
-fun getMobMaxHealth(entity: LivingEntity) = KirraDungeonServer.mythicmobsAPI.getMythicMobInstance(entity).type.health.get()
+fun getMobMaxHealth(entity: LivingEntity): Double {
+    return entity.maxHealth
+}
 
 fun formatSeconds(timeInSeconds: Int): String {
     val secondsLeft = timeInSeconds % 3600 % 60
