@@ -1,5 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen
 
+import net.sakuragame.eternal.kirradungeon.client.getCurrentHour
+
 /**
  * 副本房间实例.
  *
@@ -24,7 +26,8 @@ data class DungeonSubScreen(
     val forceEmpty: Boolean = false,
     val teleportType: ScreenTeleportType,
     val teleportData: String,
-    val droppedItems: List<String> = mutableListOf()
+    val droppedItems: List<String> = mutableListOf(),
+    val limitTime: ScreenLimitTime
 ) {
 
     enum class ScreenTeleportType {
@@ -32,4 +35,17 @@ data class DungeonSubScreen(
     }
 
     data class ScreenDescription(val text: List<String>, val bgPath: String)
+
+    data class ScreenLimitTime(var from: Int, var to: Int) {
+
+        fun isActive() = this.from != 0 && this.to != 0
+
+        fun isInLimitTime(): Boolean {
+            val currentHour = getCurrentHour()
+            if (currentHour in from until to) {
+                return true
+            }
+            return false
+        }
+    }
 }

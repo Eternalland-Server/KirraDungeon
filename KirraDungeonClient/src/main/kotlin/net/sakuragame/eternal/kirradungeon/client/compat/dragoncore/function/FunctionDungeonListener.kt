@@ -6,7 +6,6 @@ import com.taylorswiftcn.megumi.uifactory.generate.function.SubmitParams
 import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.*
@@ -21,7 +20,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common5.Baffle
-import taboolib.platform.util.asLangText
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.Pattern
@@ -79,7 +77,7 @@ object FunctionDungeonListener {
 
     @Suppress("RemoveRedundantQualifierName")
     private fun execCompSubmit(player: Player, compId: String, params: SubmitParams) {
-        val paramData = getParamData(player, params) ?: return
+        val paramData = getParamData(player, params)
         when (DungeonAPI.ParamType.valueOf(params.getParam(1))) {
             UPDATE -> doUpdate(player, paramData)
             JOIN -> doJoin(player, compId, paramData)
@@ -146,15 +144,11 @@ object FunctionDungeonListener {
         DungeonAPI.sendDroppedItems(player, droppedItems, page)
     }
 
-    private fun getParamData(player: Player, params: SubmitParams): ParamData? {
+    private fun getParamData(player: Player, params: SubmitParams): ParamData {
         val fromNumData = getFromNumDataFromParams(params)
         val toNumData = getToNumDataFromParams(fromNumData, params)
         val category = DungeonAPI.getDungeonCategory(toNumData.param1)
-        val screen = DungeonAPI.getDungeonScreen(category, toNumData.param2) ?: kotlin.run {
-            player.closeInventory()
-            MessageAPI.sendActionTip(player, player.asLangText("message-screen-went-wrong-exception"))
-            return null
-        }
+        val screen = DungeonAPI.getDungeonScreen(category, toNumData.param2) ?: DungeonAPI.getDefaultScreen()
         val subScreen = screen.dungeonSubScreens[toNumData.param3 - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
         if (player.profile().debugMode.get()) {
             printParamDataDebugMessage(player, params)

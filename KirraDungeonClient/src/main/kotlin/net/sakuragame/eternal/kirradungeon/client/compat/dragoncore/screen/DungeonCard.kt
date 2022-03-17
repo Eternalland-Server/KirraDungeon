@@ -4,6 +4,7 @@ import com.taylorswiftcn.megumi.uifactory.generate.type.ActionType
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.LabelComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.TextureComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.screen.ScreenUI
+import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.JOIN
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
@@ -11,7 +12,6 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeMaxJoinCounts
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.module.chat.colored
 
@@ -68,25 +68,41 @@ object DungeonCard : IScreen {
                     .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(type = JOIN))
                 )
             }
+            if (subScreen.limitTime.isActive() && !subScreen.limitTime.isInLimitTime()) {
+                addLockComponent()
+            }
+            if (player.profile().number.get() < DungeonAPI.getNumber(subScreen)) {
+                addLockComponent()
+            }
         }
+    }
+
+    private fun ScreenUI.addLockComponent() {
+        addComponent(TextureComp("join_lock", "ui/common/lock_shade.png")
+            .setXY("body.x + 397", "body.y + 279")
+            .setWidth("163")
+            .setHeight("44")
+        )
     }
 
     private fun getJoinCountsData(player: Player, dungeonId: String): String? {
         val zone = Zone.getByID(dungeonId) ?: return null
         val maxCounts = player.getFeeMaxJoinCounts(zone)
         val currentCounts = player.getFeeJoinCounts(zone)
-        Bukkit.broadcastMessage("maxCounts: $maxCounts, currentCounts: $currentCounts")
         // 无限副本次数.
         if (currentCounts >= 999 || currentCounts == -1) {
             return "&6&l副本次数: &a无限/无限".colored()
         }
-        // 次数不满.
-        if (currentCounts < maxCounts) {
-            return "&6&l副本次数: &e$currentCounts/$maxCounts".colored()
-        }
         // 次数为零.
         if (currentCounts <= 0) {
             return "&6&l副本次数: &c$currentCounts/0".colored()
+        }
+        if (currentCounts == maxCounts) {
+            return "&6&l副本次数: &a$currentCounts/$maxCounts".colored()
+        }
+        // 次数不满.
+        if (currentCounts < maxCounts) {
+            return "&6&l副本次数: &e$currentCounts/$maxCounts".colored()
         }
         return ""
     }

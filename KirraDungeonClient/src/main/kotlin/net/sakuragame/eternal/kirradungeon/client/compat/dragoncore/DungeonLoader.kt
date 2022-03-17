@@ -123,6 +123,11 @@ object DungeonLoader {
         }
         val teleportData = section.getString("teleport.data") ?: return null
         val droppedItems = section.getStringList("dropped-item")
+        val limitTime = DungeonSubScreen.ScreenLimitTime(0, 0).apply {
+            val split = section.getString("limit-time")?.split("-") ?: return@apply
+            to = split[0].toInt()
+            from = split[1].toInt()
+        }
         return DungeonSubScreen(
             name,
             iconPath,
@@ -133,7 +138,8 @@ object DungeonLoader {
             isSingle = isSingle,
             teleportType = teleportType,
             teleportData = teleportData,
-            droppedItems = droppedItems
+            droppedItems = droppedItems,
+            limitTime = limitTime
         )
     }
 }

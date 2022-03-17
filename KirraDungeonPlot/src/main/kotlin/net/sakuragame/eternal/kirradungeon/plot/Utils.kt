@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.plot
 
 import org.apache.commons.lang.RandomStringUtils
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
@@ -8,6 +9,14 @@ import org.bukkit.entity.Player
 import pl.betoncraft.betonquest.BetonQuest
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
+
+fun Player.reset() {
+    health = maxHealth
+    gameMode = GameMode.ADVENTURE
+    activePotionEffects.forEach {
+        removePotionEffect(it.type)
+    }
+}
 
 @Suppress("SpellCheckingInspection")
 fun sendBrokenTitleAnimation(player: Player) {

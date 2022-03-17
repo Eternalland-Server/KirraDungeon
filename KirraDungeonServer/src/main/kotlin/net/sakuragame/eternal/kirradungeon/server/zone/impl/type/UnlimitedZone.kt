@@ -5,7 +5,6 @@ import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.IZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
-import org.bukkit.Bukkit
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import java.util.*
@@ -47,7 +46,7 @@ class UnlimitedZone(override val zone: Zone, override val dungeonWorld: DungeonW
      */
     var currentFloor = 1
 
-    override fun runTimer() {
+    override fun onPlayerJoin() {
         startCountdown()
         showResurgenceTitle()
     }

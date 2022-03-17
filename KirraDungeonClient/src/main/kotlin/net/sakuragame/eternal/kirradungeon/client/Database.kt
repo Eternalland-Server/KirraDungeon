@@ -15,7 +15,6 @@ object Database {
     private val host = KirraDungeonClient.conf.getHost("settings.database")
 
     private val tableNumber = Table("${PREFIX}_table_number", host) {
-        add { id() }
         add("uid") {
             type(ColumnTypeSQL.INT) {
                 options(ColumnOptionSQL.UNIQUE_KEY, ColumnOptionSQL.NOTNULL)

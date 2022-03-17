@@ -11,12 +11,11 @@ import java.util.concurrent.atomic.AtomicInteger
 @Suppress("SpellCheckingInspection")
 object Database {
 
-    const val PREFIX = "kirradungeon"
+    private const val PREFIX = "kirradungeon"
 
-    val host = KirraDungeonServer.conf.getHost("settings.database")
+    private val host = KirraDungeonServer.conf.getHost("settings.database")
 
-    val tableNumber = Table("${PREFIX}_table_number", host) {
-        add { id() }
+    private val tableNumber = Table("${PREFIX}_table_number", host) {
         add("uid") {
             type(ColumnTypeSQL.INT) {
                 options(ColumnOptionSQL.UNIQUE_KEY, ColumnOptionSQL.NOTNULL)

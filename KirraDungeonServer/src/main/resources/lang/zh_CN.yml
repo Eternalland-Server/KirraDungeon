@@ -1,12 +1,12 @@
 message-player-not-found-data:
   - "&4&l➱ &c抱歉, 但我们未能查询到您的副本信息, 请重试."
-  - "&4&l➱ &c若频繁出现该信息, 请联系管理员"
+  - "&4&l➱ &c若频繁出现该信息, 请联系管理员."
 message-player-join-dungeon:
   - "&6&l➱ &e开始挑战: &f{0}"
   - "&6&l➱ &e祝您好运, 愿筒子护佑您."
 message-player-clear-dungeon:
   - "&6&l➱ &e挑战成功! "
-  - "&6&l➱ &e{0} 秒后会将您传送回主城服务器!"
+  - "&6&l➱ &f{0} &e秒后会将您传送回主城服务器!"
 message-fail-thread-started:
   - "&4&l➱ &c所有挑战者都已经死亡了..."
   - "&4&l➱ &c您可以使用按 &fM &c键使用复活币进行复活, 否则挑战将会在 &f{0} &c秒后自动结算."

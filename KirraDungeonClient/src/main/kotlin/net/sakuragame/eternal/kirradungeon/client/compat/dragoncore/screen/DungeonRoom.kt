@@ -6,9 +6,9 @@ import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.TextureComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.screen.ScreenUI
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.getNumber
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
-import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import org.bukkit.entity.Player
 import taboolib.module.chat.colored
 import java.util.concurrent.atomic.AtomicBoolean
@@ -84,10 +84,5 @@ object DungeonRoom : IScreen {
             .setWidth("dungeon_${index}.width")
             .setHeight("10")
         )
-    }
-
-    private fun getNumber(subScreen: DungeonSubScreen): Int {
-        val dungeonId = subScreen.teleportData
-        return Zone.getByID(dungeonId)?.condition?.first()?.number ?: return 0
     }
 }

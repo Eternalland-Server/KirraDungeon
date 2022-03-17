@@ -7,6 +7,8 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneMonsterData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneBossData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneMobData
+import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
 import net.sakuragame.eternal.kirradungeon.server.zone.sync.ZoneCondition
 
 object FunctionZone {
@@ -21,7 +23,28 @@ object FunctionZone {
         Zone.i()
     }
 
-    // 设置副本怪物首领
+    // 增加波次副本怪物.
+    fun addWaveMob(zone: Zone, monsterId: String, amount: Int, health: Double) {
+        val id = zone.id
+        val waveIndex = getWaveIndex(id) ?: 1
+        val mobList = arrayListOf<String>().also {
+            it.addAll(data.getStringList("${zone.id}.wave.$waveIndex.monsters"))
+        }
+        mobList += "$monsterId@$amount$health"
+        data["$id.wave.monsters"] = mobList
+        Zone.i()
+    }
+
+    // 设置波次副本首领.
+    fun setWaveBoss(zone: Zone, bossId: String, health: Double) {
+        val id = zone.id
+        val waveIndex = getWaveIndex(id) ?: 1
+        data["$id.wave.$waveIndex.boss.id"] = bossId
+        data["$id.wave.$waveIndex.boss.health"] = health
+        Zone.i()
+    }
+
+    // 设置副本怪物首领.
     fun setBoss(zone: Zone, loc: ZoneLocation, id: String) {
         data["${zone.id}.boss.id"] = id
         data["${zone.id}.boss.loc"] = loc.toString()
@@ -77,6 +100,31 @@ object FunctionZone {
     // 从配置文件读取攻克副本时间.
     fun readMaxLastTime(id: String) = data.getInt("$id.max-last-time")
 
+    // 从配置文件读取波次数据.
+    fun readWaveData(id: String): List<ZoneWaveData>? {
+        if (readType(id) != ZoneType.WAVE) {
+            return null
+        }
+        val waveList = mutableListOf<ZoneWaveData>()
+        val sections = data.getConfigurationSection("$id.wave") ?: return null
+        sections.getKeys(false).forEach {
+            val monsterDataList = mutableListOf<ZoneWaveData.ZoneWaveMonsterData>()
+            val index = it.toInt()
+            data.getStringList("$id.wave.$index.monsters").forEach { str ->
+                val split = str.split("@")
+                val monsterId = split[0]
+                val amount = split[1].toIntOrNull() ?: 1
+                val health = split[2].toDoubleOrNull() ?: 1.0
+                monsterDataList += ZoneWaveData.ZoneWaveMonsterData(monsterId, amount, health)
+            }
+            val bossId = data.getString("$id.wave.$index.boss.id") ?: return null
+            val bossHealth = data.getDouble("$id.wave.boss.$index.health")
+            val bossData = ZoneWaveData.ZoneWaveBossData(bossId, bossHealth)
+            waveList += ZoneWaveData(monsterDataList, bossData)
+        }
+        return waveList
+    }
+
     // 从配置文件读取副本进入条件数据.
     fun readConditions(id: String): MutableList<ZoneCondition> {
         return mutableListOf<ZoneCondition>().also conditionAlso@{ conditionList ->
@@ -118,7 +166,7 @@ object FunctionZone {
     }
 
     // 从配置文件读取数字.
-    fun readNumber(id: String) : Int {
+    fun readNumber(id: String): Int {
         return data.getInt("$id.number")
     }
 
@@ -127,6 +175,7 @@ object FunctionZone {
         return data.getInt("$id.icon")
     }
 
+    // 从配置文件读取重生时间.
     fun readResurgenceTime(id: String): Int {
         return data.getInt("$id.resurgence-time", 0)
     }

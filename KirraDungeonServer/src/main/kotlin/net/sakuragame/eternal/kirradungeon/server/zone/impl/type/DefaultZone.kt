@@ -46,7 +46,7 @@ class DefaultZone(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     override var failThread: PlatformExecutor.PlatformTask? = null
 
-    override fun runTimer() {
+    override fun onPlayerJoin() {
         // 移除未经过 MythicMobDeathEvent 死亡的实体。
         submit(async = true, delay = 0L, period = 20L) {
             if (canDel() || isClear || isFail) {

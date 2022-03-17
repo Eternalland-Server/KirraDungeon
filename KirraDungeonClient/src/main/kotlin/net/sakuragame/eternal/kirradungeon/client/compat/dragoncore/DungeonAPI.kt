@@ -8,6 +8,7 @@ import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
+import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -68,5 +69,10 @@ object DungeonAPI {
             val item = ZaphkielAPI.getItemStack(indexStr) ?: ItemStack(Material.AIR)
             PacketSender.putClientSlotItem(player, slotId, item)
         }
+    }
+
+    fun getNumber(subScreen: DungeonSubScreen): Int {
+        val dungeonId = subScreen.teleportData
+        return Zone.getByID(dungeonId)?.condition?.first()?.number ?: return 0
     }
 }

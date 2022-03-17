@@ -40,7 +40,7 @@ class SpecialZone(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     override var failThread: PlatformExecutor.PlatformTask? = null
 
-    override fun runTimer() {
+    override fun onPlayerJoin() {
         startCountdown()
         showResurgenceTitle()
     }

@@ -5,12 +5,9 @@ import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
-import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
+import net.sakuragame.eternal.kirradungeon.plot.*
 import net.sakuragame.eternal.kirradungeon.plot.Profile.Companion.profile
-import net.sakuragame.eternal.kirradungeon.plot.addNoobiePoints
 import net.sakuragame.eternal.kirradungeon.plot.function.FunctionPlot.playDome
-import net.sakuragame.eternal.kirradungeon.plot.getMobMaxHealth
-import net.sakuragame.eternal.kirradungeon.plot.sendBrokenTitleAnimation
 import net.sakuragame.eternal.script.api.NergiganteAPI
 import net.sakuragame.eternal.script.api.event.NSConversationEndEvent
 import net.sakuragame.eternal.script.api.event.NSConversationOptionEvent
@@ -25,6 +22,7 @@ import org.bukkit.event.entity.EntityCombustEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
@@ -112,7 +110,10 @@ object FunctionListener {
     fun e(e: NSFilmEndEvent) {
         val player = e.player
         player.addNoobiePoints(1)
-        KirraCoreBukkitAPI.teleportToSpawnServer(player)
+        KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在传送至主城 &7@", true)
+        submit(async = true, delay = 40L) {
+            KirraCoreBukkitAPI.teleportToSpawnServer(player)
+        }
     }
 
     @SubscribeEvent
@@ -182,6 +183,12 @@ object FunctionListener {
         if (player.gameMode == GameMode.SPECTATOR) e.isCancelled = true
     }
 
+    @SubscribeEvent
+    fun e(e: AsyncPlayerChatEvent) {
+        e.isCancelled = true
+        e.player.sendMessage("&4&l➱ &c当前服务器禁止聊天.".colored())
+    }
+
     // 濒死保护机制.
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
@@ -193,6 +200,7 @@ object FunctionListener {
 
     private fun doJoinTask(player: Player, dungeonWorld: DungeonWorld) {
         val profile = player.profile() ?: return
+        player.reset()
         profile.dungeonWorld = dungeonWorld
         FunctionPlot.start(player)
     }

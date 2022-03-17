@@ -15,6 +15,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveZone
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
@@ -147,9 +148,9 @@ interface IZone {
     fun getBoss() = Bukkit.getEntity(bossUUID) as? LivingEntity
 
     /**
-     * 开启一些需要的调度器.
+     * 当玩家进入.
      */
-    fun runTimer()
+    fun onPlayerJoin()
 
     /**
      * 处理玩家进入.
@@ -169,7 +170,7 @@ interface IZone {
         submit(delay = 40) {
             showJoinMessage(player, zone.name)
             spawnEntities(spawnBoss, spawnMob)
-            runTimer()
+            onPlayerJoin()
             DungeonJoinEvent(player, zone.id, this@IZone).call()
         }
     }
@@ -222,6 +223,15 @@ interface IZone {
         teleportToSpawn()
     }
 
+    /**
+     * 向玩家展示大标题.
+     */
+    fun sendTitle(title: String, subTitle: String, fadeIn: Int, stay: Int, fadeOut: Int) {
+        getPlayers().forEach {
+            it.sendTitle(title.colored(), subTitle.colored(), fadeIn, stay, fadeOut)
+        }
+    }
+
     fun teleportToSpawn() {
         var secs = 5
         submit(delay = 60L, period = 20, async = true) {
@@ -259,7 +269,6 @@ interface IZone {
                         healthPercent,
                         lastTime
                     )
-                    return@forEach
                 }
                 BossBar.setHealth(it, "&c&l${bossEntity.health.roundToInt()} / ${getMobMaxHealth(bossEntity)}".colored(), healthPercent)
             }
@@ -359,6 +368,7 @@ interface IZone {
             DEFAULT -> DefaultZone.defaultZones.remove(this)
             SPECIAL -> SpecialZone.specialZones.remove(this)
             UNLIMITED -> UnlimitedZone.unlimitedZones.remove(this)
+            WAVE -> WaveZone.waveZones.remove(this)
         }
     }
 

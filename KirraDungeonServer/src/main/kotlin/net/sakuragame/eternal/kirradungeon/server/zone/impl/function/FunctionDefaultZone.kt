@@ -64,7 +64,9 @@ object FunctionDefaultZone {
         val screenId = e.screenID
         val playerZone = DefaultZone.getByPlayer(player.uniqueId) ?: return
         if (screenId != BossBar.screenID) return
-        playerZone.updateBossBar(init = true)
+        submit(delay = 20L) {
+            playerZone.updateBossBar(init = true)
+        }
     }
 
     private fun isDungeonFromDefault(name: String): Boolean {

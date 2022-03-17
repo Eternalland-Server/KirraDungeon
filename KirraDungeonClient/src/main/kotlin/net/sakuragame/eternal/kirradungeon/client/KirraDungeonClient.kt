@@ -9,6 +9,7 @@ import taboolib.module.configuration.Configuration
 import taboolib.platform.BukkitPlugin
 import java.util.concurrent.TimeUnit
 
+@Suppress("SpellCheckingInspection")
 object KirraDungeonClient : Plugin() {
 
     @Config

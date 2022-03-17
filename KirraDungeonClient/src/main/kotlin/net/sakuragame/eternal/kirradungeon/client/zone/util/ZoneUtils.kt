@@ -8,13 +8,18 @@ import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition
 import org.bukkit.entity.Player
 
 fun getNonDefaultZoneCondition(player: Player, zone: Zone): ZoneCondition {
-    return zone.condition
-        .firstOrNull { it.permissionName != "default" && player.hasPermission(it.permissionName) }
-        ?: getDefaultZoneConditions(zone)
+    zone.condition.sortedByDescending { it.dailyCounts }
+        .filter { it.permissionName != "default" }
+        .forEach {
+            if (player.hasPermission(it.permissionName)) {
+                return it
+            }
+        }
+    return getDefaultZoneConditions(zone)
 }
 
 fun getDefaultZoneConditions(zone: Zone): ZoneCondition {
-    return zone.condition.first()
+    return zone.condition.first { it.permissionName == "default" }
 }
 
 fun Player.getFeeMaxJoinCounts(zone: Zone): Int {

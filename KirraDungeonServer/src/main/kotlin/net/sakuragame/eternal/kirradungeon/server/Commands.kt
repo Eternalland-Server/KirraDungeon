@@ -103,7 +103,6 @@ object Commands {
                     return@execute
                 }
                 DungeonServerAPI.getWorldManager().loadDungeon(zone.id, object : RunnableVal<DungeonWorld>() {
-
                     override fun run(value: DungeonWorld?) {
                         if (value == null) return
                         value.properties.isAllowMonsters
@@ -144,6 +143,21 @@ object Commands {
             DungeonServerAPI.getWorldManager().unloadDungeon(editingDungeonWorld!!, true)
             editingDungeonWorld = null
             player.sendMessage("&a已保存.".colored())
+        }
+    }
+
+    @CommandBody
+    val delDBFile = subCommand {
+        dynamic(commit = "dungeonID") {
+            execute<Player> { player, _, argument ->
+                val zone = Zone.getByID(argument)
+                if (zone == null) {
+                    player.sendMessage("&7该副本不存在.".colored())
+                    return@execute
+                }
+                DungeonServerAPI.getWorldManager().deleteDungeon(zone.id)
+                player.sendMessage("&a已删除数据库内的地图数据.".colored())
+            }
         }
     }
 
@@ -215,11 +229,56 @@ object Commands {
         }
     }
 
+    @CommandBody
+    val addWaveMonster = subCommand {
+        dynamic(commit = "dungeonID") {
+            dynamic(commit = "monsterId") {
+                dynamic(commit = "monsterAmount") {
+                    dynamic(commit = "monsterHealth") {
+                        execute<Player> { player, context, _ ->
+                            val zone = getWaveZone(player, context.get(1)) ?: return@execute
+                            val monsterId = context.get(2)
+                            val monsterAmount = context.get(3).toIntOrNull() ?: 1
+                            val monsterHealth = context.get(4).toDoubleOrNull() ?: 1.0
+                            FunctionZone.addWaveMob(zone, monsterId, monsterAmount, monsterHealth)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @CommandBody
+    val setWaveBoss = subCommand {
+        dynamic(commit = "dungeonID") {
+            dynamic(commit = "monsterId") {
+                dynamic(commit = "monsterHealth") {
+                    execute<Player> { player, context, _ ->
+                        val zone = getWaveZone(player, context.get(1)) ?: return@execute
+                        val bossId = context.get(2)
+                        val bossHealth = context.get(3).toDoubleOrNull() ?: 1.0
+                        FunctionZone.setWaveBoss(zone, bossId, bossHealth)
+                    }
+                }
+            }
+        }
+    }
+
+    @CommandBody
     val getZoneLoc = subCommand {
         execute<Player> { player, _, _ ->
             val loc = ZoneLocation.parseToZoneLocation(player.location).toString()
             player.sendMessage("&a坐标: &f$loc".colored())
         }
+    }
+
+    private fun getWaveZone(player: Player, zoneId: String): Zone? {
+        val zone = Zone.getByID(zoneId)
+        if (zone == null || zone.data.type == ZoneType.WAVE) {
+            player.sendMessage("&c[System] &7错误的名字或类型.")
+            return null
+        }
+        return zone
     }
 
     private fun getDefaultDungeonProperties() = DungeonProperties().also {
