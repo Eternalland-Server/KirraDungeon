@@ -12,6 +12,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.Zone.Companion.editingDun
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
@@ -47,6 +48,10 @@ object Commands {
             }
             sender.sendMessage("&c[System] &7无限制 (武神塔) 类型:".colored())
             Zone.zones.filter { it.data.type == ZoneType.UNLIMITED }.forEach {
+                sender.sendMessage("&a${it.id} &7(${it.name}&7)".colored())
+            }
+            sender.sendMessage("&c[System] &7波次类型:".colored())
+            Zone.zones.filter { it.data.type == ZoneType.WAVE }.forEach {
                 sender.sendMessage("&a${it.id} &7(${it.name}&7)".colored())
             }
         }
@@ -235,12 +240,20 @@ object Commands {
             dynamic(commit = "monsterId") {
                 dynamic(commit = "monsterAmount") {
                     dynamic(commit = "monsterHealth") {
-                        execute<Player> { player, context, _ ->
-                            val zone = getWaveZone(player, context.get(1)) ?: return@execute
-                            val monsterId = context.get(2)
-                            val monsterAmount = context.get(3).toIntOrNull() ?: 1
-                            val monsterHealth = context.get(4).toDoubleOrNull() ?: 1.0
-                            FunctionZone.addWaveMob(zone, monsterId, monsterAmount, monsterHealth)
+                        dynamic(commit = "wave") {
+                            execute<Player> { player, context, _ ->
+                                val zone = getWaveZone(player, context.get(1)) ?: return@execute
+                                val monsterId = context.get(2)
+                                val monsterAmount = context.get(3).toIntOrNull() ?: 1
+                                val monsterHealth = context.get(4).toDoubleOrNull() ?: 1.0
+                                val wave = context.get(5).toIntOrNull() ?: getWaveIndex(zone.id)
+                                if (wave == null) {
+                                    player.sendMessage("&c[System] &7波次数据错误!".colored())
+                                    return@execute
+                                }
+                                FunctionZone.addWaveMob(wave, zone, monsterId, monsterAmount, monsterHealth)
+                                player.sendMessage("&c[System] &7成功!".colored())
+                            }
                         }
                     }
                 }
@@ -253,13 +266,32 @@ object Commands {
         dynamic(commit = "dungeonID") {
             dynamic(commit = "monsterId") {
                 dynamic(commit = "monsterHealth") {
-                    execute<Player> { player, context, _ ->
-                        val zone = getWaveZone(player, context.get(1)) ?: return@execute
-                        val bossId = context.get(2)
-                        val bossHealth = context.get(3).toDoubleOrNull() ?: 1.0
-                        FunctionZone.setWaveBoss(zone, bossId, bossHealth)
+                    dynamic(commit = "wave") {
+                        execute<Player> { player, context, _ ->
+                            val zone = getWaveZone(player, context.get(1)) ?: return@execute
+                            val bossId = context.get(2)
+                            val bossHealth = context.get(3).toDoubleOrNull() ?: 1.0
+                            val wave = context.get(4).toIntOrNull() ?: getWaveIndex(zone.id)
+                            if (wave == null) {
+                                player.sendMessage("&c[System] &c波次数据错误!".colored())
+                                return@execute
+                            }
+                            FunctionZone.setWaveBoss(wave, zone, bossId, bossHealth)
+                            player.sendMessage("&c[System] &7成功!".colored())
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    @CommandBody
+    val addWaveLoc = subCommand {
+        dynamic(commit = "dungeonId") {
+            execute<Player> { player, context, _ ->
+                val zone = getWaveZone(player, context.get(1)) ?: return@execute
+                FunctionZone.addWaveLoc(zone, player.location)
+                player.sendMessage("&c[System] &7成功!".colored())
             }
         }
     }
@@ -274,8 +306,8 @@ object Commands {
 
     private fun getWaveZone(player: Player, zoneId: String): Zone? {
         val zone = Zone.getByID(zoneId)
-        if (zone == null || zone.data.type == ZoneType.WAVE) {
-            player.sendMessage("&c[System] &7错误的名字或类型.")
+        if (zone == null) {
+            player.sendMessage("&c[System] &7错误的名字或类型.".colored())
             return null
         }
         return zone

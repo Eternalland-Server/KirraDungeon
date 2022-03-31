@@ -36,7 +36,7 @@ fun IZone.startCountdown() {
             return@submit
         }
         getPlayers().forEach {
-            BossBar.setTime(it, lastTime--)
+            BossBar.open(it, lastTime--)
         }
     }
 }

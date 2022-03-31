@@ -8,8 +8,8 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneBossData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneMobData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
 import net.sakuragame.eternal.kirradungeon.server.zone.sync.ZoneCondition
+import org.bukkit.Location
 
 object FunctionZone {
 
@@ -24,23 +24,37 @@ object FunctionZone {
     }
 
     // 增加波次副本怪物.
-    fun addWaveMob(zone: Zone, monsterId: String, amount: Int, health: Double) {
+    fun addWaveMob(wave: Int, zone: Zone, monsterId: String, amount: Int, health: Double) {
         val id = zone.id
-        val waveIndex = getWaveIndex(id) ?: 1
         val mobList = arrayListOf<String>().also {
-            it.addAll(data.getStringList("${zone.id}.wave.$waveIndex.monsters"))
+            val strList = data.getStringList("${zone.id}.wave.$wave.monsters")
+            if (strList.isNotEmpty()) {
+                it.addAll(data.getStringList("${zone.id}.wave.$wave.monsters"))
+            }
         }
-        mobList += "$monsterId@$amount$health"
-        data["$id.wave.monsters"] = mobList
+        mobList += "$monsterId@$amount@$health"
+        data["$id.wave.$wave.monsters"] = mobList
+        Zone.i()
+    }
+
+    // 增加波次副本随机刷新点.
+    fun addWaveLoc(zone: Zone, loc: Location) {
+        val id = zone.id
+        val locList = arrayListOf<String>().also {
+            val strList = data.getStringList("$id.wave-locs")
+            if (strList.isNotEmpty()) {
+                it.addAll(data.getStringList("$id.wave-locs"))
+            }
+        }
+        locList.add(ZoneLocation.parseToZoneLocation(loc).toString())
+        data["$id.wave-locs"] = locList
         Zone.i()
     }
 
     // 设置波次副本首领.
-    fun setWaveBoss(zone: Zone, bossId: String, health: Double) {
+    fun setWaveBoss(wave: Int, zone: Zone, bossId: String, health: Double) {
         val id = zone.id
-        val waveIndex = getWaveIndex(id) ?: 1
-        data["$id.wave.$waveIndex.boss.id"] = bossId
-        data["$id.wave.$waveIndex.boss.health"] = health
+        data["$id.wave.$wave.boss"] = "$bossId@$health"
         Zone.i()
     }
 
@@ -117,12 +131,25 @@ object FunctionZone {
                 val health = split[2].toDoubleOrNull() ?: 1.0
                 monsterDataList += ZoneWaveData.ZoneWaveMonsterData(monsterId, amount, health)
             }
-            val bossId = data.getString("$id.wave.$index.boss.id") ?: return null
-            val bossHealth = data.getDouble("$id.wave.boss.$index.health")
+            val boss = data.getString("$id.wave.$index.boss") ?: return null
+            val split = boss.split("@")
+            val bossId = split[0]
+            val bossHealth = split[1].toDoubleOrNull() ?: 1.0
             val bossData = ZoneWaveData.ZoneWaveBossData(bossId, bossHealth)
             waveList += ZoneWaveData(monsterDataList, bossData)
         }
         return waveList
+    }
+
+    fun readWaveLocs(id: String): List<ZoneLocation>? {
+        val locList = mutableListOf<ZoneLocation>()
+        data.getStringList("$id.wave-locs").forEach {
+            locList.add(ZoneLocation.parseToZoneLocation(it) ?: return@forEach)
+        }
+        if (locList.isEmpty()) {
+            return null
+        }
+        return locList
     }
 
     // 从配置文件读取副本进入条件数据.

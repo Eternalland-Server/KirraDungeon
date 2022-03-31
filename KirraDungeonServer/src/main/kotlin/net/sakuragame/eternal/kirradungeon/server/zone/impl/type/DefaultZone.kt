@@ -1,10 +1,9 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
-import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.IZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
 import org.bukkit.Bukkit
@@ -18,14 +17,7 @@ import java.util.*
 class DefaultZone(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IZone {
 
     init {
-        // 超时判断. (副本创建后长时间未进入)
-        submit(async = true, delay = 2000) {
-            if (canDel()) {
-                del()
-                cancel()
-                return@submit
-            }
-        }
+        runOverTimeCheck()
     }
 
     override val createdTime = System.currentTimeMillis()
@@ -65,16 +57,6 @@ class DefaultZone(override val zone: Zone, override val dungeonWorld: DungeonWor
     }
 
     override fun canClear() = getMonsters(containsBoss = true).isEmpty() && !isClear && !isFail
-
-    override fun clear() {
-        isClear = true
-        val players = getPlayers()
-        players.forEach {
-            DungeonClearEvent(it, zone.id).call()
-        }
-        val delay2BackSpawnServer = KirraDungeonServer.conf.getInt("settings.delay-back-spawn-server-secs")
-        sendClearMessage(players, delay2BackSpawnServer)
-    }
 
     @Suppress("DuplicatedCode")
     companion object {

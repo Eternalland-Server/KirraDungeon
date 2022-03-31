@@ -14,6 +14,7 @@ import net.sakuragame.eternal.kirradungeon.client.getCurrentHour
  * @property teleportType 传送类别.
  * @property teleportData 传送信息.
  * @property droppedItems 该副本所掉落的物品.
+ * @property limitTime 副本限制开放时间.
  */
 @Suppress("SpellCheckingInspection")
 data class DungeonSubScreen(

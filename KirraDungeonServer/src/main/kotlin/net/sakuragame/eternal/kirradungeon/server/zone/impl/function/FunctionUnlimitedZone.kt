@@ -1,9 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl.function
 
-import com.taylorswiftcn.megumi.uifactory.event.screen.UIFScreenOpenEvent
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
-import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
@@ -48,18 +46,6 @@ object FunctionUnlimitedZone {
         unlimitedZone.removeMonsterUUID(entity.uniqueId)
         // 爬塔, 在怪物首领死后执行下一层相关操作.
         doSuccToNextFloor(unlimitedZone)
-    }
-
-    // 血条初始化.
-    @SubscribeEvent
-    fun e(e: UIFScreenOpenEvent) {
-        val player = e.player
-        val screenId = e.screenID
-        val unlimitedZone = UnlimitedZone.getByPlayer(player.uniqueId) ?: return
-        if (screenId != BossBar.screenID) return
-        submit(delay = 20L) {
-            unlimitedZone.updateBossBar(init = true)
-        }
     }
 
     @SubscribeEvent

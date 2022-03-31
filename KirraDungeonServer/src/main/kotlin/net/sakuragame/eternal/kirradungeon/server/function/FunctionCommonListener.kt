@@ -1,9 +1,11 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
+import com.taylorswiftcn.megumi.uifactory.event.screen.UIFScreenOpenEvent
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
+import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
@@ -16,6 +18,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.getIZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveZone
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -50,6 +53,7 @@ object FunctionCommonListener {
             DEFAULT -> DefaultZone.create(copyZone, e.dungeonWorld)
             SPECIAL -> SpecialZone.create(copyZone, e.dungeonWorld)
             UNLIMITED -> UnlimitedZone.create(copyZone, e.dungeonWorld)
+            WAVE -> WaveZone.create(copyZone, e.dungeonWorld)
         }
     }
 
@@ -82,7 +86,6 @@ object FunctionCommonListener {
         }
     }
 
-    // 玩家死亡判断.
     @SubscribeEvent
     fun e(e: PlayerDeathEvent) {
         val player = e.entity
@@ -91,6 +94,7 @@ object FunctionCommonListener {
             DEFAULT -> DefaultZone.getByPlayer(e.entity.uniqueId) ?: return
             SPECIAL -> SpecialZone.getByPlayer(e.entity.uniqueId) ?: return
             UNLIMITED -> UnlimitedZone.getByPlayer(e.entity.uniqueId) ?: return
+            WAVE -> WaveZone.getByPlayer(e.entity.uniqueId) ?: return
         }
         player.apply {
             playDeathAnimation()
@@ -119,6 +123,22 @@ object FunctionCommonListener {
         val profile = e.player.profile()
         if (profile.number.get() <= zone.data.number) {
             profile.number.set(zone.data.number + 1)
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: UIFScreenOpenEvent) {
+        val player = e.player
+        val screenId = e.screenID
+        val zone = when (player.profile().zoneType) {
+            DEFAULT -> DefaultZone.getByPlayer(player.uniqueId) ?: return
+            SPECIAL -> return
+            UNLIMITED -> UnlimitedZone.getByPlayer(player.uniqueId) ?: return
+            WAVE -> return
+        }
+        if (screenId != BossBar.screenID) return
+        submit(delay = 20L) {
+            zone.updateBossBar(init = true)
         }
     }
 

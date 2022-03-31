@@ -8,6 +8,7 @@ import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
+import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonJoinEvent
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
@@ -18,6 +19,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedZone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveZone
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
+import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
@@ -232,6 +234,18 @@ interface IZone {
         }
     }
 
+    /**
+     * 向玩家播放声音.
+     */
+    fun sendSound(sound: Sound, volume: Float, pitch: Float) {
+        getPlayers().forEach {
+            it.playSound(it.location, sound, volume, pitch)
+        }
+    }
+
+    /**
+     * 传送玩家至主城.
+     */
     fun teleportToSpawn() {
         var secs = 5
         submit(delay = 60L, period = 20, async = true) {
@@ -332,7 +346,15 @@ interface IZone {
     /**
      * 执行通关相关操作。
      */
-    fun clear()
+    fun clear() {
+        isClear = true
+        val players = getPlayers()
+        players.forEach {
+            DungeonClearEvent(it, zone.id).call()
+        }
+        val delay2BackSpawnServer = KirraDungeonServer.conf.getInt("settings.delay-back-spawn-server-secs")
+        sendClearMessage(players, delay2BackSpawnServer)
+    }
 
     /**
      * 玩家挑战失败.

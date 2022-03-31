@@ -57,7 +57,7 @@ dependencies {
     compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.1.6-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
-    compileOnly("net.sakuragame.eternal:JustMessage:1.0.2-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
     compileOnly("biz.paluch.redis:lettuce:4.1.1.Final@jar")
     compileOnly("ink.ptms.core:v11200:11200")

@@ -3,23 +3,16 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.IZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
-import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import java.util.*
 
 class SpecialZone(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IZone {
 
     init {
-        // 超时判断. (副本创建后长时间未进入)
-        submit(async = true, delay = 1000) {
-            if (canDel()) {
-                del()
-                cancel()
-                return@submit
-            }
-        }
+        runOverTimeCheck()
     }
 
     override val createdTime = System.currentTimeMillis()

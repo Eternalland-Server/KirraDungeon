@@ -15,7 +15,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveDat
  * @property number      内部编号.
  * @property iconNumber  图标编号.
  * @property resurgenceTime 复活时间.
- * @property waveData      波次数据。
+ * @property waveData      波次数据.
  *
  */
 data class ZoneData(
@@ -28,6 +28,7 @@ data class ZoneData(
     val iconNumber: Int,
     val resurgenceTime: Int,
     val waveData: List<ZoneWaveData>? = null,
+    val waveSpawnLocs: List<ZoneLocation>? = null
 ) {
 
     fun isCustomSkyEnabled() = this.zoneSkyData != null

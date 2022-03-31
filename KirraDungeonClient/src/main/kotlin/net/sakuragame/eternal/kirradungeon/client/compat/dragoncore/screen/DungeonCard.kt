@@ -68,6 +68,9 @@ object DungeonCard : IScreen {
                     .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(type = JOIN))
                 )
             }
+            if (player.hasPermission("admin")) {
+                return@apply
+            }
             if (subScreen.limitTime.isActive() && !subScreen.limitTime.isInLimitTime()) {
                 addLockComponent()
             }

@@ -6,12 +6,13 @@ import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveZone
 import org.bukkit.event.entity.EntityDamageEvent
+import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 
-object FunctionDefaultZone {
+object FunctionWaveZone {
 
     @SubscribeEvent
     fun e(e: DungeonPlayerJoinEvent) {
@@ -22,40 +23,40 @@ object FunctionDefaultZone {
             if (Zone.editingDungeonWorld != null) {
                 return@submit
             }
-            if (!isDungeonFromDefault(e.dungeonWorld.worldIdentifier)) {
+            if (!isDungeonFromWave(e.dungeonWorld.worldIdentifier)) {
                 return@submit
             }
-            val defaultZone = DefaultZone.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
+            val waveZone = WaveZone.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
                 kickPlayerByNotFoundData(player)
                 return@submit
             }
-            profile.zoneType = ZoneType.DEFAULT
-            profile.zoneUUID = defaultZone.uuid
-            defaultZone.addPlayerUUID(player.uniqueId)
-            defaultZone.handleJoin(player, spawnBoss = true, spawnMob = true)
+            profile.zoneType = ZoneType.WAVE
+            profile.zoneUUID = waveZone.uuid
+            waveZone.addPlayerUUID(player.uniqueId)
+            waveZone.handleJoin(player, spawnBoss = false, spawnMob = false)
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun e(e: MythicMobDeathEvent) {
         val entity = e.entity
-        val playerZone = DefaultZone.getByMobUUID(entity.uniqueId) ?: return
-        playerZone.removeMonsterUUID(entity.uniqueId)
-        if (playerZone.canClear()) {
-            // 当副本可通关时, 执行通关操作.
-            playerZone.clear()
+        val waveZone = WaveZone.getByMobUUID(entity.uniqueId) ?: return
+        e.drops.clear()
+        waveZone.removeMonsterUUID(entity.uniqueId)
+        submit(delay = 3) {
+            waveZone.handleMonsterRemove()
         }
     }
 
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
-        val playerZone = DefaultZone.getByMobUUID(e.entity.uniqueId) ?: return
+        val playerZone = WaveZone.getByMobUUID(e.entity.uniqueId) ?: return
         if (playerZone.bossUUID == e.entity.uniqueId) {
             playerZone.updateBossBar()
         }
     }
 
-    private fun isDungeonFromDefault(name: String): Boolean {
-        return Zone.getByID(name)?.data?.type == ZoneType.DEFAULT
+    private fun isDungeonFromWave(name: String): Boolean {
+        return Zone.getByID(name)?.data?.type == ZoneType.WAVE
     }
 }

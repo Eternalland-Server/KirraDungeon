@@ -46,7 +46,8 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         number = FunctionZone.readNumber(id),
                         iconNumber = FunctionZone.readIcon(id),
                         resurgenceTime = FunctionZone.readResurgenceTime(id),
-                        waveData = FunctionZone.readWaveData(id)
+                        waveData = FunctionZone.readWaveData(id),
+                        waveSpawnLocs = FunctionZone.readWaveLocs(id)
                     )
                 )
             }
