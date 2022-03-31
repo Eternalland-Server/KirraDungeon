@@ -128,6 +128,7 @@ object DungeonLoader {
             to = split[0].toInt()
             from = split[1].toInt()
         }
+        val limitRealm = DungeonSubScreen.ScreenLimitRealm(section.getInt("limit-realm", 0))
         return DungeonSubScreen(
             name,
             iconPath,
@@ -139,7 +140,8 @@ object DungeonLoader {
             teleportType = teleportType,
             teleportData = teleportData,
             droppedItems = droppedItems,
-            limitTime = limitTime
+            limitTime = limitTime,
+            limitRealm = limitRealm
         )
     }
 }

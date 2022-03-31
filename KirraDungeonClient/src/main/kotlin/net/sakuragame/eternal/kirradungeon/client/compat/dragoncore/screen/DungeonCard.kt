@@ -9,6 +9,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.JOIN
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.getRealm
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
 import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeMaxJoinCounts
@@ -75,6 +76,9 @@ object DungeonCard : IScreen {
                 addLockComponent()
             }
             if (player.profile().number.get() < DungeonAPI.getNumber(subScreen)) {
+                addLockComponent()
+            }
+            if (player.getRealm() < subScreen.limitRealm.realm) {
                 addLockComponent()
             }
         }

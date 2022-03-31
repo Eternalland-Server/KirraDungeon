@@ -15,6 +15,7 @@ import net.sakuragame.eternal.kirradungeon.client.getCurrentHour
  * @property teleportData 传送信息.
  * @property droppedItems 该副本所掉落的物品.
  * @property limitTime 副本限制开放时间.
+ * @property limitRealm 副本限制境界.
  */
 @Suppress("SpellCheckingInspection")
 data class DungeonSubScreen(
@@ -28,7 +29,8 @@ data class DungeonSubScreen(
     val teleportType: ScreenTeleportType,
     val teleportData: String,
     val droppedItems: List<String> = mutableListOf(),
-    val limitTime: ScreenLimitTime
+    val limitTime: ScreenLimitTime,
+    val limitRealm: ScreenLimitRealm
 ) {
 
     enum class ScreenTeleportType {
@@ -49,4 +51,6 @@ data class DungeonSubScreen(
             return false
         }
     }
+
+    data class ScreenLimitRealm(val realm: Int)
 }
