@@ -1,11 +1,11 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
 import com.taylorswiftcn.megumi.uifactory.event.screen.UIFScreenOpenEvent
+import io.lumine.xikage.mythicmobs.skills.targeters.RandomLocationsNearTargetsTargeter
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
@@ -129,15 +129,13 @@ object FunctionCommonListener {
     @SubscribeEvent
     fun e(e: UIFScreenOpenEvent) {
         val player = e.player
-        val screenId = e.screenID
         val zone = when (player.profile().zoneType) {
             DEFAULT -> DefaultZone.getByPlayer(player.uniqueId) ?: return
             SPECIAL -> return
             UNLIMITED -> UnlimitedZone.getByPlayer(player.uniqueId) ?: return
             WAVE -> return
         }
-        if (screenId != BossBar.screenID) return
-        submit(delay = 20L) {
+        submit(delay = 40L) {
             zone.updateBossBar(init = true)
         }
     }

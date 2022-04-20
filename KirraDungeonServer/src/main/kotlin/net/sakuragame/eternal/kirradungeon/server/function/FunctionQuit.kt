@@ -49,7 +49,7 @@ object FunctionQuit {
         if (!profile.isChallenging) {
             return
         }
-        KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在将您传送回大厅 &f@", false)
+        KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在将您传送回大厅. &f@", false)
         KirraCoreBukkitAPI.teleportToSpawnServer(player)
         profile.isQuitting = true
     }

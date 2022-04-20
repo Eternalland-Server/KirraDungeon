@@ -101,7 +101,7 @@ object Commands {
                     val number = context.get(2).toIntOrNull() ?: 1
                     player.profile().number.set(number)
                     player.profile().save()
-                    sender.sendMessage("&c[System] &7已经把 ${player.name} 的编号设置为 ${number}".colored())
+                    sender.sendMessage("&c[System] &7已经把 ${player.name} 的编号设置为 $number".colored())
                 }
             }
         }

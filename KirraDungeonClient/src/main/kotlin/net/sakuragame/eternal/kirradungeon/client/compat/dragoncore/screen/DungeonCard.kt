@@ -104,6 +104,7 @@ object DungeonCard : IScreen {
         if (currentCounts <= 0) {
             return "&6&l副本次数: &c$currentCounts/0".colored()
         }
+        // 次数等于最大进入次数.
         if (currentCounts == maxCounts) {
             return "&6&l副本次数: &a$currentCounts/$maxCounts".colored()
         }

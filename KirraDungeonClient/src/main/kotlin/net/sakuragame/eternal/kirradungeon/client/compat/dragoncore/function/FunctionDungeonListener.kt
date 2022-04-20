@@ -133,7 +133,7 @@ object FunctionDungeonListener {
         FunctionDungeon.openAssignGUI(player, toData, paramData)
     }
 
-     fun doPage(player: Player, paramData: ParamData) {
+    fun doPage(player: Player, paramData: ParamData) {
         val page = paramData.toData.param4
         val droppedItems = paramData.subScreen.droppedItems
         if (page > DungeonAPI.getMaxPage(droppedItems) || page < 1) {

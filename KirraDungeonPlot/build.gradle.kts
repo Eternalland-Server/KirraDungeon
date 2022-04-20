@@ -23,6 +23,9 @@ taboolib {
             name("UIFactory")
             name("JustMessage")
         }
+        contributors {
+            name("闲蛋")
+        }
     }
     install("common")
     install("common-5")
@@ -49,10 +52,9 @@ repositories {
 
 dependencies {
     compileOnly("public:MythicMobs:4.12.0@jar")
-    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.1.7-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:NergiganteScript:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")
-    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.0.9-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.2.2-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")

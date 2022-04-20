@@ -219,7 +219,7 @@ interface IZone {
     fun sendClearMessage(players: List<Player>, delaySecs: Int) {
         val passedTime = formatSeconds(TimeUnit.SECONDS.convert((System.currentTimeMillis() - createdTime), TimeUnit.MILLISECONDS).toInt())
         players.forEach {
-            it.sendTitle("&a&l通关!".colored(), "&7通关时长: $passedTime".colored(), 20, 100, 20)
+            it.sendTitle("&a&l通关!".colored(), "&7通关时长: $passedTime".colored(), 0, 100, 0)
             it.sendLang("message-player-clear-dungeon", delaySecs)
         }
         teleportToSpawn()
@@ -255,9 +255,9 @@ interface IZone {
                     return@submit
                 }
                 secs--
-                it.sendTitle("", "&a将在 &f&l$secs &a秒后传送回您到主城.".colored(), 10, 20, 0)
+                it.sendTitle("", "&a将在 &f&l$secs &a秒后传送回您到主城.".colored(), 0, 25, 0)
                 if (secs <= 0) {
-                    it.sendTitle("", "&e&l正在传送.".colored(), 10, 200, 0)
+                    it.sendTitle("", "&e&l正在传送.".colored(), 0, 200, 0)
                     KirraCoreBukkitAPI.teleportToSpawnServer(it)
                     cancel()
                     return@submit

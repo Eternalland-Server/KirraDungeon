@@ -66,10 +66,6 @@ class Profile(val player: Player) {
     fun read() {
         submit(async = true, delay = 3L) {
             val num = Database.getNumber(player)
-            if (num == null && player.hasPermission("admin")) {
-                player.sendMessage("数据错误.".colored())
-                return@submit
-            }
             if (num == null) {
                 if (player.hasPermission("admin")) {
                     player.sendMessage("&c[System] &7在我们准备读取您的信息时, 发生了一个错误.".colored())

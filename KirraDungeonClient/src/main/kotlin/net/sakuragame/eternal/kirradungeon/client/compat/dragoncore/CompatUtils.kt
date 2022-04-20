@@ -11,9 +11,6 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.Dunge
 import org.bukkit.entity.Player
 import taboolib.module.configuration.util.getStringColored
 
-private const val defaultNullName = "none"
-private const val defaultRoomIconPath = "ui/dungeon/icon/general/sign_deny.png"
-
 fun Player.getRealm(): Int {
     return JustLevelAPI.getRealm(this)
 }
