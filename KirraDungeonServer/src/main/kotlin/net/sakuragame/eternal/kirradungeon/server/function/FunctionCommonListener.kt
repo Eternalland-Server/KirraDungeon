@@ -1,7 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
 import com.taylorswiftcn.megumi.uifactory.event.screen.UIFScreenOpenEvent
-import io.lumine.xikage.mythicmobs.skills.targeters.RandomLocationsNearTargetsTargeter
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
@@ -14,11 +13,10 @@ import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
 import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.getIZone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialZone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedZone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -50,10 +48,10 @@ object FunctionCommonListener {
         e.dungeonWorld.bukkitWorld.isAutoSave = false
         // 初始化.
         when (copyZoneData.type) {
-            DEFAULT -> DefaultZone.create(copyZone, e.dungeonWorld)
-            SPECIAL -> SpecialZone.create(copyZone, e.dungeonWorld)
-            UNLIMITED -> UnlimitedZone.create(copyZone, e.dungeonWorld)
-            WAVE -> WaveZone.create(copyZone, e.dungeonWorld)
+            DEFAULT -> DefaultDungeon.create(copyZone, e.dungeonWorld)
+            SPECIAL -> SpecialDungeon.create(copyZone, e.dungeonWorld)
+            UNLIMITED -> UnlimitedDungeon.create(copyZone, e.dungeonWorld)
+            WAVE -> WaveDungeon.create(copyZone, e.dungeonWorld)
         }
     }
 
@@ -80,8 +78,8 @@ object FunctionCommonListener {
         }
         if (e.cause == EntityDamageEvent.DamageCause.VOID) {
             e.isCancelled = true
-            val iZone = profile.getIZone() ?: return
-            player.teleport(iZone.zone.data.spawnLoc.toBukkitLocation(player.world))
+            val dungeon = profile.getIDungeon() ?: return
+            player.teleport(dungeon.zone.data.spawnLoc.toBukkitLocation(player.world))
             player.sendLang("message-player-lifted-from-void")
         }
     }
@@ -91,10 +89,10 @@ object FunctionCommonListener {
         val player = e.entity
         if (!player.profile().isChallenging) return
         val zone = when (player.profile().zoneType) {
-            DEFAULT -> DefaultZone.getByPlayer(e.entity.uniqueId) ?: return
-            SPECIAL -> SpecialZone.getByPlayer(e.entity.uniqueId) ?: return
-            UNLIMITED -> UnlimitedZone.getByPlayer(e.entity.uniqueId) ?: return
-            WAVE -> WaveZone.getByPlayer(e.entity.uniqueId) ?: return
+            DEFAULT -> DefaultDungeon.getByPlayer(e.entity.uniqueId) ?: return
+            SPECIAL -> SpecialDungeon.getByPlayer(e.entity.uniqueId) ?: return
+            UNLIMITED -> UnlimitedDungeon.getByPlayer(e.entity.uniqueId) ?: return
+            WAVE -> WaveDungeon.getByPlayer(e.entity.uniqueId) ?: return
         }
         player.apply {
             playDeathAnimation()
@@ -120,9 +118,11 @@ object FunctionCommonListener {
     @SubscribeEvent
     fun e(e: DungeonClearEvent) {
         val zone = Zone.getByID(e.dungeonId) ?: return
-        val profile = e.player.profile()
-        if (profile.number.get() <= zone.data.number) {
-            profile.number.set(zone.data.number + 1)
+        e.players.forEach {
+            val profile = it.profile()
+            if (profile.number.get() <= zone.data.number) {
+                profile.number.set(zone.data.number + 1)
+            }
         }
     }
 
@@ -130,9 +130,9 @@ object FunctionCommonListener {
     fun e(e: UIFScreenOpenEvent) {
         val player = e.player
         val zone = when (player.profile().zoneType) {
-            DEFAULT -> DefaultZone.getByPlayer(player.uniqueId) ?: return
+            DEFAULT -> DefaultDungeon.getByPlayer(player.uniqueId) ?: return
             SPECIAL -> return
-            UNLIMITED -> UnlimitedZone.getByPlayer(player.uniqueId) ?: return
+            UNLIMITED -> UnlimitedDungeon.getByPlayer(player.uniqueId) ?: return
             WAVE -> return
         }
         submit(delay = 40L) {

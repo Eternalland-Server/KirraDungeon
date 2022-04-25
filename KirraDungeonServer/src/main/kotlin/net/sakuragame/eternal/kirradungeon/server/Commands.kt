@@ -13,7 +13,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
 import org.bukkit.WorldType
@@ -228,7 +228,7 @@ object Commands {
     @CommandBody
     val openDragonCoreUI = subCommand {
         execute<Player> { player, _, _ ->
-            val playerZone = DefaultZone.getByPlayer(player.uniqueId) ?: return@execute
+            val playerZone = DefaultDungeon.getByPlayer(player.uniqueId) ?: return@execute
             DragonCoreCompat.updateDragonVars(player, playerZone.zone.name)
             PacketSender.sendOpenHud(player, DragonCoreCompat.joinTitleHud.id)
         }

@@ -24,7 +24,7 @@ object DungeonRoom : IScreen {
     override fun build2Screen(screen: DungeonScreen, subScreen: DungeonSubScreen, player: Player): ScreenUI {
         return ScreenUI(screenId).apply {
             for (index in 0..4) {
-                if (screen.dungeonSubScreens.getOrNull(index) != null) addRoom(index + 1, screen, player)
+                if (screen.dungeonSubScreens[index] != null) addRoom(index + 1, screen, player)
             }
         }
     }

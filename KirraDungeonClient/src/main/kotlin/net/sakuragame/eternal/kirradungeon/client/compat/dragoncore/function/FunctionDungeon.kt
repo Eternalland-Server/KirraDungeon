@@ -50,7 +50,7 @@ object FunctionDungeon {
             .build()!!
         PacketSender.sendRunFunction(player, "default", statements, false)
         val category = DungeonAPI.getDungeonCategory(numData.param1)
-        val screen = DungeonAPI.getDungeonScreen(category, numData.param2) ?: return
+        val screen = DungeonAPI.getDungeonScreen(category, numData.param2 - 1) ?: return
         val subScreen = screen.dungeonSubScreens[numData.param3 - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
         submit(async = true, delay = 3L) {
             sendScreen(player, screen, subScreen)

@@ -10,4 +10,4 @@ import taboolib.platform.type.BukkitProxyEvent
  * @author kirraObj
  * @since 2021/12/8 2:24
  */
-class DungeonClearEvent(val player: Player, val dungeonId: String) : BukkitProxyEvent()
+class DungeonClearEvent(val players: List<Player>, val dungeonId: String) : BukkitProxyEvent()

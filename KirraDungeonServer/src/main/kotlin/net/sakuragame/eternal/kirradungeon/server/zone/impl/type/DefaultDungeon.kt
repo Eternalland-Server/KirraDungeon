@@ -2,7 +2,7 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.IZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
@@ -14,7 +14,7 @@ import java.util.*
 /**
  * 默认副本, 副本实现类其中之一.
  */
-class DefaultZone(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IZone {
+class DefaultDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IDungeon {
 
     init {
         runOverTimeCheck()
@@ -61,33 +61,33 @@ class DefaultZone(override val zone: Zone, override val dungeonWorld: DungeonWor
     @Suppress("DuplicatedCode")
     companion object {
 
-        val defaultZones = mutableListOf<DefaultZone>()
+        val defaultDungeons = mutableListOf<DefaultDungeon>()
 
-        fun getByDungeonWorldUUID(uuid: UUID) = defaultZones.firstOrNull { it.dungeonWorld.uuid == uuid }
+        fun getByDungeonWorldUUID(uuid: UUID) = defaultDungeons.firstOrNull { it.dungeonWorld.uuid == uuid }
 
-        fun getByPlayer(playerUUID: UUID): DefaultZone? {
-            defaultZones.forEach { defaultZone ->
-                if (defaultZone.playerUUIDList.find { it == playerUUID } != null) {
-                    return defaultZone
+        fun getByPlayer(playerUUID: UUID): DefaultDungeon? {
+            defaultDungeons.forEach { defaultDungeon ->
+                if (defaultDungeon.playerUUIDList.find { it == playerUUID } != null) {
+                    return defaultDungeon
                 }
             }
             return null
         }
 
-        fun getByMobUUID(mobUUID: UUID): DefaultZone? {
-            defaultZones.forEach { defaultZone ->
-                if (defaultZone.monsterUUIDList.find { it == mobUUID } != null) {
-                    return defaultZone
+        fun getByMobUUID(mobUUID: UUID): DefaultDungeon? {
+            defaultDungeons.forEach { defaultDungeon ->
+                if (defaultDungeon.monsterUUIDList.find { it == mobUUID } != null) {
+                    return defaultDungeon
                 }
-                if (defaultZone.bossUUID == mobUUID) {
-                    return defaultZone
+                if (defaultDungeon.bossUUID == mobUUID) {
+                    return defaultDungeon
                 }
             }
             return null
         }
 
         fun create(zone: Zone, dungeonWorld: DungeonWorld) {
-            defaultZones += DefaultZone(zone, dungeonWorld)
+            defaultDungeons += DefaultDungeon(zone, dungeonWorld)
         }
     }
 }

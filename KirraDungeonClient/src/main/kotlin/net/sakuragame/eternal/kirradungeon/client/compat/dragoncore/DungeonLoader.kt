@@ -20,17 +20,8 @@ import java.io.File
 
 object DungeonLoader {
 
-    // "常规" 大栏界面.
-    val normalParentScreen = mutableListOf<DungeonScreen>()
-
-    // "活动" 大栏界面.
-    val activityParentScreen = mutableListOf<DungeonScreen>()
-
-    // "特殊" 大栏界面.
-    val specialParentScreen = mutableListOf<DungeonScreen>()
-
-    // "团队" 大栏界面.
-    val teamParentScreen = mutableListOf<DungeonScreen>()
+    // 存储所有界面的表.
+    val parentScreens = mutableMapOf<DungeonCategory, MutableList<DungeonScreen>>()
 
     @Awake(LifeCycle.ENABLE)
     fun i() {
@@ -57,10 +48,7 @@ object DungeonLoader {
     }
 
     private fun clear() {
-        normalParentScreen.clear()
-        activityParentScreen.clear()
-        specialParentScreen.clear()
-        teamParentScreen.clear()
+        parentScreens.clear()
     }
 
     private fun read(category: DungeonCategory) {
@@ -71,14 +59,13 @@ object DungeonLoader {
         }
         val yamlFiles = folder.listFiles()!!.map { loadFromFile(it, Type.YAML) }
         val dungeonScreens = mutableListOf<DungeonScreen>().also { screenList ->
-            yamlFiles.forEachIndexed { index, file ->
-                if (index > 4) return
+            yamlFiles.forEach { file ->
                 screenList += readScreen(category, file)
             }
         }
-        dungeonScreens.sortedByDescending { it.priority }.forEach {
-            category.getParentScreen() += it
-        }
+        parentScreens[category] = dungeonScreens
+            .sortedByDescending { it.priority }
+            .toMutableList()
     }
 
     private fun DungeonCategory.getFolder() = when (this) {
@@ -98,11 +85,10 @@ object DungeonLoader {
         val thirdSubScreen = readSubScreen(conf.getConfigurationSection("settings.third"))
         val fourthSubScreen = readSubScreen(conf.getConfigurationSection("settings.fourth"))
         val fifthSubScreen = readSubScreen(conf.getConfigurationSection("settings.fifth"))
-        val dungeonSubScreens = arrayOf(firstSubScreen, secondSubScreen, thirdSubScreen, fourthSubScreen, fifthSubScreen)
+        val dungeonSubScreens = mutableMapOf(0 to firstSubScreen, 1 to secondSubScreen, 2 to thirdSubScreen, 3 to fourthSubScreen, 4 to fifthSubScreen)
         return DungeonScreen(defaultSelectScreen, category, priority, name, mapBgPath, dungeonSubScreens = dungeonSubScreens)
     }
 
-    @Suppress("FoldInitializerAndIfToElvis")
     private fun readSubScreen(section: ConfigurationSection?): DungeonSubScreen? {
         if (section == null) return null
         val name = section.getStringColored("name") ?: return null
@@ -118,9 +104,7 @@ object DungeonLoader {
         val teleportType = DungeonSubScreen.ScreenTeleportType
             .values()
             .find { section.getString("teleport.type")?.uppercase() == it.name }
-        if (teleportType == null) {
-            return null
-        }
+            ?: return null
         val teleportData = section.getString("teleport.data") ?: return null
         val droppedItems = section.getStringList("dropped-item")
         val limitTime = DungeonSubScreen.ScreenLimitTime(0, 0).apply {

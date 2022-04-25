@@ -4,6 +4,7 @@ import com.taylorswiftcn.megumi.uifactory.event.comp.UIFCompSubmitEvent
 import net.sakuragame.eternal.justlevel.api.JustLevelAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory.*
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.Dungeon
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonCard
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonRegion
@@ -25,15 +26,22 @@ fun UIFCompSubmitEvent.isBelongDungeon(): Boolean {
 }
 
 fun DungeonCategory.display() = when (this) {
-    DungeonCategory.NORMAL -> KirraDungeonClient.conf.getStringColored("settings.dungeon.normal-display")!!
-    DungeonCategory.TEAM -> KirraDungeonClient.conf.getStringColored("settings.dungeon.team-display")!!
-    DungeonCategory.ACTIVITY -> KirraDungeonClient.conf.getStringColored("settings.dungeon.activity-display")!!
-    DungeonCategory.SPECIAL -> KirraDungeonClient.conf.getStringColored("settings.dungeon.special-display")!!
+    NORMAL -> KirraDungeonClient.conf.getStringColored("settings.dungeon.normal-display")!!
+    TEAM -> KirraDungeonClient.conf.getStringColored("settings.dungeon.team-display")!!
+    ACTIVITY -> KirraDungeonClient.conf.getStringColored("settings.dungeon.activity-display")!!
+    SPECIAL -> KirraDungeonClient.conf.getStringColored("settings.dungeon.special-display")!!
 }
 
 fun DungeonCategory.getParentScreen() = when (this) {
-    DungeonCategory.NORMAL -> DungeonLoader.normalParentScreen
-    DungeonCategory.TEAM -> DungeonLoader.teamParentScreen
-    DungeonCategory.ACTIVITY -> DungeonLoader.activityParentScreen
-    DungeonCategory.SPECIAL -> DungeonLoader.specialParentScreen
+    NORMAL -> DungeonLoader.parentScreens[NORMAL]
+    TEAM -> DungeonLoader.parentScreens[TEAM]
+    ACTIVITY -> DungeonLoader.parentScreens[ACTIVITY]
+    SPECIAL -> DungeonLoader.parentScreens[SPECIAL]
+}!!
+
+fun DungeonCategory.getIndex() = when (this) {
+    NORMAL -> 1
+    TEAM -> 2
+    ACTIVITY -> 3
+    SPECIAL -> 4
 }

@@ -6,7 +6,7 @@ import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -14,7 +14,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.platform.util.sendLang
 
-object FunctionUnlimitedZone {
+object FunctionUnlimitedDungeon {
 
     @SubscribeEvent
     fun e(e: DungeonPlayerJoinEvent) {
@@ -28,7 +28,7 @@ object FunctionUnlimitedZone {
             if (!isDungeonFromUnlimited(e.dungeonWorld.worldIdentifier)) {
                 return@submit
             }
-            val unlimitedZone = UnlimitedZone.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
+            val unlimitedZone = UnlimitedDungeon.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
                 kickPlayerByNotFoundData(player)
                 return@submit
             }
@@ -42,7 +42,7 @@ object FunctionUnlimitedZone {
     @SubscribeEvent
     fun e(e: MythicMobDeathEvent) {
         val entity = e.entity
-        val unlimitedZone = UnlimitedZone.getByMobUUID(entity.uniqueId) ?: return
+        val unlimitedZone = UnlimitedDungeon.getByMobUUID(entity.uniqueId) ?: return
         unlimitedZone.removeMonsterUUID(entity.uniqueId)
         // 爬塔, 在怪物首领死后执行下一层相关操作.
         doSuccToNextFloor(unlimitedZone)
@@ -50,14 +50,14 @@ object FunctionUnlimitedZone {
 
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
-        val playerZone = UnlimitedZone.getByMobUUID(e.entity.uniqueId) ?: return
+        val playerZone = UnlimitedDungeon.getByMobUUID(e.entity.uniqueId) ?: return
         if (playerZone.bossUUID == e.entity.uniqueId) {
             playerZone.updateBossBar()
         }
     }
 
     @Suppress("SpellCheckingInspection")
-    private fun doSuccToNextFloor(unlimitedZone: UnlimitedZone) {
+    private fun doSuccToNextFloor(unlimitedZone: UnlimitedDungeon) {
         unlimitedZone.getPlayers().forEach {
             unlimitedZone.floorPlus1()
             val currentFloor = unlimitedZone.currentFloor

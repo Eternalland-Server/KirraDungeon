@@ -2,7 +2,6 @@ package net.sakuragame.eternal.kirradungeon.server
 
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.getIZone
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerKickEvent
@@ -66,10 +65,10 @@ class Profile(val player: Player) {
     fun drop() {
         if (isChallenging) {
             submit(delay = 3, async = true) {
-                val zone = getIZone() ?: return@submit
-                zone.playerUUIDList.remove(player.uniqueId)
-                if (zone.canDel()) {
-                    zone.del()
+                val dungeon = getIDungeon() ?: return@submit
+                dungeon.playerUUIDList.remove(player.uniqueId)
+                if (dungeon.canDel()) {
+                    dungeon.del()
                 }
             }
             BossBar.close(player)
@@ -88,4 +87,6 @@ class Profile(val player: Player) {
             Database.setNumber(player, number.get())
         }
     }
+
+    fun getIDungeon() = KirraDungeonServerAPI.getDungeonByPlayer(player)
 }

@@ -9,14 +9,15 @@ import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
+import net.sakuragame.eternal.kirradungeon.server.event.DungeonFailEvent
 import net.sakuragame.eternal.kirradungeon.server.event.DungeonJoinEvent
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultZone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialZone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedZone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.Sound
@@ -34,7 +35,7 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 @JvmDefaultWithoutCompatibility
-interface IZone {
+interface IDungeon {
 
     /**
      * 副本 UUID.
@@ -173,7 +174,7 @@ interface IZone {
             showJoinMessage(player, zone.name)
             spawnEntities(spawnBoss, spawnMob)
             onPlayerJoin()
-            DungeonJoinEvent(player, zone.id, this@IZone).call()
+            DungeonJoinEvent(player, zone.id, this@IDungeon).call()
         }
     }
 
@@ -349,9 +350,7 @@ interface IZone {
     fun clear() {
         isClear = true
         val players = getPlayers()
-        players.forEach {
-            DungeonClearEvent(it, zone.id).call()
-        }
+        DungeonClearEvent(players, zone.id).call()
         val delay2BackSpawnServer = KirraDungeonServer.conf.getInt("settings.delay-back-spawn-server-secs")
         sendClearMessage(players, delay2BackSpawnServer)
     }
@@ -362,6 +361,7 @@ interface IZone {
      */
     fun fail(type: FailType) {
         isFail = true
+        DungeonFailEvent(getPlayers(), zone.id).call()
         val failText = when (type) {
             OVERTIME -> Bukkit.getServer().consoleSender.asLangText("message-player-over-time")
             ALL_DIED -> Bukkit.getServer().consoleSender.asLangText("message-player-over-time")
@@ -387,10 +387,10 @@ interface IZone {
     fun del() {
         DungeonServerAPI.getWorldManager().dropDungeon(dungeonWorld)
         when (zone.data.type) {
-            DEFAULT -> DefaultZone.defaultZones.remove(this)
-            SPECIAL -> SpecialZone.specialZones.remove(this)
-            UNLIMITED -> UnlimitedZone.unlimitedZones.remove(this)
-            WAVE -> WaveZone.waveZones.remove(this)
+            DEFAULT -> DefaultDungeon.defaultDungeons.remove(this)
+            SPECIAL -> SpecialDungeon.specialDungeons.remove(this)
+            UNLIMITED -> UnlimitedDungeon.unlimitedDungeons.remove(this)
+            WAVE -> WaveDungeon.waveDungeons.remove(this)
         }
     }
 

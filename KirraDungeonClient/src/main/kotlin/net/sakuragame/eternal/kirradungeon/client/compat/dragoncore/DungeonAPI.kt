@@ -21,11 +21,11 @@ object DungeonAPI {
         UPDATE, JOIN, CLOSE, PAGE
     }
 
-    fun getDefaultScreen() = DungeonLoader.normalParentScreen[0]
+    fun getDefaultScreen() = DungeonLoader.parentScreens[DungeonCategory.NORMAL]!![0]
 
     fun getDefaultSubScreen(screen: DungeonScreen?): DungeonSubScreen {
         if (screen == null) return getDefaultScreen().dungeonSubScreens[0]!!
-        return screen.dungeonSubScreens.find { it?.forceEmpty == false } ?: getDefaultScreen().dungeonSubScreens[0]!!
+        return screen.dungeonSubScreens.values.find { it?.forceEmpty == false } ?: getDefaultScreen().dungeonSubScreens[0]!!
     }
 
     fun getPluginParams(
@@ -53,7 +53,7 @@ object DungeonAPI {
 
     fun getDungeonScreen(category: DungeonCategory, index: Int): DungeonScreen? {
         val parent = category.getParentScreen()
-        return parent.getOrNull(index - 1)
+        return parent.getOrNull(index)
     }
 
     fun getMaxPage(droppedItems: List<String>): Int {

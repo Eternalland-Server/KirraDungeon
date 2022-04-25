@@ -90,6 +90,15 @@ object Commands {
     }
 
     @CommandBody
+    val test = subCommand {
+        dynamic(commit = "dungeonId") {
+            execute<Player> { player, _, argument ->
+                KirraDungeonClientAPI.openUI(player, argument)
+            }
+        }
+    }
+
+    @CommandBody
     val setNumber = subCommand {
         dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ ->

@@ -4,7 +4,7 @@ import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.IZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
@@ -15,7 +15,7 @@ import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import java.util.*
 
-class WaveZone(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IZone {
+class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IDungeon {
 
     init {
         runOverTimeCheck()
@@ -171,33 +171,33 @@ class WaveZone(override val zone: Zone, override val dungeonWorld: DungeonWorld)
     @Suppress("DuplicatedCode")
     companion object {
 
-        val waveZones = mutableListOf<WaveZone>()
+        val waveDungeons = mutableListOf<WaveDungeon>()
 
-        fun getByDungeonWorldUUID(uuid: UUID) = waveZones.firstOrNull { it.dungeonWorld.uuid == uuid }
+        fun getByDungeonWorldUUID(uuid: UUID) = waveDungeons.firstOrNull { it.dungeonWorld.uuid == uuid }
 
-        fun getByPlayer(playerUUID: UUID): WaveZone? {
-            waveZones.forEach { waveZone ->
-                if (waveZone.playerUUIDList.find { it == playerUUID } != null) {
-                    return waveZone
+        fun getByPlayer(playerUUID: UUID): WaveDungeon? {
+            waveDungeons.forEach { waveDungeon ->
+                if (waveDungeon.playerUUIDList.find { it == playerUUID } != null) {
+                    return waveDungeon
                 }
             }
             return null
         }
 
-        fun getByMobUUID(mobUUID: UUID): WaveZone? {
-            waveZones.forEach { waveZone ->
-                if (waveZone.monsterUUIDList.find { it == mobUUID } != null) {
-                    return waveZone
+        fun getByMobUUID(mobUUID: UUID): WaveDungeon? {
+            waveDungeons.forEach { waveDungeon ->
+                if (waveDungeon.monsterUUIDList.find { it == mobUUID } != null) {
+                    return waveDungeon
                 }
-                if (waveZone.bossUUID == mobUUID) {
-                    return waveZone
+                if (waveDungeon.bossUUID == mobUUID) {
+                    return waveDungeon
                 }
             }
             return null
         }
 
         fun create(zone: Zone, dungeonWorld: DungeonWorld) {
-            waveZones += WaveZone(zone, dungeonWorld)
+            waveDungeons += WaveDungeon(zone, dungeonWorld)
         }
     }
 

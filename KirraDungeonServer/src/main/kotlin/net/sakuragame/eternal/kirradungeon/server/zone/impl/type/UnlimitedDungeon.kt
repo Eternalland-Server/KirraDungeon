@@ -2,14 +2,14 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.IZone
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
 import taboolib.common.platform.service.PlatformExecutor
 import java.util.*
 
-class SpecialZone(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IZone {
+class UnlimitedDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld): IDungeon {
 
     init {
         runOverTimeCheck()
@@ -33,6 +33,12 @@ class SpecialZone(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     override var failThread: PlatformExecutor.PlatformTask? = null
 
+    /**
+     * 当前挑战楼层.
+     * 每次挑战结束都会 + 1, 并重新生成一只属性 + 50% 的 BOSS.
+     */
+    var currentFloor = 1
+
     override fun onPlayerJoin() {
         startCountdown()
         showResurgenceTitle()
@@ -46,36 +52,40 @@ class SpecialZone(override val zone: Zone, override val dungeonWorld: DungeonWor
         error("not reachable")
     }
 
+    fun floorPlus1() {
+        currentFloor++
+    }
+
     @Suppress("DuplicatedCode")
     companion object {
 
-        val specialZones = mutableListOf<SpecialZone>()
+        val unlimitedDungeons = mutableListOf<UnlimitedDungeon>()
 
-        fun getByDungeonWorldUUID(uuid: UUID) = specialZones.firstOrNull { it.dungeonWorld.uuid == uuid }
+        fun getByDungeonWorldUUID(uuid: UUID) = unlimitedDungeons.firstOrNull { it.dungeonWorld.uuid == uuid }
 
-        fun getByPlayer(playerUUID: UUID): SpecialZone? {
-            specialZones.forEach { specialZone ->
-                if (specialZone.playerUUIDList.find { it == playerUUID } != null) {
-                    return specialZone
+        fun getByPlayer(playerUUID: UUID): UnlimitedDungeon? {
+            unlimitedDungeons.forEach { unlimitedDungeon ->
+                if (unlimitedDungeon.playerUUIDList.find { it == playerUUID } != null) {
+                    return unlimitedDungeon
                 }
             }
             return null
         }
 
-        fun getByMobUUID(mobUUID: UUID): SpecialZone? {
-            specialZones.forEach { specialZone ->
-                if (specialZone.monsterUUIDList.find { it == mobUUID } != null) {
-                    return specialZone
+        fun getByMobUUID(mobUUID: UUID): UnlimitedDungeon? {
+            unlimitedDungeons.forEach { unlimitedDungeon ->
+                if (unlimitedDungeon.monsterUUIDList.find { it == mobUUID } != null) {
+                    return unlimitedDungeon
                 }
-                if (specialZone.bossUUID == mobUUID) {
-                    return specialZone
+                if (unlimitedDungeon.bossUUID == mobUUID) {
+                    return unlimitedDungeon
                 }
             }
             return null
         }
 
         fun create(zone: Zone, dungeonWorld: DungeonWorld) {
-            specialZones += SpecialZone(zone, dungeonWorld)
+            unlimitedDungeons += UnlimitedDungeon(zone, dungeonWorld)
         }
     }
 }

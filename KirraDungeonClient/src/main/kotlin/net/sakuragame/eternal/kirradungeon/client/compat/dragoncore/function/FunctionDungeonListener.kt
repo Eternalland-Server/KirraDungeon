@@ -15,6 +15,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.isBelongDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.event.ZoneJoinEvent
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
@@ -78,6 +79,10 @@ object FunctionDungeonListener {
     @Suppress("RemoveRedundantQualifierName")
     private fun execCompSubmit(player: Player, compId: String, params: SubmitParams) {
         val paramData = getParamData(player, params)
+        if (player.profile().debugMode.get()) {
+            Bukkit.broadcastMessage("fromData: ${paramData.fromData}")
+            Bukkit.broadcastMessage("toData: ${paramData.toData}")
+        }
         when (DungeonAPI.ParamType.valueOf(params.getParam(1))) {
             UPDATE -> doUpdate(player, paramData)
             JOIN -> doJoin(player, compId, paramData)
@@ -145,14 +150,14 @@ object FunctionDungeonListener {
     }
 
     private fun getParamData(player: Player, params: SubmitParams): ParamData {
-        val fromNumData = getFromNumDataFromParams(params)
-        val toNumData = getToNumDataFromParams(fromNumData, params)
-        val category = DungeonAPI.getDungeonCategory(toNumData.param1)
-        val screen = DungeonAPI.getDungeonScreen(category, toNumData.param2) ?: DungeonAPI.getDefaultScreen()
-        val subScreen = screen.dungeonSubScreens[toNumData.param3 - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
         if (player.profile().debugMode.get()) {
             printParamDataDebugMessage(player, params)
         }
+        val fromNumData = getFromNumDataFromParams(params)
+        val toNumData = getToNumDataFromParams(fromNumData, params)
+        val category = DungeonAPI.getDungeonCategory(toNumData.param1)
+        val screen = DungeonAPI.getDungeonScreen(category, toNumData.param2 - 1) ?: DungeonAPI.getDefaultScreen()
+        val subScreen = screen.dungeonSubScreens[toNumData.param3 - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
         return ParamData(fromNumData, toNumData, category, screen, subScreen)
     }
 
