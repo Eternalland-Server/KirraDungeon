@@ -5,12 +5,12 @@ import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
+import net.sakuragame.eternal.kirradungeon.common.event.DungeonClearEvent
+import net.sakuragame.eternal.kirradungeon.common.event.DungeonFailEvent
+import net.sakuragame.eternal.kirradungeon.common.event.DungeonJoinEvent
 import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
-import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
-import net.sakuragame.eternal.kirradungeon.server.event.DungeonFailEvent
-import net.sakuragame.eternal.kirradungeon.server.event.DungeonJoinEvent
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
@@ -174,7 +174,7 @@ interface IDungeon {
             showJoinMessage(player, zone.name)
             spawnEntities(spawnBoss, spawnMob)
             onPlayerJoin()
-            DungeonJoinEvent(player, zone.id, this@IDungeon).call()
+            DungeonJoinEvent(player, zone.id).call()
         }
     }
 

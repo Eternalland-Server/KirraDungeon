@@ -15,13 +15,6 @@ import taboolib.platform.util.hasItem
 import taboolib.platform.util.isAir
 import taboolib.platform.util.takeItem
 
-/**
- * KirraDungeons
- * net.sakuragame.KirraDungeons.client.ZoneFrequency
- *
- * @author kirraObj
- * @since 2021/11/4 14:11
- */
 data class ZoneCondition(
     val permissionName: String = "default",
     val dailyCounts: Int,

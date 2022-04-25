@@ -9,8 +9,8 @@ import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.c
 import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkFee
 import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkItems
 import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.withDraw
-import net.sakuragame.eternal.kirraparty.bukkit.party.Party
-import net.sakuragame.eternal.kirraparty.bukkit.party.Party.Companion.getParty
+import net.sakuragame.eternal.kirraparty.bukkit.party.PartyAPI
+import net.sakuragame.eternal.kirraparty.bukkit.party.PartyPosition
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -53,12 +53,12 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
                 return
             }
             // 与组队系统挂钩.
-            val party = player.getParty()
+            val party = PartyAPI.getParty(player)
             if (party == null) {
                 zone.join(listOf(player))
                 return
             }
-            if (party.getTeamPosition(player.uniqueId) != Party.Position.LEADER) {
+            if (party.getPosition(player.uniqueId) != PartyPosition.LEADER) {
                 player.sendLang("command-member-try-join-zone")
                 return
             } else {

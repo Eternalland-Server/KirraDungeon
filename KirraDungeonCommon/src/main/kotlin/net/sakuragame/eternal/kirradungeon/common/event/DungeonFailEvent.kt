@@ -1,4 +1,4 @@
-package net.sakuragame.eternal.kirradungeon.server.event
+package net.sakuragame.eternal.kirradungeon.common.event
 
 import org.bukkit.entity.Player
 import taboolib.platform.type.BukkitProxyEvent

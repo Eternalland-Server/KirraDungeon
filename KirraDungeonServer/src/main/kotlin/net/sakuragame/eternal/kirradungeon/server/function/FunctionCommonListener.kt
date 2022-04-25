@@ -5,9 +5,9 @@ import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
+import net.sakuragame.eternal.kirradungeon.common.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
-import net.sakuragame.eternal.kirradungeon.server.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.isSpectator
 import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
 import net.sakuragame.eternal.kirradungeon.server.turnToSpectator

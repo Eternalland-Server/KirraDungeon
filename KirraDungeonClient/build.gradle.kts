@@ -13,6 +13,7 @@ version = projectVersion
 taboolib {
     description {
         dependencies {
+            name("KirraDungeonCommon")
             name("Zaphkiel")
             name("KirraPartyBukkit")
             name("KirraCoreBukkit")

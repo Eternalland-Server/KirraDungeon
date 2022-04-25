@@ -19,6 +19,7 @@ object KirraDungeonClientAPI {
      * @return 是否成功打开
      */
     fun openUI(player: Player, dungeonId: String): Boolean {
+
         val paramData = doSearch(dungeonId) ?: return false
         FunctionDungeon.openAssignGUI(player, paramData.toData, paramData)
         return true
