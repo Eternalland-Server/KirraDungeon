@@ -12,7 +12,7 @@ object KirraDungeonCommonAPI {
         NONE, CLIENT, SERVER;
     }
 
-    fun getCurrentServer(): ServerType {
+    fun getRunningServerType(): ServerType {
         if (Bukkit.getPluginManager().getPlugin("KirraDungeonClient") != null) {
             return CLIENT
         }
@@ -23,7 +23,7 @@ object KirraDungeonCommonAPI {
     }
 
     fun getDisplayNameById(id: String): String? {
-        return when (getCurrentServer()) {
+        return when (getRunningServerType()) {
             NONE -> null
             CLIENT -> KirraDungeonClientAPI.getDungenSubScreenById(id)?.name
             SERVER -> Zone.zones.find { it.name.contains(id) }?.name

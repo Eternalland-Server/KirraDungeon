@@ -249,6 +249,7 @@ interface IDungeon {
      */
     fun teleportToSpawn() {
         var secs = 5
+        getPlayers().forEach { DragonCoreCompat.closeFailHud(it) }
         submit(delay = 60L, period = 20, async = true) {
             getPlayers().forEach {
                 if (!it.isOnline) {
@@ -295,6 +296,7 @@ interface IDungeon {
      */
     fun startFailThread() {
         getPlayers().forEach {
+            DragonCoreCompat.openFailHud(it)
             it.sendLang("message-fail-thread-started", failTime)
         }
         failThread = submit(async = true, period = 20) {
@@ -406,6 +408,7 @@ interface IDungeon {
         failThread?.cancel()
         failThread = null
         failTime = 60
+        DragonCoreCompat.closeFailHud(player)
         player.teleport(zone.data.spawnLoc.toBukkitLocation(player.world))
         player.reset()
         player.sendTitle("&6&l复活".colored(), "&7尽全力打败怪物们!".colored(), 3, 40, 0)

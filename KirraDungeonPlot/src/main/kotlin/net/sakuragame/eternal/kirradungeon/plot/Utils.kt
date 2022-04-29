@@ -6,7 +6,6 @@ import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import pl.betoncraft.betonquest.BetonQuest
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 
@@ -43,12 +42,4 @@ fun spawnArmorStand(loc: Location) = (loc.world.spawnEntity(loc, EntityType.ARMO
     it.setGravity(false)
     it.isVisible = false
     it.isMarker = true
-}
-
-fun Player.getNoobiePoints(): Int? {
-    return BetonQuest.getInstance().getPlayerData(uniqueId).points.firstOrNull { it.category == "noobie_quest" }?.count
-}
-
-fun Player.addNoobiePoints(int: Int) {
-    BetonQuest.getInstance().getPlayerData(uniqueId).modifyPoints("noobie_quest", int)
 }

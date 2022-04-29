@@ -5,9 +5,12 @@ import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
-import net.sakuragame.eternal.kirradungeon.plot.*
+import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
 import net.sakuragame.eternal.kirradungeon.plot.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.plot.function.FunctionPlot.playDome
+import net.sakuragame.eternal.kirradungeon.plot.getMobMaxHealth
+import net.sakuragame.eternal.kirradungeon.plot.reset
+import net.sakuragame.eternal.kirradungeon.plot.sendBrokenTitleAnimation
 import net.sakuragame.eternal.script.api.NergiganteAPI
 import net.sakuragame.eternal.script.api.event.NSConversationEndEvent
 import net.sakuragame.eternal.script.api.event.NSConversationOptionEvent
@@ -109,7 +112,6 @@ object FunctionListener {
     @SubscribeEvent
     fun e(e: NSFilmEndEvent) {
         val player = e.player
-        player.addNoobiePoints(1)
         KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在传送至主城 &7@", true)
         submit(async = true, delay = 40L) {
             KirraCoreBukkitAPI.teleportToSpawnServer(player)

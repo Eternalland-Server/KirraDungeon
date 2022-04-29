@@ -57,7 +57,6 @@ dependencies {
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
-    compileOnly("net.sakuragame.eternal:BetonQuest:1.13.0-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
     compileOnly("ink.ptms.core:v11200:11200")
     compileOnly(kotlin("stdlib"))
