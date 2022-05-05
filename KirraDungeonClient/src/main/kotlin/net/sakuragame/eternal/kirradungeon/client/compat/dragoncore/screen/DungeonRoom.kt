@@ -40,7 +40,9 @@ object DungeonRoom : IScreen {
         val name = Atomics.newReference<String>(room.name)
         val forceLock = AtomicBoolean(room.forceLock)
 
-        if (player.profile().number.get() < getNumber(room)) {
+        val profile = player.profile() ?: return
+
+        if (profile.number.get() < getNumber(room)) {
             forceLock.set(true)
             name.set("&7&o暂未解锁".colored())
         }

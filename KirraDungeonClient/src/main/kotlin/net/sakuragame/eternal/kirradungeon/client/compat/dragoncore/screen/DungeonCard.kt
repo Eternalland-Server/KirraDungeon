@@ -75,7 +75,8 @@ object DungeonCard : IScreen {
             if (subScreen.limitTime.isActive() && !subScreen.limitTime.isInLimitTime()) {
                 addLockComponent()
             }
-            if (player.profile().number.get() < DungeonAPI.getNumber(subScreen)) {
+            val profile = player.profile() ?: return@apply
+            if (profile.number.get() < DungeonAPI.getNumber(subScreen)) {
                 addLockComponent()
             }
             if (player.getRealm() < subScreen.limitRealm.realm) {

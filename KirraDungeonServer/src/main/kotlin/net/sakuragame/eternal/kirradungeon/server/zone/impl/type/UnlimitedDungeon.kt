@@ -9,7 +9,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
 import taboolib.common.platform.service.PlatformExecutor
 import java.util.*
 
-class UnlimitedDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld): IDungeon {
+class UnlimitedDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IDungeon {
 
     init {
         runOverTimeCheck()

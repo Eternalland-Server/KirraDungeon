@@ -36,7 +36,7 @@ class Profile(val player: Player) {
             }
         }
 
-        fun Player.profile() = profiles.values.first { it.player.uniqueId == uniqueId }
+        fun Player.profile() = profiles.values.firstOrNull { it.player.uniqueId == uniqueId }
 
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         fun e(e: PlayerJoinEvent) {
@@ -56,7 +56,7 @@ class Profile(val player: Player) {
         }
 
         private fun dataRecycle(player: Player) {
-            player.profile().apply {
+            player.profile()?.apply {
                 save()
                 drop()
             }

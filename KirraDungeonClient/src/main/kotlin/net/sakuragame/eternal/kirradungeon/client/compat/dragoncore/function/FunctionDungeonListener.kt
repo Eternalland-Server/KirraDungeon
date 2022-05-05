@@ -79,7 +79,8 @@ object FunctionDungeonListener {
     @Suppress("RemoveRedundantQualifierName")
     private fun execCompSubmit(player: Player, compId: String, params: SubmitParams) {
         val paramData = getParamData(player, params)
-        if (player.profile().debugMode.get()) {
+        val profile = player.profile() ?: return
+        if (profile.debugMode.get()) {
             Bukkit.broadcastMessage("fromData: ${paramData.fromData}")
             Bukkit.broadcastMessage("toData: ${paramData.toData}")
         }
@@ -150,7 +151,7 @@ object FunctionDungeonListener {
     }
 
     private fun getParamData(player: Player, params: SubmitParams): ParamData {
-        if (player.profile().debugMode.get()) {
+        if (player.profile()?.debugMode?.get() == true) {
             printParamDataDebugMessage(player, params)
         }
         val fromNumData = getFromNumDataFromParams(params)

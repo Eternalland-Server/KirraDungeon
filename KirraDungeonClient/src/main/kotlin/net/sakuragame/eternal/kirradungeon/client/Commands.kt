@@ -84,8 +84,9 @@ object Commands {
     @CommandBody
     val debug = subCommand {
         execute<Player> { player, _, _ ->
-            player.profile().debugMode.set(!player.profile().debugMode.get())
-            player.sendMessage("&c[System] &f${player.profile().debugMode.get().toString().uppercase()}".colored())
+            val profile = player.profile() ?: return@execute
+            profile.debugMode.set(!profile.debugMode.get())
+            player.sendMessage("&c[System] &f${profile.debugMode.get().toString().uppercase()}".colored())
         }
     }
 
@@ -107,9 +108,10 @@ object Commands {
             dynamic(commit = "number") {
                 execute<CommandSender> { sender, context, _ ->
                     val player = Bukkit.getPlayer(context.get(1)) ?: return@execute
+                    val profile = player.profile() ?: return@execute
                     val number = context.get(2).toIntOrNull() ?: 1
-                    player.profile().number.set(number)
-                    player.profile().save()
+                    profile.number.set(number)
+                    profile.save()
                     sender.sendMessage("&c[System] &7已经把 ${player.name} 的编号设置为 $number".colored())
                 }
             }

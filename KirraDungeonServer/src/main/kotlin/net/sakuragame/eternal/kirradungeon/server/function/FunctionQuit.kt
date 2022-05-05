@@ -5,6 +5,7 @@ import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
 import net.sakuragame.eternal.justmessage.api.common.NotifyBox
 import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxConfirmEvent
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
+import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.function.baffle.FunctionBaffle
 import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
@@ -46,6 +47,7 @@ object FunctionQuit {
         val profile = player.profile()
         player.closeInventory()
         player.turnToSpectator()
+        DragonCoreCompat.closeFailHud(player)
         if (!profile.isChallenging) {
             return
         }

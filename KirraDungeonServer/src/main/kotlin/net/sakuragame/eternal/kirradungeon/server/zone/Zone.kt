@@ -26,9 +26,9 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
 
         val zones = mutableListOf<Zone>()
 
-        fun getByName(name: String) = zones.firstOrNull { it.name == name }
+        fun getByName(name: String) = zones.find { it.name == name }
 
-        fun getByID(id: String) = zones.firstOrNull { it.id == id }
+        fun getByID(id: String) = zones.find { it.id == id }
 
         @Awake(LifeCycle.ENABLE)
         fun i() {
