@@ -18,6 +18,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
+import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.Sound
@@ -47,6 +48,11 @@ interface IDungeon {
      * 副本创建时间.
      */
     val createdTime: Long
+
+    /**
+     * 副本初始化
+     */
+    var init: Boolean
 
     /**
      * 原副本信息.
@@ -172,10 +178,21 @@ interface IDungeon {
         }
         submit(delay = 40) {
             showJoinMessage(player, zone.name)
-            spawnEntities(spawnBoss, spawnMob)
+            if (!init) {
+                init(spawnBoss, spawnMob)
+            }
             onPlayerJoin()
             DungeonJoinEvent(player, zone.id).call()
         }
+    }
+
+    /**
+     * 初始化操作
+     */
+    fun init(spawnBoss: Boolean, spawnMob: Boolean) {
+        init = true
+        spawnEntities(spawnBoss, spawnMob)
+        spawnModels()
     }
 
     /**
@@ -202,6 +219,19 @@ interface IDungeon {
             val bossEntity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(bossData.type, bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld), bossLevel) as LivingEntity
             bossEntity.isGlowing = true
             bossUUID = bossEntity.uniqueId
+        }
+    }
+
+    /**
+     * 生成模型
+     */
+    fun spawnModels() {
+        if (zone.data.models.isEmpty()) {
+            return
+        }
+        zone.data.models.forEach {
+            val model = KirraModelAPI.models[it.model] ?: return@forEach
+            KirraModelAPI.createTempModel(it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), model)
         }
     }
 

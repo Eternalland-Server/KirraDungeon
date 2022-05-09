@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.zone
 
+import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneModelData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneMonsterData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
@@ -27,8 +28,9 @@ data class ZoneData(
     val number: Int,
     val iconNumber: Int,
     val resurgenceTime: Int,
+    val models: List<ZoneModelData>,
     val waveData: List<ZoneWaveData>? = null,
-    val waveSpawnLocs: List<ZoneLocation>? = null
+    val waveSpawnLocs: List<ZoneLocation>? = null,
 ) {
 
     fun isCustomSkyEnabled() = this.zoneSkyData != null

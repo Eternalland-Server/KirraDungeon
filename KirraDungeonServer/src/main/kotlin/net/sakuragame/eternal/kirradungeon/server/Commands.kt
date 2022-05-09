@@ -14,6 +14,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
+import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
 import org.bukkit.WorldType
@@ -107,6 +108,9 @@ object Commands {
                     player.sendMessage("&7该副本不存在.".colored())
                     return@execute
                 }
+                if (editingDungeonWorld != null) {
+                    player.sendMessage("&7不能两个人同时编辑！".colored())
+                }
                 DungeonServerAPI.getWorldManager().loadDungeon(zone.id, object : RunnableVal<DungeonWorld>() {
                     override fun run(value: DungeonWorld?) {
                         if (value == null) return
@@ -114,6 +118,10 @@ object Commands {
                         editingDungeonWorld = value
                         value.bukkitWorld.also { world ->
                             world.entities.forEach { it.remove() }
+                        }
+                        zone.data.models.forEach {
+                            val model = KirraModelAPI.models[it.model] ?: return@forEach
+                            KirraModelAPI.createTempModel(it.loc.toBukkitLocation(value.bukkitWorld), model, it.id)
                         }
                         player.teleport(zone.data.spawnLoc.toBukkitLocation(value.bukkitWorld))
                     }
@@ -133,6 +141,64 @@ object Commands {
             val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
             FunctionZone.setLoc(zone, ZoneLocation.parseToZoneLocation(player.location))
             player.sendMessage("&a设置成功!".colored())
+        }
+    }
+
+    @CommandBody
+    val setModel = subCommand {
+        dynamic(commit = "dungeonId") {
+            dynamic(commit = "id") {
+                dynamic(commit = "modelId") {
+                    execute<Player> { player, context, _ ->
+                        val zone = getZone(player, context.get(1)) ?: return@execute
+                        val id = context.get(2)
+                        val model = KirraModelAPI.models[context.get(3)] ?: return@execute
+                        val loc = player.location
+                            .toCenter(0.5)
+                            .subtract(0.0, 1.0, 0.0)
+                        if (Zone.editingModelIds.contains(id)) {
+                            player.sendMessage("&c不能跟已有 id 冲突.".colored())
+                            return@execute
+                        }
+                        FunctionZone.setModel(zone, id, model.id, ZoneLocation.parseToZoneLocation(loc))
+                        KirraModelAPI.createTempModel(loc, model, id)
+                        Zone.editingModelIds += id
+                        player.sendMessage("&a设置成功.".colored())
+                    }
+                }
+            }
+        }
+    }
+
+    @CommandBody
+    val removeModel = subCommand {
+        dynamic(commit = "dungeonId") {
+            dynamic(commit = "id") {
+                suggestion<Player> { _, _ ->
+                    Zone.editingModelIds.toMutableList()
+                }
+                execute<Player> { player, context, _ ->
+                    val zone = getZone(player, context.get(1)) ?: return@execute
+                    val id = context.get(2)
+                    FunctionZone.removeModel(zone, id)
+                    KirraModelAPI.removeModel(id)
+                    Zone.editingModelIds -= id
+                    player.sendMessage("&a移除成功".colored())
+                }
+            }
+        }
+    }
+
+    @CommandBody
+    val checkModels = subCommand {
+        dynamic(commit = "dungeonId") {
+            execute<Player> { player, context, _ ->
+                val zone = getZone(player, context.get(1)) ?: return@execute
+                player.sendMessage("&a${zone.id} 副本模型:".colored())
+                zone.data.models.forEach {
+                    player.sendMessage("&7${it.id} - ${it.loc} - ${it.model}".colored())
+                }
+            }
         }
     }
 
@@ -242,7 +308,7 @@ object Commands {
                     dynamic(commit = "monsterHealth") {
                         dynamic(commit = "wave") {
                             execute<Player> { player, context, _ ->
-                                val zone = getWaveZone(player, context.get(1)) ?: return@execute
+                                val zone = getZone(player, context.get(1)) ?: return@execute
                                 val monsterId = context.get(2)
                                 val monsterAmount = context.get(3).toIntOrNull() ?: 1
                                 val monsterHealth = context.get(4).toDoubleOrNull() ?: 1.0
@@ -268,7 +334,7 @@ object Commands {
                 dynamic(commit = "monsterHealth") {
                     dynamic(commit = "wave") {
                         execute<Player> { player, context, _ ->
-                            val zone = getWaveZone(player, context.get(1)) ?: return@execute
+                            val zone = getZone(player, context.get(1)) ?: return@execute
                             val bossId = context.get(2)
                             val bossHealth = context.get(3).toDoubleOrNull() ?: 1.0
                             val wave = context.get(4).toIntOrNull() ?: getWaveIndex(zone.id)
@@ -289,7 +355,7 @@ object Commands {
     val addWaveLoc = subCommand {
         dynamic(commit = "dungeonId") {
             execute<Player> { player, context, _ ->
-                val zone = getWaveZone(player, context.get(1)) ?: return@execute
+                val zone = getZone(player, context.get(1)) ?: return@execute
                 FunctionZone.addWaveLoc(zone, player.location)
                 player.sendMessage("&c[System] &7成功!".colored())
             }
@@ -304,7 +370,7 @@ object Commands {
         }
     }
 
-    private fun getWaveZone(player: Player, zoneId: String): Zone? {
+    private fun getZone(player: Player, zoneId: String): Zone? {
         val zone = Zone.getByID(zoneId)
         if (zone == null) {
             player.sendMessage("&c[System] &7错误的名字或类型.".colored())

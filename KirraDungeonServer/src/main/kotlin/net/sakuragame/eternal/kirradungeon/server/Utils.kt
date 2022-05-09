@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server
 
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import taboolib.platform.util.asLangTextList
@@ -30,4 +31,8 @@ fun formatSeconds(timeInSeconds: Int): String {
     val mM = (if (minutes < 10) "0" else "") + minutes
     val sS = (if (secondsLeft < 10) "0" else "") + secondsLeft
     return "${mM}分${sS}秒."
+}
+
+fun Location.toCenter(offset: Double): Location {
+    return Location(world, blockX + offset, blockY + offset, blockZ + offset)
 }

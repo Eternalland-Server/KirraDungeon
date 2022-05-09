@@ -73,6 +73,12 @@ object FunctionCommonListener {
         val player = e.entity as? Player ?: return
         val profile = player.profile()
         if (!profile.isChallenging) {
+            val editingWorld = Zone.editingDungeonWorld
+            if (editingWorld != null) {
+                if (player.world.uid == editingWorld.bukkitWorld.uid) {
+                    return
+                }
+            }
             e.isCancelled = true
             return
         }

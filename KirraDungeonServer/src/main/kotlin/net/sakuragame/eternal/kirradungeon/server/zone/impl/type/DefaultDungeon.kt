@@ -22,6 +22,8 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override val createdTime = System.currentTimeMillis()
 
+    override var init = false
+
     override var isClear = false
 
     override var isFail = false

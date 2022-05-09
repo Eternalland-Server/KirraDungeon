@@ -17,6 +17,8 @@ class UnlimitedDungeon(override val zone: Zone, override val dungeonWorld: Dunge
 
     override val createdTime = System.currentTimeMillis()
 
+    override var init = false
+
     override var isClear = false
 
     override var isFail = false

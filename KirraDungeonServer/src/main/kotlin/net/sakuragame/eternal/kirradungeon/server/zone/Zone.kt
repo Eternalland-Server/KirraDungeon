@@ -24,6 +24,8 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
 
         var editingDungeonWorld: DungeonWorld? = null
 
+        val editingModelIds = mutableSetOf<String>()
+
         val zones = mutableListOf<Zone>()
 
         fun getByName(name: String) = zones.find { it.name == name }
@@ -46,6 +48,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         number = FunctionZone.readNumber(id),
                         iconNumber = FunctionZone.readIcon(id),
                         resurgenceTime = FunctionZone.readResurgenceTime(id),
+                        models = FunctionZone.readModels(id),
                         waveData = FunctionZone.readWaveData(id),
                         waveSpawnLocs = FunctionZone.readWaveLocs(id)
                     )
