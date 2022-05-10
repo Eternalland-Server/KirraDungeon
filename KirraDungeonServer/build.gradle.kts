@@ -13,14 +13,15 @@ version = projectVersion
 taboolib {
     description {
         dependencies {
-            name("KirraDungeonCommon")
             name("MythicMobs")
             name("DataManager")
+            name("KirraDungeonCommon")
             name("KirraCoreBukkit")
             name("DungeonServer")
             name("DragonCore")
             name("JustAttribute")
             name("UIFactory")
+            name("Adyeshach")
         }
         contributors {
             name("闲蛋")

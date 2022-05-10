@@ -24,8 +24,6 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
 
         var editingDungeonWorld: DungeonWorld? = null
 
-        val editingModelIds = mutableListOf<String>()
-
         val zones = mutableListOf<Zone>()
 
         fun getByName(name: String) = zones.find { it.name == name }

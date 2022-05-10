@@ -132,7 +132,6 @@ object FunctionZone {
             val split = data.getString("$id.model.$it")?.split("@") ?: return@forEach
             val modelId = split[0]
             val loc = ZoneLocation.parseToZoneLocation(split[1]) ?: return@forEach
-            Zone.editingModelIds += it
             models += ZoneModelData(it, modelId, loc)
         }
         return models

@@ -155,56 +155,11 @@ object Commands {
     }
 
     @CommandBody
-    val setModel = subCommand {
-        dynamic(commit = "dungeonId") {
-            dynamic(commit = "id") {
-                dynamic(commit = "modelId") {
-                    execute<Player> { player, context, _ ->
-                        val zone = getZone(player, context.get(1)) ?: return@execute
-                        val id = context.get(2)
-                        val model = KirraModelAPI.models[context.get(3)] ?: return@execute
-                        val loc = player
-                            .location
-                            .toCenter(0.5)
-                        if (Zone.editingModelIds.contains(id)) {
-                            player.sendMessage("&c不能跟已有 id 冲突.".colored())
-                            return@execute
-                        }
-                        FunctionZone.setModel(zone, id, model.id, ZoneLocation.parseToZoneLocation(loc))
-                        KirraModelAPI.createTempModel(loc, model, id)
-                        Zone.editingModelIds += id
-                        player.sendMessage("&a设置成功.".colored())
-                    }
-                }
-            }
-        }
-    }
-
-    @CommandBody
-    val removeModel = subCommand {
-        dynamic(commit = "dungeonId") {
-            dynamic(commit = "id") {
-                suggestion<Player> { _, _ ->
-                    Zone.editingModelIds.toMutableList()
-                }
-                execute<Player> { player, context, _ ->
-                    val zone = getZone(player, context.get(1)) ?: return@execute
-                    val id = context.get(2)
-                    FunctionZone.removeModel(zone, id)
-                    KirraModelAPI.removeModel(id)
-                    Zone.editingModelIds -= id
-                    player.sendMessage("&a移除成功".colored())
-                }
-            }
-        }
-    }
-
-    @CommandBody
     val checkModels = subCommand {
         dynamic(commit = "dungeonId") {
             execute<Player> { player, context, _ ->
                 val zone = getZone(player, context.get(1)) ?: return@execute
-                player.sendMessage("&a${zone.id} 副本模型:".colored())
+                player.sendMessage("&a${zone.id} 的副本模型:".colored())
                 zone.data.models.forEach {
                     player.sendMessage("&7${it.id} - ${it.loc} - ${it.model}".colored())
                 }
