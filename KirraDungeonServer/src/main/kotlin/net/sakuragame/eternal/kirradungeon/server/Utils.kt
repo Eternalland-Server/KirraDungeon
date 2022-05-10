@@ -34,5 +34,5 @@ fun formatSeconds(timeInSeconds: Int): String {
 }
 
 fun Location.toCenter(offset: Double): Location {
-    return Location(world, blockX + offset, blockY + offset, blockZ + offset)
+    return Location(world, blockX + offset, blockY.toDouble(), blockZ + offset)
 }

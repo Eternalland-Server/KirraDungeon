@@ -16,6 +16,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveDat
  * @property number      内部编号.
  * @property iconNumber  图标编号.
  * @property resurgenceTime 复活时间.
+ * @property models 模型数据.
  * @property waveData      波次数据.
  *
  */

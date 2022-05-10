@@ -6,6 +6,7 @@ import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
+import net.sakuragame.eternal.kirradungeon.server.function.FunctionModelWand
 import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone.Companion.editingDungeonWorld
@@ -26,6 +27,7 @@ import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
+import taboolib.platform.util.giveItem
 
 @CommandHeader(name = "KirraDungeonServer", aliases = ["dungeon"], permission = "admin")
 object Commands {
@@ -145,6 +147,14 @@ object Commands {
     }
 
     @CommandBody
+    val getModelWand = subCommand {
+        execute<Player> { player, _, _ ->
+            player.sendMessage("&a已给予模型魔杖".colored())
+            player.giveItem(FunctionModelWand.modelWand)
+        }
+    }
+
+    @CommandBody
     val setModel = subCommand {
         dynamic(commit = "dungeonId") {
             dynamic(commit = "id") {
@@ -153,9 +163,9 @@ object Commands {
                         val zone = getZone(player, context.get(1)) ?: return@execute
                         val id = context.get(2)
                         val model = KirraModelAPI.models[context.get(3)] ?: return@execute
-                        val loc = player.location
+                        val loc = player
+                            .location
                             .toCenter(0.5)
-                            .subtract(0.0, 1.0, 0.0)
                         if (Zone.editingModelIds.contains(id)) {
                             player.sendMessage("&c不能跟已有 id 冲突.".colored())
                             return@execute

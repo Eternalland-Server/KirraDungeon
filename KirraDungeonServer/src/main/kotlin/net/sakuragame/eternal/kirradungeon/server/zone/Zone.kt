@@ -24,7 +24,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
 
         var editingDungeonWorld: DungeonWorld? = null
 
-        val editingModelIds = mutableSetOf<String>()
+        val editingModelIds = mutableListOf<String>()
 
         val zones = mutableListOf<Zone>()
 

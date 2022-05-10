@@ -5,8 +5,8 @@ import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
 import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.justmessage.api.common.NotifyBox
 import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxConfirmEvent
+import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServerAPI
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
-import net.sakuragame.eternal.kirradungeon.server.function.baffle.FunctionBaffle
 import net.sakuragame.eternal.kirradungeon.server.isSpectator
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
@@ -34,10 +34,10 @@ object FunctionResurgence {
         val player = e.player
         val profile = player.profile()
         if (profile.isQuitting) return
-        if (!FunctionBaffle.functionBaffle.hasNext(player.name)) {
+        if (!KirraDungeonServerAPI.baffle.hasNext(player.name)) {
             return
         }
-        FunctionBaffle.functionBaffle.next(player.name)
+        KirraDungeonServerAPI.baffle.next(player.name)
         val dungeon = profile.getIDungeon() ?: return
         if (player.isSpectator() && dungeon.canResurgence()) {
             if (!player.isPlayerHasResurgenceItem()) {
@@ -55,8 +55,8 @@ object FunctionResurgence {
         }
         val player = e.player
         val profile = player.profile()
-        player.closeInventory()
         val dungeon = profile.getIDungeon() ?: return
+        player.closeInventory()
         dungeon.resurgence(player)
     }
 

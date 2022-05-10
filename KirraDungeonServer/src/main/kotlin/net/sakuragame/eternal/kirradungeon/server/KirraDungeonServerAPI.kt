@@ -8,9 +8,15 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import org.bukkit.entity.Player
+import taboolib.common5.Baffle
+import java.util.concurrent.TimeUnit
 
 @Suppress("SpellCheckingInspection")
 object KirraDungeonServerAPI {
+
+    val baffle by lazy {
+        Baffle.of(1, TimeUnit.SECONDS)
+    }
 
     /**
      * 根据玩家获取副本实例.

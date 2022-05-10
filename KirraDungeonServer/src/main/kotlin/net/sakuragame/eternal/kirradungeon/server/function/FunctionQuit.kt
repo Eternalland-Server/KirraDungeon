@@ -4,9 +4,9 @@ import net.sakuragame.eternal.dragoncore.api.CoreAPI
 import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
 import net.sakuragame.eternal.justmessage.api.common.NotifyBox
 import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxConfirmEvent
+import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServerAPI
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
-import net.sakuragame.eternal.kirradungeon.server.function.baffle.FunctionBaffle
 import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
 import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import taboolib.common.LifeCycle
@@ -28,10 +28,10 @@ object FunctionQuit {
     @SubscribeEvent
     fun e(e: KeyPressEvent) {
         val player = e.player
-        if (!FunctionBaffle.functionBaffle.hasNext(player.name)) {
+        if (!KirraDungeonServerAPI.baffle.hasNext(player.name)) {
             return
         }
-        FunctionBaffle.functionBaffle.next(player.name)
+        KirraDungeonServerAPI.baffle.next(player.name)
         if (e.key != TRIGGER_KEY) {
             return
         }
