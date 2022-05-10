@@ -85,7 +85,7 @@ object FunctionModelWand {
     }
 
     private fun Player.openMenu1(loc: Location) {
-        openMenu<Linked<Model>> {
+        openMenu<Linked<Model>>("模型列表") {
             rows(6)
             slots(inventoryCenterSlots)
             elements {
