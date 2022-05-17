@@ -4,7 +4,7 @@ val projectVersion: String by project
 plugins {
     `java-library`
     id("io.izzel.taboolib") version "1.34"
-    id("org.jetbrains.kotlin.jvm") version "1.5.10"
+    id("org.jetbrains.kotlin.jvm") version "1.5.30"
 }
 
 group = "net.sakuragame.eternal.kirradungeon.plot"

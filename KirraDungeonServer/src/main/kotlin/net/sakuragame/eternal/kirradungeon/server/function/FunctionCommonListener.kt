@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.world.WorldUnloadEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
@@ -37,6 +38,13 @@ import taboolib.platform.util.sendLang
  * @since 2021/11/8 3:51
  */
 object FunctionCommonListener {
+
+    @SubscribeEvent
+    fun e(e: WorldUnloadEvent) {
+        e.world.loadedChunks.forEach {
+            it.unload(false)
+        }
+    }
 
     @SubscribeEvent
     fun e(e: DungeonLoadedEvent) {

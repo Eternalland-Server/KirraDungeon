@@ -53,7 +53,7 @@ repositories {
 
 dependencies {
     compileOnly("net.luckperms:api:5.3")
-    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.2.2-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.2.4-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:GemsEconomy:4.9.4-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DungeonSystem-Client-API:1.1.3-SNAPSHOT@jar")

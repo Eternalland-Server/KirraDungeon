@@ -5,6 +5,7 @@ import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
+import net.sakuragame.eternal.kirracore.bukkit.KirraCoreBukkitAPI
 import net.sakuragame.eternal.kirradungeon.common.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.common.event.DungeonFailEvent
 import net.sakuragame.eternal.kirradungeon.common.event.DungeonJoinEvent
@@ -19,7 +20,6 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
-import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
@@ -210,14 +210,12 @@ interface IDungeon {
                 repeat(monster.amount) {
                     val randomLoc = bukkitLoc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
                     val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(monster.type, randomLoc) as? LivingEntity ?: return@repeat
-                    entity.isGlowing = true
                     monsterUUIDList.add(entity.uniqueId)
                 }
             }
         }
         if (spawnBoss) {
             val bossEntity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(bossData.type, bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld), bossLevel) as LivingEntity
-            bossEntity.isGlowing = true
             bossUUID = bossEntity.uniqueId
         }
     }

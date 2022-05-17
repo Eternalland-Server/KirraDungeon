@@ -4,11 +4,11 @@ import net.sakuragame.eternal.dragoncore.api.CoreAPI
 import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
 import net.sakuragame.eternal.justmessage.api.common.NotifyBox
 import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxConfirmEvent
+import net.sakuragame.eternal.kirracore.bukkit.KirraCoreBukkitAPI
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServerAPI
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
-import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent

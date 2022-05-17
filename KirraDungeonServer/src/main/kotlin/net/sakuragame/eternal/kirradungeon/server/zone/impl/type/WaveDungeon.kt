@@ -141,7 +141,6 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
             repeat(it.amount) { _ ->
                 val loc = waveLocs.random().toBukkitLocation(dungeonWorld.bukkitWorld).add(getRandomDouble(), 0.0, getRandomDouble())
                 val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(it.monsterId, loc) as LivingEntity
-                entity.isGlowing = true
                 entity.maxHealth = it.health
                 entity.health = it.health
                 monsterUUIDList += entity.uniqueId
@@ -158,7 +157,6 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
         wave.bossData.apply {
             val loc = waveLocs.random().toBukkitLocation(dungeonWorld.bukkitWorld)
             val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(bossId, loc) as LivingEntity
-            entity.isGlowing = true
             entity.maxHealth = health
             entity.health = health
             monsterUUIDList += entity.uniqueId

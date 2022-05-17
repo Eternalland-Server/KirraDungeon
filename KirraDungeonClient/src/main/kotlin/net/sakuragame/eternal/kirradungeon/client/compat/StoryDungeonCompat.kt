@@ -3,7 +3,7 @@ package net.sakuragame.eternal.kirradungeon.client.compat
 import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
 import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
 import net.sakuragame.eternal.justmessage.api.MessageAPI
-import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
+import net.sakuragame.eternal.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.entity.Player
 import taboolib.common5.Baffle
 import taboolib.platform.util.asLangTextList
