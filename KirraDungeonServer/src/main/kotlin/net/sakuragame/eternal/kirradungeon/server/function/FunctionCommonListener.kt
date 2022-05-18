@@ -17,6 +17,8 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
+import net.sakuragame.eternal.kirraminer.KirraMinerAPI
+import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -39,27 +41,44 @@ import taboolib.platform.util.sendLang
  */
 object FunctionCommonListener {
 
+    // 保险措施
+    // 将世界卸载后, 若不卸载区块区块则不会自动回收
     @SubscribeEvent
     fun e(e: WorldUnloadEvent) {
-        e.world.loadedChunks.forEach {
+        val world = e.world
+        world.entities.forEach {
+            it.remove()
+        }
+        world.loadedChunks.forEach {
             it.unload(false)
         }
     }
 
     @SubscribeEvent
     fun e(e: DungeonLoadedEvent) {
-        if (Zone.getByID(e.dungeonWorld.worldIdentifier) == null) {
+        val dungeonWorld = e.dungeonWorld
+        if (Zone.getByID(dungeonWorld.worldIdentifier) == null) {
             return
         }
-        val copyZoneData = Zone.getByID(e.dungeonWorld.worldIdentifier)!!.data.copy()
-        val copyZone = Zone.getByID(e.dungeonWorld.worldIdentifier)!!.copy(data = copyZoneData)
-        e.dungeonWorld.bukkitWorld.isAutoSave = false
+        val copyZoneData = Zone.getByID(dungeonWorld.worldIdentifier)!!.data.copy()
+        val copyZone = Zone.getByID(dungeonWorld.worldIdentifier)!!.copy(data = copyZoneData)
+        // 将模型数据生成在世界里.
+        copyZone.data.models.forEach {
+            val model = KirraModelAPI.models[it.model] ?: return@forEach
+            KirraModelAPI.createTempModel(it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), model, it.id)
+        }
+        // 将矿物数据生成在世界里.
+        copyZone.data.ores.forEach {
+            val ore = KirraMinerAPI.ores[it.ore] ?: return@forEach
+            KirraMinerAPI.createTempOre(it.id, ore, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld))
+        }
+        dungeonWorld.bukkitWorld.isAutoSave = false
         // 初始化.
         when (copyZoneData.type) {
-            DEFAULT -> DefaultDungeon.create(copyZone, e.dungeonWorld)
-            SPECIAL -> SpecialDungeon.create(copyZone, e.dungeonWorld)
-            UNLIMITED -> UnlimitedDungeon.create(copyZone, e.dungeonWorld)
-            WAVE -> WaveDungeon.create(copyZone, e.dungeonWorld)
+            DEFAULT -> DefaultDungeon.create(copyZone, dungeonWorld)
+            SPECIAL -> SpecialDungeon.create(copyZone, dungeonWorld)
+            UNLIMITED -> UnlimitedDungeon.create(copyZone, dungeonWorld)
+            WAVE -> WaveDungeon.create(copyZone, dungeonWorld)
         }
     }
 
@@ -80,14 +99,7 @@ object FunctionCommonListener {
     fun e(e: EntityDamageEvent) {
         val player = e.entity as? Player ?: return
         val profile = player.profile()
-        if (!profile.isChallenging) {
-            val editingWorld = Zone.editingDungeonWorld
-            if (editingWorld != null) {
-                if (player.world.uid == editingWorld.bukkitWorld.uid) {
-                    return
-                }
-            }
-            e.isCancelled = true
+        if (profile.isEditing) {
             return
         }
         if (e.cause == EntityDamageEvent.DamageCause.VOID) {
@@ -145,9 +157,9 @@ object FunctionCommonListener {
         val player = e.player
         val zone = when (player.profile().zoneType) {
             DEFAULT -> DefaultDungeon.getByPlayer(player.uniqueId) ?: return
-            SPECIAL -> return
+            SPECIAL -> SpecialDungeon.getByPlayer(player.uniqueId) ?: return
             UNLIMITED -> UnlimitedDungeon.getByPlayer(player.uniqueId) ?: return
-            WAVE -> return
+            WAVE -> WaveDungeon.getByPlayer(player.uniqueId) ?: return
         }
         submit(delay = 40L) {
             zone.updateBossBar(init = true)

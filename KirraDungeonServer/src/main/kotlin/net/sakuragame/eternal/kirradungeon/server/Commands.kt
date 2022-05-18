@@ -6,7 +6,8 @@ import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
-import net.sakuragame.eternal.kirradungeon.server.function.FunctionModelWand
+import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionModelWand
+import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionOreWand
 import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone.Companion.editingDungeonWorld
@@ -15,7 +16,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
-import net.sakuragame.eternal.kirramodel.KirraModelAPI
+import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
 import org.bukkit.WorldType
@@ -116,14 +117,9 @@ object Commands {
                 DungeonServerAPI.getWorldManager().loadDungeon(zone.id, object : RunnableVal<DungeonWorld>() {
                     override fun run(value: DungeonWorld?) {
                         if (value == null) return
-                        value.properties.isAllowMonsters
                         editingDungeonWorld = value
                         value.bukkitWorld.also { world ->
                             world.entities.forEach { it.remove() }
-                        }
-                        zone.data.models.forEach {
-                            val model = KirraModelAPI.models[it.model] ?: return@forEach
-                            KirraModelAPI.createTempModel(it.loc.toBukkitLocation(value.bukkitWorld), model, it.id)
                         }
                         player.teleport(zone.data.spawnLoc.toBukkitLocation(value.bukkitWorld))
                     }
@@ -155,6 +151,14 @@ object Commands {
     }
 
     @CommandBody
+    val getOreWand = subCommand {
+        execute<Player> { player, _, _ ->
+            player.sendMessage("&a已给予矿物魔杖".colored())
+            player.giveItem(FunctionOreWand.oreWand)
+        }
+    }
+
+    @CommandBody
     val checkModels = subCommand {
         dynamic(commit = "dungeonId") {
             execute<Player> { player, context, _ ->
@@ -170,14 +174,16 @@ object Commands {
     @CommandBody
     val save = subCommand {
         execute<Player> { player, _, _ ->
+            val editingDungeonWorld = Zone.editingDungeonWorld
             if (editingDungeonWorld == null) {
                 player.sendMessage("&7无法进行该操作, 副本丢失.".colored())
                 return@execute
             }
-            DungeonServerAPI.getWorldManager().saveDungeon(editingDungeonWorld!!)
+            KirraMinerAPI.removeOresOfWorld(editingDungeonWorld.bukkitWorld)
+            DungeonServerAPI.getWorldManager().saveDungeon(editingDungeonWorld)
             player.teleport(Bukkit.getWorld("world").spawnLocation)
-            DungeonServerAPI.getWorldManager().unloadDungeon(editingDungeonWorld!!, true)
-            editingDungeonWorld = null
+            DungeonServerAPI.getWorldManager().unloadDungeon(editingDungeonWorld, true)
+            Zone.editingDungeonWorld = null
             player.sendMessage("&a已保存.".colored())
         }
     }

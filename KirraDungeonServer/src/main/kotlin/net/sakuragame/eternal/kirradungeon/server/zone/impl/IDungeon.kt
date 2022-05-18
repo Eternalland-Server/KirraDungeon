@@ -19,7 +19,6 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
-import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
@@ -192,7 +191,6 @@ interface IDungeon {
     fun init(spawnBoss: Boolean, spawnMob: Boolean) {
         init = true
         spawnEntities(spawnBoss, spawnMob)
-        spawnModels()
     }
 
     /**
@@ -217,19 +215,6 @@ interface IDungeon {
         if (spawnBoss) {
             val bossEntity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(bossData.type, bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld), bossLevel) as LivingEntity
             bossUUID = bossEntity.uniqueId
-        }
-    }
-
-    /**
-     * 生成模型
-     */
-    fun spawnModels() {
-        if (zone.data.models.isEmpty()) {
-            return
-        }
-        zone.data.models.forEach {
-            val model = KirraModelAPI.models[it.model] ?: return@forEach
-            KirraModelAPI.createTempModel(it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), model)
         }
     }
 

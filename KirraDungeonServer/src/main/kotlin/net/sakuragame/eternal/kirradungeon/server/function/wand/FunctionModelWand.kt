@@ -1,9 +1,8 @@
-package net.sakuragame.eternal.kirradungeon.server.function
+package net.sakuragame.eternal.kirradungeon.server.function.wand
 
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import net.sakuragame.eternal.kirradungeon.server.toCenter
 import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
-import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import net.sakuragame.eternal.kirramodel.model.Model
@@ -14,7 +13,6 @@ import org.bukkit.event.block.Action.LEFT_CLICK_AIR
 import org.bukkit.event.block.Action.LEFT_CLICK_BLOCK
 import org.bukkit.event.player.PlayerInteractEvent
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.library.xseries.XMaterial
 import taboolib.module.chat.colored
 import taboolib.module.nms.inputSign
 import taboolib.module.ui.openMenu
@@ -63,7 +61,7 @@ object FunctionModelWand {
         if (!item.isSimilar(modelWand)) {
             return
         }
-        val zone = player.getEditingZone() ?: return
+        val zone = FunctionWand.getEditingZone(player) ?: return
         val model = zone.data.models.find { it.loc.toBukkitLocation(player.world).distance(e.entity.getLocation()) < 0.1 } ?: kotlin.run {
             player.sendMessage("&c错误, 该模型并不由 KirraModel 托管".colored())
             return
@@ -71,17 +69,6 @@ object FunctionModelWand {
         FunctionZone.removeModel(zone, model.id)
         KirraModelAPI.removeModel(model.id)
         player.sendMessage("&a已移除".colored())
-    }
-
-    private fun Player.getEditingZone(): Zone? {
-        val world = Zone.editingDungeonWorld ?: kotlin.run {
-            sendMessage("&c无效编辑, 你并没有在配置副本".colored())
-            return null
-        }
-        return Zone.getByID(world.worldIdentifier) ?: kotlin.run {
-            sendMessage("&c错误, 副本不存在".colored())
-            return null
-        }
     }
 
     private fun Player.openMenu1(loc: Location) {
@@ -100,7 +87,7 @@ object FunctionModelWand {
                 }
             }
             onClick { _, element ->
-                val zone = getEditingZone() ?: return@onClick
+                val zone = FunctionWand.getEditingZone(this@openMenu1) ?: return@onClick
                 val player = this@openMenu1
                 val spawnLoc = loc.add(0.0, 1.0, 0.0).toCenter(0.5)
                 player.closeInventory()
@@ -119,20 +106,7 @@ object FunctionModelWand {
                     player.sendMessage("&a配置成功.".colored())
                 }
             }
-            setNextPage(51) { _, hasNextPage ->
-                if (hasNextPage) {
-                    buildItem(XMaterial.SPECTRAL_ARROW) { name = "&7下一页".colored() }
-                } else {
-                    buildItem(XMaterial.ARROW) { name = "&8下一页".colored() }
-                }
-            }
-            setPreviousPage(47) { _, hasPreviousPage ->
-                if (hasPreviousPage) {
-                    buildItem(XMaterial.SPECTRAL_ARROW) { name = "&7上一页".colored() }
-                } else {
-                    buildItem(XMaterial.ARROW) { name = "&8上一页".colored() }
-                }
-            }
+            FunctionWand.addPage(this)
         }
     }
 }

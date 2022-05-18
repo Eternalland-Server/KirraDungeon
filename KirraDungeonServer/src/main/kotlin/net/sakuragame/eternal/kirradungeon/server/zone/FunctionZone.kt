@@ -5,6 +5,7 @@ import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer.data
 import net.sakuragame.eternal.kirradungeon.server.splitWithNoSpace
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneModelData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneMonsterData
+import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneOreData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneBossData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneMobData
@@ -16,39 +17,39 @@ object FunctionZone {
 
     // 增加副本出生点怪物
     fun addMob(zone: Zone, loc: ZoneLocation, id: String, amount: Int) {
-        val mobList = arrayListOf<String>().also {
+        val mobs = arrayListOf<String>().also {
             it.addAll(data.getStringList("${zone.id}.mobs"))
         }
-        mobList.add("$loc; $id; $amount")
-        data["${zone.id}.mobs"] = mobList
+        mobs.add("$loc; $id; $amount")
+        data["${zone.id}.mobs"] = mobs
         Zone.i()
     }
 
     // 增加波次副本怪物
     fun addWaveMob(wave: Int, zone: Zone, monsterId: String, amount: Int, health: Double) {
         val id = zone.id
-        val mobList = arrayListOf<String>().also {
+        val mobs = arrayListOf<String>().also {
             val strList = data.getStringList("${zone.id}.wave.$wave.monsters")
             if (strList.isNotEmpty()) {
                 it.addAll(data.getStringList("${zone.id}.wave.$wave.monsters"))
             }
         }
-        mobList += "$monsterId@$amount@$health"
-        data["$id.wave.$wave.monsters"] = mobList
+        mobs += "$monsterId@$amount@$health"
+        data["$id.wave.$wave.monsters"] = mobs
         Zone.i()
     }
 
     // 增加波次副本随机刷新点
     fun addWaveLoc(zone: Zone, loc: Location) {
         val id = zone.id
-        val locList = arrayListOf<String>().also {
+        val locs = arrayListOf<String>().also {
             val strList = data.getStringList("$id.wave-locs")
             if (strList.isNotEmpty()) {
                 it.addAll(data.getStringList("$id.wave-locs"))
             }
         }
-        locList.add(ZoneLocation.parseToZoneLocation(loc).toString())
-        data["$id.wave-locs"] = locList
+        locs.add(ZoneLocation.parseToZoneLocation(loc).toString())
+        data["$id.wave-locs"] = locs
         Zone.i()
     }
 
@@ -56,6 +57,20 @@ object FunctionZone {
     fun setWaveBoss(wave: Int, zone: Zone, bossId: String, health: Double) {
         val id = zone.id
         data["$id.wave.$wave.boss"] = "$bossId@$health"
+        Zone.i()
+    }
+
+    // 增加副本矿物
+    fun setOre(zone: Zone, id: String, oreId: String, loc: ZoneLocation) {
+        val zoneId = zone.id
+        data["$zoneId.ore.$id"] = "$oreId@$loc"
+        Zone.i()
+    }
+
+    // 移除副本矿物
+    fun removeOre(zone: Zone, id: String) {
+        val zoneId = zone.id
+        data["$zoneId.ore.$id"] = null
         Zone.i()
     }
 
@@ -133,6 +148,19 @@ object FunctionZone {
             val modelId = split[0]
             val loc = ZoneLocation.parseToZoneLocation(split[1]) ?: return@forEach
             models += ZoneModelData(it, modelId, loc)
+        }
+        return models
+    }
+
+    // 从配置文件读取矿物数据
+    fun readOres(id: String): List<ZoneOreData> {
+        val models = mutableListOf<ZoneOreData>()
+        val sections = data.getConfigurationSection("$id.ore")?.getKeys(false) ?: return emptyList()
+        sections.forEach {
+            val split = data.getString("$id.ore.$it")?.split("@") ?: return@forEach
+            val modelId = split[0]
+            val loc = ZoneLocation.parseToZoneLocation(split[1]) ?: return@forEach
+            models += ZoneOreData(it, modelId, loc)
         }
         return models
     }

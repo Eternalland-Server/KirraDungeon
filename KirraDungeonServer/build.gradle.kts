@@ -22,6 +22,7 @@ taboolib {
             name("JustAttribute")
             name("UIFactory")
             name("Adyeshach")
+            name("KirraMiner")
         }
         contributors {
             name("闲蛋")
@@ -52,6 +53,7 @@ repositories {
     maven {
         url = uri("https://repo.tabooproject.org/repository/maven-releases/")
     }
+    maven { url = uri("https://lss233.littleservice.cn/repositories/minecraft/") }
     mavenCentral()
 }
 
@@ -65,7 +67,7 @@ dependencies {
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
     compileOnly("biz.paluch.redis:lettuce:4.1.1.Final@jar")
-    compileOnly("ink.ptms.core:v11200:11200")
+    compileOnly("org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
 }

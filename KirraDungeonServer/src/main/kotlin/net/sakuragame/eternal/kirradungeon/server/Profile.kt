@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server
 
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
+import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
@@ -21,6 +22,12 @@ import java.util.concurrent.atomic.AtomicInteger
  * @since 2021/11/9 15:51
  */
 class Profile(val player: Player) {
+
+    val isEditing: Boolean
+        get() {
+            val editingWorld = Zone.editingDungeonWorld ?: return false
+            return editingWorld.bukkitWorld.players.find { it.uniqueId == player.uniqueId } != null
+        }
 
     val number = AtomicInteger(1)
 
