@@ -56,7 +56,7 @@ object Database {
             }
         } else {
             tableNumber.insert(dataSource, "uid", "number") {
-                value("$uid", "$number")
+                value(uid, number)
             }
         }
     }
