@@ -38,83 +38,79 @@ data class ZoneCondition(
             return gson.fromJson(string, ZoneCondition::class.java)!!
         }
 
-        fun List<Player>.checkFee(zone: Zone): Boolean {
-            forEach {
-                val feeMap = it.getZoneFee(zone)
-                if (feeMap.isEmpty()) return true
-                feeMap.forEach mapForeach@{ mapFee ->
-                    val playerBal = GemsEconomyAPI.getBalance(it.uniqueId, mapFee.key)
-                    if (playerBal >= mapFee.value) {
-                        if (ZoneWithDraw.gemsMap.containsKey(it.uniqueId)) {
-                            ZoneWithDraw.gemsMap[it.uniqueId]!![mapFee.key] = mapFee.value
-                            return@mapForeach
-                        }
-                        ZoneWithDraw.gemsMap[it.uniqueId] = mutableMapOf(Pair(mapFee.key, mapFee.value))
-                    } else {
-                        NotifyBox(ECONOMY_NOT_ENOUGH_KEY_BOX, "&6&l副本".colored(), it.asLangTextList("message-dungeon-economy-not-enough", it.displayName, mapFee.key))
-                            .open(it, false)
-                        return false
+        fun checkFee(players: List<Player>, zone: Zone): Boolean {
+            val player = players[0]
+            val feeMap = player.getZoneFee(zone)
+            if (feeMap.isEmpty()) return true
+            feeMap.forEach mapForeach@{ mapFee ->
+                val playerBal = GemsEconomyAPI.getBalance(player.uniqueId, mapFee.key)
+                if (playerBal >= mapFee.value) {
+                    if (ZoneWithDraw.gemsMap.containsKey(player.uniqueId)) {
+                        ZoneWithDraw.gemsMap[player.uniqueId]!![mapFee.key] = mapFee.value
+                        return@mapForeach
                     }
-                }
-            }
-            return true
-        }
-
-        fun List<Player>.checkCounts(zone: Zone): Boolean {
-            forEach {
-                if (it.getFeeJoinCounts(zone) <= 0 && !it.isOp) {
-                    NotifyBox(COUNT_NOT_ENOUGH_KEY_BOX, "&6&l副本".colored(), it.asLangTextList("message-dungeon-count-not-enough", it.displayName))
-                        .open(it, false)
+                    ZoneWithDraw.gemsMap[player.uniqueId] = mutableMapOf(Pair(mapFee.key, mapFee.value))
+                } else {
+                    NotifyBox(ECONOMY_NOT_ENOUGH_KEY_BOX, "&6&l副本".colored(), player.asLangTextList("message-dungeon-economy-not-enough", player.displayName, mapFee.key))
+                        .open(player, false)
                     return false
                 }
             }
             return true
         }
 
-        fun List<Player>.checkItems(zone: Zone): Boolean {
-            forEach { player ->
-                val itemMap = player.getZoneItems(zone)
-                if (itemMap.isEmpty()) return true
-                itemMap.forEach mapForeach@{ mapItem ->
-                    if (!ZaphkielAPI.registeredItem.containsKey(mapItem.key)) {
+        fun checkCounts(players: List<Player>, zone: Zone): Boolean {
+            val player = players[0]
+            if (player.getFeeJoinCounts(zone) <= 0 && !player.isOp) {
+                NotifyBox(COUNT_NOT_ENOUGH_KEY_BOX, "&6&l副本".colored(), player.asLangTextList("message-dungeon-count-not-enough", player.displayName))
+                    .open(player, false)
+                return false
+            }
+            return true
+        }
+
+        fun checkItems(players: List<Player>, zone: Zone): Boolean {
+            val player = players[0]
+            val itemMap = player.getZoneItems(zone)
+            if (itemMap.isEmpty()) return true
+            itemMap.forEach mapForeach@{ mapItem ->
+                if (!ZaphkielAPI.registeredItem.containsKey(mapItem.key)) {
+                    return@mapForeach
+                }
+                val item = ZaphkielAPI.registeredItem[mapItem.key]!!.buildItemStack(player)
+                if (item.isAir()) return@mapForeach
+                if (!player.inventory.hasItem { it.itemMeta.displayName == item.itemMeta.displayName }) {
+                    NotifyBox(ITEM_NOT_ENOUGH_KEY_BOX,
+                        "&6&l副本".colored(),
+                        player.asLangTextList("message-dungeon-item-not-enough", player.displayName, mapItem.key))
+                        .open(player, false)
+                    return false
+                } else {
+                    if (ZoneWithDraw.itemsMap.containsKey(player.uniqueId)) {
+                        ZoneWithDraw.itemsMap[player.uniqueId]!![mapItem.key] = mapItem.value
                         return@mapForeach
                     }
-                    val item = ZaphkielAPI.registeredItem[mapItem.key]!!.buildItemStack(player)
-                    if (item.isAir()) return@mapForeach
-                    if (!player.inventory.hasItem { it.itemMeta.displayName == item.itemMeta.displayName }) {
-                        NotifyBox(ITEM_NOT_ENOUGH_KEY_BOX,
-                            "&6&l副本".colored(),
-                            player.asLangTextList("message-dungeon-item-not-enough", player.displayName, mapItem.key))
-                            .open(player, false)
-                        return false
-                    } else {
-                        if (ZoneWithDraw.itemsMap.containsKey(player.uniqueId)) {
-                            ZoneWithDraw.itemsMap[player.uniqueId]!![mapItem.key] = mapItem.value
-                            return@mapForeach
-                        }
-                        ZoneWithDraw.itemsMap[player.uniqueId] = mutableMapOf(Pair(mapItem.key, mapItem.value))
-                    }
+                    ZoneWithDraw.itemsMap[player.uniqueId] = mutableMapOf(Pair(mapItem.key, mapItem.value))
                 }
             }
             return true
         }
 
-        fun List<Player>.withDraw() {
-            forEach { player ->
-                if (ZoneWithDraw.itemsMap.containsKey(player.uniqueId)) {
-                    val itemMapList = ZoneWithDraw.itemsMap[player.uniqueId]!!
-                    itemMapList.forEach { itemMap ->
-                        player.inventory.takeItem(itemMap.value) { it.itemMeta.displayName == ZaphkielAPI.registeredItem[itemMap.key]!!.buildItemStack(player).itemMeta.displayName }
-                    }
+        fun withDraw(players: List<Player>) {
+            val player = players[0]
+            if (ZoneWithDraw.itemsMap.containsKey(player.uniqueId)) {
+                val itemMapList = ZoneWithDraw.itemsMap[player.uniqueId]!!
+                itemMapList.forEach { itemMap ->
+                    player.inventory.takeItem(itemMap.value) { it.itemMeta.displayName == ZaphkielAPI.registeredItem[itemMap.key]!!.buildItemStack(player).itemMeta.displayName }
                 }
-                if (ZoneWithDraw.gemsMap.containsKey(player.uniqueId)) {
-                    val gemPairList = ZoneWithDraw.gemsMap[player.uniqueId]!!
-                    gemPairList.forEach {
-                        GemsEconomyAPI.withdraw(player.uniqueId, it.value, it.key, "副本花费")
-                    }
-                }
-                ZoneWithDraw.recycleVars(player)
             }
+            if (ZoneWithDraw.gemsMap.containsKey(player.uniqueId)) {
+                val gemPairList = ZoneWithDraw.gemsMap[player.uniqueId]!!
+                gemPairList.forEach {
+                    GemsEconomyAPI.withdraw(player.uniqueId, it.value, it.key, "副本花费")
+                }
+            }
+            ZoneWithDraw.recycleVars(player)
         }
 
     }

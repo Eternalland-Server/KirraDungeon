@@ -21,7 +21,7 @@ import taboolib.platform.util.buildItem
 import taboolib.platform.util.inventoryCenterSlots
 
 @Suppress("SpellCheckingInspection")
-object FunctionModelWand {
+object FunctionModelWand : IWand {
 
     val modelWand by lazy {
         buildItem(Material.STICK) {
@@ -61,7 +61,7 @@ object FunctionModelWand {
         if (!item.isSimilar(modelWand)) {
             return
         }
-        val zone = FunctionWand.getEditingZone(player) ?: return
+        val zone = getEditingZone(player) ?: return
         val model = zone.data.models.find { it.loc.toBukkitLocation(player.world).distance(e.entity.getLocation()) < 0.1 } ?: kotlin.run {
             player.sendMessage("&c错误, 该模型并不由 KirraModel 托管".colored())
             return
@@ -87,7 +87,7 @@ object FunctionModelWand {
                 }
             }
             onClick { _, element ->
-                val zone = FunctionWand.getEditingZone(this@openMenu1) ?: return@onClick
+                val zone = getEditingZone(this@openMenu1) ?: return@onClick
                 val player = this@openMenu1
                 val spawnLoc = loc.add(0.0, 1.0, 0.0).toCenter(0.5)
                 player.closeInventory()
@@ -106,7 +106,7 @@ object FunctionModelWand {
                     player.sendMessage("&a配置成功.".colored())
                 }
             }
-            FunctionWand.addPage(this)
+            addPage(this)
         }
     }
 }

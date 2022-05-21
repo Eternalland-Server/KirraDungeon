@@ -19,7 +19,7 @@ import taboolib.module.ui.type.Linked
 import taboolib.platform.util.buildItem
 import taboolib.platform.util.inventoryCenterSlots
 
-object FunctionOreWand {
+object FunctionOreWand : IWand {
 
     val oreWand by lazy {
         buildItem(Material.STICK) {
@@ -56,7 +56,7 @@ object FunctionOreWand {
         if (!item.isSimilar(oreWand)) {
             return
         }
-        val zone = FunctionWand.getEditingZone(player) ?: return
+        val zone = getEditingZone(player) ?: return
         val ore = KirraMinerAPI.getOreByEntityUUID(e.rightClicked.uniqueId) ?: kotlin.run {
             player.sendMessage("&c错误, 这并不是一个矿物.".colored())
             return
@@ -82,7 +82,7 @@ object FunctionOreWand {
                 }
             }
             onClick { _, element ->
-                val zone = FunctionWand.getEditingZone(this@openMenu1) ?: return@onClick
+                val zone = getEditingZone(this@openMenu1) ?: return@onClick
                 val player = this@openMenu1
                 val spawnLoc = loc.add(0.0, 1.0, 0.0).toCenter(0.5)
                 player.closeInventory()
@@ -101,7 +101,7 @@ object FunctionOreWand {
                     player.sendMessage("&a配置成功.".colored())
                 }
             }
-            FunctionWand.addPage(this)
+            addPage(this)
         }
     }
 }

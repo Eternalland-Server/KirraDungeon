@@ -4,8 +4,10 @@ import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
 import net.sakuragame.dungeonsystem.common.exception.DungeonServerRunOutException
 import net.sakuragame.dungeonsystem.common.exception.UnknownDungeonException
 import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
+import net.sakuragame.eternal.justmessage.api.common.NotifyBox
 import net.sakuragame.eternal.kirracore.bukkit.KirraCoreBukkitAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
+import net.sakuragame.eternal.kirradungeon.client.function.FunctionListener
 import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkCounts
 import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkFee
 import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkItems
@@ -42,7 +44,7 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
 
         private fun clearAll() = zones.clear()
 
-        fun preJoin(player: Player, name: String) {
+        fun preJoin(player: Player, name: String, isTeam: Boolean) {
             if (name == "nergigante_dragon" && !player.hasPermission("admin")) {
                 player.sendLang("command-cant-join-story-zone")
                 return
@@ -52,13 +54,22 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
                 player.sendLang("command-not-found-zone")
                 return
             }
-            // 与组队系统挂钩.
             val party = PartyAPI.getParty(player)
+            // 当按下了单人副本按键, 当前却在队伍
+            if (party != null && !isTeam) {
+                NotifyBox(FunctionListener.AUTO_CLOSE_NOTIFY_BOX_KEY, "&6&l副本", listOf("您目前仍在一个队伍里", "请解散或退出队伍后重试.")).open(player, false)
+                return
+            }
+            // 当按下了组队副本按键, 却不在任何队伍
+            if (party == null && isTeam) {
+                NotifyBox(FunctionListener.AUTO_CLOSE_NOTIFY_BOX_KEY, "&6&l副本", listOf("您不在任何一个队伍里", "请创建或进入队伍后重试.")).open(player, false)
+                return
+            }
+            // 正常流程
             if (party == null) {
                 zone.join(listOf(player))
                 return
-            }
-            if (party.getPosition(player.uniqueId) != PartyPosition.LEADER) {
+            } else if (party.getPosition(player.uniqueId) != PartyPosition.LEADER) {
                 player.sendLang("command-member-try-join-zone")
                 return
             } else {
@@ -74,13 +85,13 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
 
     fun join(players: List<Player>) {
         // 检查玩家进入是否拥有足额进入次数.
-        if (!players.checkCounts(this)) return
+        if (!checkCounts(players, this)) return
         // 检查玩家是否拥有目标金额.
-        if (!players.checkFee(this)) return
+        if (!checkFee(players, this)) return
         // 检查玩家是否拥有目标物品.
-        if (!players.checkItems(this)) return
+        if (!checkItems(players, this)) return
         // 进行扣除操作. (物品 & 金额)
-        players.withDraw()
+        withDraw(players)
         // 进行传送操作, 之后转交由 Server 端处理.
         try {
             val serverId = DungeonClientAPI.getClientManager().queryServer("rpg-dungeon")

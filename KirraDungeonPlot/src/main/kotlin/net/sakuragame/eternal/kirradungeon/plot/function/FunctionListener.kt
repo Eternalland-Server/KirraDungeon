@@ -5,6 +5,7 @@ import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
+import net.sakuragame.eternal.kirracore.bukkit.KirraCoreBukkitAPI
 import net.sakuragame.eternal.kirradungeon.plot.KirraDungeonPlot
 import net.sakuragame.eternal.kirradungeon.plot.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.plot.function.FunctionPlot.playDome
@@ -15,7 +16,6 @@ import net.sakuragame.eternal.script.api.NergiganteAPI
 import net.sakuragame.eternal.script.api.event.NSConversationEndEvent
 import net.sakuragame.eternal.script.api.event.NSConversationOptionEvent
 import net.sakuragame.eternal.script.api.event.NSFilmEndEvent
-import net.sakuragame.kirracore.bukkit.KirraCoreBukkitAPI
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Sound
@@ -36,6 +36,7 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
+import taboolib.platform.util.title
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToInt
@@ -67,8 +68,18 @@ object FunctionListener {
                 if (player.profile()?.dungeonWorld == null) {
                     return@forEach
                 }
-                BossBar.setTime(player, int - 1)
-                countDownMap[uuid] = int - 1
+                val value = int - 1
+                if (value <= 0) {
+                    player.gameMode = GameMode.SPECTATOR
+                    player.teleport(FunctionPlot.playerSpawnLoc.toBukkitLocation(player.world).add(0.0, 10.0, 0.0))
+                    player.title("&c&l失败", "&7你根本没在认真打吧?!", 0, 60, 5)
+                    KirraCoreBukkitAPI.teleportPlayerToAnotherServer("rpg-login-1", player)
+                    KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在传送 &7@", true)
+                    countDownMap.remove(player.uniqueId)
+                    return@forEach
+                }
+                BossBar.setTime(player, value)
+                countDownMap[uuid] = value
             }
         }
     }
@@ -112,10 +123,9 @@ object FunctionListener {
     @SubscribeEvent
     fun e(e: NSFilmEndEvent) {
         val player = e.player
+        player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 9999999, 10))
         KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在传送至主城 &7@", true)
-        submit(async = true, delay = 40L) {
-            KirraCoreBukkitAPI.teleportToSpawnServer(player)
-        }
+        KirraCoreBukkitAPI.teleportToSpawnServer(player)
     }
 
     @SubscribeEvent

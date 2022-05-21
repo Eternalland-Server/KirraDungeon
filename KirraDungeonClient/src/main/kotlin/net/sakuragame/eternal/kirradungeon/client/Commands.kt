@@ -29,7 +29,7 @@ object Commands {
     val join = subCommand {
         dynamic {
             execute<Player> { player, _, argument ->
-                Zone.preJoin(player, argument)
+                Zone.preJoin(player, argument, false)
             }
         }
     }

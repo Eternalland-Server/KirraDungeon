@@ -7,7 +7,7 @@ import taboolib.module.chat.colored
 import taboolib.module.ui.type.Linked
 import taboolib.platform.util.buildItem
 
-object FunctionWand {
+interface IWand {
 
     fun getEditingZone(player: Player): Zone? {
         val world = Zone.editingDungeonWorld ?: kotlin.run {
