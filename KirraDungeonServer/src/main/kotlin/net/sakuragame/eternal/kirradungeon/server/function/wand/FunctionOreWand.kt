@@ -1,8 +1,8 @@
 package net.sakuragame.eternal.kirradungeon.server.function.wand
 
 import net.sakuragame.eternal.kirradungeon.server.toCenter
-import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.OreWriter
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.eternal.kirraminer.ore.Ore
 import org.bukkit.Location
@@ -63,7 +63,7 @@ object FunctionOreWand : IWand {
         }
         val mapId = KirraMinerAPI.getOreMapId(ore) ?: return
         KirraMinerAPI.removeOre(mapId)
-        FunctionZone.removeOre(zone, mapId)
+        OreWriter.remove(zone, mapId)
     }
 
     private fun Player.openMenu1(loc: Location) {
@@ -96,7 +96,7 @@ object FunctionOreWand : IWand {
                         player.sendMessage("&c内容与现存矿物冲突".colored())
                         return@inputSign
                     }
-                    FunctionZone.setOre(zone, id, element.id, ZoneLocation.parseToZoneLocation(spawnLoc))
+                    OreWriter.set(zone, id, element.id, ZoneLocation.parseToZoneLocation(spawnLoc))
                     KirraMinerAPI.createTempOre(id, element, loc)
                     player.sendMessage("&a配置成功.".colored())
                 }

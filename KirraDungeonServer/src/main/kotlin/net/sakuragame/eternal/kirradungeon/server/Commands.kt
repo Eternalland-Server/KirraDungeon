@@ -8,14 +8,17 @@ import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionModelWand
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionOreWand
-import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone.Companion.editingDungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.MonsterWriter
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.SkyDataWriter
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.SpawnLocWriter
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.WaveDataWriter
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.DungeonManager
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
@@ -137,7 +140,7 @@ object Commands {
                 return@execute
             }
             val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
-            FunctionZone.setLoc(zone, ZoneLocation.parseToZoneLocation(player.location))
+            SpawnLocWriter.set(zone, ZoneLocation.parseToZoneLocation(player.location))
             player.sendMessage("&a设置成功!".colored())
         }
     }
@@ -216,7 +219,7 @@ object Commands {
                     val mobType = context.argument(-1)
                     val amount = argument.toIntOrNull() ?: 1
                     val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
-                    FunctionZone.addMob(zone, zoneLoc, mobType, amount)
+                    MonsterWriter.setMob(zone, zoneLoc, mobType, amount)
                     player.sendMessage("&a成功在 &f$zoneLoc &a添加怪物 = &f$mobType x $amount".colored())
                 }
             }
@@ -233,7 +236,7 @@ object Commands {
                 }
                 val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
                 val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
-                FunctionZone.setBoss(zone, zoneLoc, argument)
+                MonsterWriter.setBoss(zone, zoneLoc, argument)
                 player.sendMessage("&a成功在 &f$zoneLoc &a设置怪物首领 = &f$argument".colored())
             }
         }
@@ -255,7 +258,7 @@ object Commands {
                         SkyPacket.THUNDER_LEVEL_CHANGE
                     }
                     val value = argument.toFloatOrNull() ?: 4f
-                    FunctionZone.setSkyColor(zone, ZoneSkyData(packetType, value))
+                    SkyDataWriter.set(zone, ZoneSkyData(packetType, value))
                     player.sendMessage("&a您设置了副本 &f${zone.name} &a的天空颜色为: &f(${packetType.name}, $value)")
                 }
             }
@@ -265,8 +268,8 @@ object Commands {
     @CommandBody
     val openDragonCoreUI = subCommand {
         execute<Player> { player, _, _ ->
-            val playerZone = DefaultDungeon.getByPlayer(player.uniqueId) ?: return@execute
-            DragonCoreCompat.updateDragonVars(player, playerZone.zone.name)
+            val dungeon = DungeonManager.getByPlayer(player.uniqueId) ?: return@execute
+            DragonCoreCompat.updateDragonVars(player, dungeon.zone.name)
             PacketSender.sendOpenHud(player, DragonCoreCompat.joinTitleHud.id)
         }
     }
@@ -288,7 +291,7 @@ object Commands {
                                     player.sendMessage("&c[System] &7波次数据错误!".colored())
                                     return@execute
                                 }
-                                FunctionZone.addWaveMob(wave, zone, monsterId, monsterAmount, monsterHealth)
+                                WaveDataWriter.setWaveMob(wave, zone, monsterId, monsterAmount, monsterHealth)
                                 player.sendMessage("&c[System] &7成功!".colored())
                             }
                         }
@@ -313,7 +316,7 @@ object Commands {
                                 player.sendMessage("&c[System] &c波次数据错误!".colored())
                                 return@execute
                             }
-                            FunctionZone.setWaveBoss(wave, zone, bossId, bossHealth)
+                            WaveDataWriter.setWaveBoss(wave, zone, bossId, bossHealth)
                             player.sendMessage("&c[System] &7成功!".colored())
                         }
                     }
@@ -327,7 +330,7 @@ object Commands {
         dynamic(commit = "dungeonId") {
             execute<Player> { player, context, _ ->
                 val zone = getZone(player, context.get(1)) ?: return@execute
-                FunctionZone.addWaveLoc(zone, player.location)
+                WaveDataWriter.addWaveLoc(zone, player.location)
                 player.sendMessage("&c[System] &7成功!".colored())
             }
         }

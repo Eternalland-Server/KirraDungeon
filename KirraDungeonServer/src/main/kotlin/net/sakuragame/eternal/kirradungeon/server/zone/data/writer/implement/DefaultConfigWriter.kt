@@ -5,7 +5,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 
 object DefaultConfigWriter : WriteHelper {
 
-    fun set() {
+    fun set(id: String, name: String) {
         // 类型
         data["$id.type"] = "DEFAULT"
         // 副本时间

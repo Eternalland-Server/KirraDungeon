@@ -47,37 +47,4 @@ class SpecialDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     override fun clear() {
         error("not reachable")
     }
-
-    @Suppress("DuplicatedCode")
-    companion object {
-
-        val specialDungeons = mutableListOf<SpecialDungeon>()
-
-        fun getByDungeonWorldUUID(uuid: UUID) = specialDungeons.firstOrNull { it.dungeonWorld.uuid == uuid }
-
-        fun getByPlayer(playerUUID: UUID): SpecialDungeon? {
-            specialDungeons.forEach { specialDungeon ->
-                if (specialDungeon.playerUUIDList.find { it == playerUUID } != null) {
-                    return specialDungeon
-                }
-            }
-            return null
-        }
-
-        fun getByMobUUID(mobUUID: UUID): SpecialDungeon? {
-            specialDungeons.forEach { specialDungeon ->
-                if (specialDungeon.monsterUUIDList.find { it == mobUUID } != null) {
-                    return specialDungeon
-                }
-                if (specialDungeon.bossUUID == mobUUID) {
-                    return specialDungeon
-                }
-            }
-            return null
-        }
-
-        fun create(zone: Zone, dungeonWorld: DungeonWorld) {
-            specialDungeons += SpecialDungeon(zone, dungeonWorld)
-        }
-    }
 }

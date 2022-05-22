@@ -2,8 +2,8 @@ package net.sakuragame.eternal.kirradungeon.server.function.wand
 
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
 import net.sakuragame.eternal.kirradungeon.server.toCenter
-import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.ModelWriter
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import net.sakuragame.eternal.kirramodel.model.Model
 import org.bukkit.Location
@@ -66,7 +66,7 @@ object FunctionModelWand : IWand {
             player.sendMessage("&c错误, 该模型并不由 KirraModel 托管".colored())
             return
         }
-        FunctionZone.removeModel(zone, model.id)
+        ModelWriter.remove(zone, model.id)
         KirraModelAPI.removeModel(model.id)
         player.sendMessage("&a已移除".colored())
     }
@@ -101,7 +101,7 @@ object FunctionModelWand : IWand {
                         player.sendMessage("&c内容与现存模型冲突".colored())
                         return@inputSign
                     }
-                    FunctionZone.setModel(zone, id, element.id, ZoneLocation.parseToZoneLocation(spawnLoc))
+                    ModelWriter.set(zone, id, element.id, ZoneLocation.parseToZoneLocation(spawnLoc))
                     KirraModelAPI.createTempModel(spawnLoc, element, id)
                     player.sendMessage("&a配置成功.".colored())
                 }

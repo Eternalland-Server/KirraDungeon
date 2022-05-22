@@ -7,7 +7,7 @@ import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.DungeonManager
 import org.bukkit.Bukkit
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
@@ -26,7 +26,7 @@ object FunctionSpecialDungeon {
             if (!isDungeonFromSpecial(e.dungeonWorld.worldIdentifier)) {
                 return@submit
             }
-            val specialZone = SpecialDungeon.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
+            val specialZone = DungeonManager.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
                 kickPlayerByNotFoundData(player)
                 return@submit
             }
@@ -41,17 +41,17 @@ object FunctionSpecialDungeon {
     fun e(e: MythicMobDeathEvent) {
         val mobType = e.mobType
         val entity = e.entity
-        val specialZone = SpecialDungeon.getByMobUUID(entity.uniqueId) ?: return
-        specialZone.removeMonsterUUID(entity.uniqueId)
-        val loc = specialZone.zone.data.monsterData.mobList.map { it.loc.toBukkitLocation(entity.world) }.random()
-        val resurgenceTime = specialZone.zone.data.resurgenceTime
+        val dungeon = DungeonManager.getByMobUUID(entity.uniqueId) ?: return
+        dungeon.removeMonsterUUID(entity.uniqueId)
+        val loc = dungeon.zone.data.monsterData.mobList.map { it.loc.toBukkitLocation(entity.world) }.random()
+        val resurgenceTime = dungeon.zone.data.resurgenceTime
         // 无脑刷类型, 怪物死亡之后让它在数秒后重生.
         submit(delay = resurgenceTime * 20L) {
             if (Bukkit.getWorlds().none { it.uid == loc.world.uid }) {
                 return@submit
             }
             val mob = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(mobType, loc, 1)
-            specialZone.addMonsterUUID(mob.uniqueId)
+            dungeon.addMonsterUUID(mob.uniqueId)
         }
     }
 

@@ -59,37 +59,4 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     override fun canClear() = getMonsters(containsBoss = true).isEmpty() && !isClear && !isFail
-
-    @Suppress("DuplicatedCode")
-    companion object {
-
-        val defaultDungeons = mutableListOf<DefaultDungeon>()
-
-        fun getByDungeonWorldUUID(uuid: UUID) = defaultDungeons.firstOrNull { it.dungeonWorld.uuid == uuid }
-
-        fun getByPlayer(playerUUID: UUID): DefaultDungeon? {
-            defaultDungeons.forEach { defaultDungeon ->
-                if (defaultDungeon.playerUUIDList.find { it == playerUUID } != null) {
-                    return defaultDungeon
-                }
-            }
-            return null
-        }
-
-        fun getByMobUUID(mobUUID: UUID): DefaultDungeon? {
-            defaultDungeons.forEach { defaultDungeon ->
-                if (defaultDungeon.monsterUUIDList.find { it == mobUUID } != null) {
-                    return defaultDungeon
-                }
-                if (defaultDungeon.bossUUID == mobUUID) {
-                    return defaultDungeon
-                }
-            }
-            return null
-        }
-
-        fun create(zone: Zone, dungeonWorld: DungeonWorld) {
-            defaultDungeons += DefaultDungeon(zone, dungeonWorld)
-        }
-    }
 }

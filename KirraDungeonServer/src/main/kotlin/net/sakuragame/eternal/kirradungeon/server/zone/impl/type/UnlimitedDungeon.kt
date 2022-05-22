@@ -57,37 +57,4 @@ class UnlimitedDungeon(override val zone: Zone, override val dungeonWorld: Dunge
     fun floorPlus1() {
         currentFloor++
     }
-
-    @Suppress("DuplicatedCode")
-    companion object {
-
-        val unlimitedDungeons = mutableListOf<UnlimitedDungeon>()
-
-        fun getByDungeonWorldUUID(uuid: UUID) = unlimitedDungeons.firstOrNull { it.dungeonWorld.uuid == uuid }
-
-        fun getByPlayer(playerUUID: UUID): UnlimitedDungeon? {
-            unlimitedDungeons.forEach { unlimitedDungeon ->
-                if (unlimitedDungeon.playerUUIDList.find { it == playerUUID } != null) {
-                    return unlimitedDungeon
-                }
-            }
-            return null
-        }
-
-        fun getByMobUUID(mobUUID: UUID): UnlimitedDungeon? {
-            unlimitedDungeons.forEach { unlimitedDungeon ->
-                if (unlimitedDungeon.monsterUUIDList.find { it == mobUUID } != null) {
-                    return unlimitedDungeon
-                }
-                if (unlimitedDungeon.bossUUID == mobUUID) {
-                    return unlimitedDungeon
-                }
-            }
-            return null
-        }
-
-        fun create(zone: Zone, dungeonWorld: DungeonWorld) {
-            unlimitedDungeons += UnlimitedDungeon(zone, dungeonWorld)
-        }
-    }
 }

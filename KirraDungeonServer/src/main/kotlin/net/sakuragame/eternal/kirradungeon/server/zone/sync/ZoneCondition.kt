@@ -3,8 +3,8 @@ package net.sakuragame.eternal.kirradungeon.server.zone.sync
 import com.google.gson.Gson
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.debug
-import net.sakuragame.eternal.kirradungeon.server.zone.FunctionZone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.ConditionWriter
 import taboolib.common.platform.function.submit
 
 
@@ -50,7 +50,7 @@ data class ZoneCondition(
 
         fun initConditionsMap() {
             Zone.zones.forEach { key ->
-                val conditions = FunctionZone.readConditions(key.id)
+                val conditions = ConditionWriter.read(key.id)
                 conditionMap[key.id] = conditions
             }
         }

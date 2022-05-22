@@ -13,6 +13,7 @@ import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
 import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.DungeonManager
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
@@ -75,10 +76,10 @@ object FunctionCommonListener {
         dungeonWorld.bukkitWorld.isAutoSave = false
         // 初始化.
         when (copyZoneData.type) {
-            DEFAULT -> DefaultDungeon.create(copyZone, dungeonWorld)
-            SPECIAL -> SpecialDungeon.create(copyZone, dungeonWorld)
-            UNLIMITED -> UnlimitedDungeon.create(copyZone, dungeonWorld)
-            WAVE -> WaveDungeon.create(copyZone, dungeonWorld)
+            DEFAULT -> DungeonManager.create(DefaultDungeon(copyZone, dungeonWorld))
+            SPECIAL -> DungeonManager.create(SpecialDungeon(copyZone, dungeonWorld))
+            UNLIMITED -> DungeonManager.create(UnlimitedDungeon(copyZone, dungeonWorld))
+            WAVE -> DungeonManager.create(WaveDungeon(copyZone, dungeonWorld))
         }
     }
 
@@ -114,12 +115,7 @@ object FunctionCommonListener {
     fun e(e: PlayerDeathEvent) {
         val player = e.entity
         if (!player.profile().isChallenging) return
-        val zone = when (player.profile().zoneType) {
-            DEFAULT -> DefaultDungeon.getByPlayer(e.entity.uniqueId) ?: return
-            SPECIAL -> SpecialDungeon.getByPlayer(e.entity.uniqueId) ?: return
-            UNLIMITED -> UnlimitedDungeon.getByPlayer(e.entity.uniqueId) ?: return
-            WAVE -> WaveDungeon.getByPlayer(e.entity.uniqueId) ?: return
-        }
+        val dungeon = DungeonManager.getByPlayer(player.uniqueId) ?: return
         player.apply {
             playDeathAnimation()
             health = maxHealth
@@ -127,8 +123,8 @@ object FunctionCommonListener {
             sendTitle("&c&l菜".colored(), "", 0, 40, 10)
         }
         submit(async = false, delay = 10L) {
-            if (zone.isAllPlayersDead() && zone.failThread == null) {
-                zone.startFailThread()
+            if (dungeon.isAllPlayersDead() && dungeon.failThread == null) {
+                dungeon.startFailThread()
             }
         }
     }
@@ -155,14 +151,9 @@ object FunctionCommonListener {
     @SubscribeEvent
     fun e(e: UIFScreenOpenEvent) {
         val player = e.player
-        val zone = when (player.profile().zoneType) {
-            DEFAULT -> DefaultDungeon.getByPlayer(player.uniqueId) ?: return
-            SPECIAL -> SpecialDungeon.getByPlayer(player.uniqueId) ?: return
-            UNLIMITED -> UnlimitedDungeon.getByPlayer(player.uniqueId) ?: return
-            WAVE -> WaveDungeon.getByPlayer(player.uniqueId) ?: return
-        }
+        val dungeon = DungeonManager.getByPlayer(player.uniqueId) ?: return
         submit(delay = 40L) {
-            zone.updateBossBar(init = true)
+            dungeon.updateBossBar(init = true)
         }
     }
 

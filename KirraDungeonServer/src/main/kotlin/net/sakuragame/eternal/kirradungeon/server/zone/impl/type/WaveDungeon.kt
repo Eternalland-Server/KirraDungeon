@@ -168,39 +168,6 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
         waveCounts++
     }
 
-    @Suppress("DuplicatedCode")
-    companion object {
-
-        val waveDungeons = mutableListOf<WaveDungeon>()
-
-        fun getByDungeonWorldUUID(uuid: UUID) = waveDungeons.firstOrNull { it.dungeonWorld.uuid == uuid }
-
-        fun getByPlayer(playerUUID: UUID): WaveDungeon? {
-            waveDungeons.forEach { waveDungeon ->
-                if (waveDungeon.playerUUIDList.find { it == playerUUID } != null) {
-                    return waveDungeon
-                }
-            }
-            return null
-        }
-
-        fun getByMobUUID(mobUUID: UUID): WaveDungeon? {
-            waveDungeons.forEach { waveDungeon ->
-                if (waveDungeon.monsterUUIDList.find { it == mobUUID } != null) {
-                    return waveDungeon
-                }
-                if (waveDungeon.bossUUID == mobUUID) {
-                    return waveDungeon
-                }
-            }
-            return null
-        }
-
-        fun create(zone: Zone, dungeonWorld: DungeonWorld) {
-            waveDungeons += WaveDungeon(zone, dungeonWorld)
-        }
-    }
-
     private fun getRandomDouble(): Double {
         return kotlin.random.Random.nextDouble(1.0, 3.0)
     }

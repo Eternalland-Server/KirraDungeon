@@ -64,7 +64,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
         }
 
         fun create(id: String, name: String) {
-            FunctionZone.writeDefaultDataToConf(id, name)
+            DefaultConfigWriter.set(id, name)
             i()
         }
     }

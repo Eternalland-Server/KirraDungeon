@@ -13,12 +13,7 @@ import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
-import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
@@ -401,12 +396,7 @@ interface IDungeon {
      */
     fun del() {
         DungeonServerAPI.getWorldManager().dropDungeon(dungeonWorld)
-        when (zone.data.type) {
-            DEFAULT -> DefaultDungeon.defaultDungeons.remove(this)
-            SPECIAL -> SpecialDungeon.specialDungeons.remove(this)
-            UNLIMITED -> UnlimitedDungeon.unlimitedDungeons.remove(this)
-            WAVE -> WaveDungeon.waveDungeons.remove(this)
-        }
+        DungeonManager.dungeons -= this
     }
 
     /**
