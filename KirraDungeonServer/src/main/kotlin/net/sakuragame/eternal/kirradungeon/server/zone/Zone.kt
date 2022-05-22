@@ -2,6 +2,7 @@ package net.sakuragame.eternal.kirradungeon.server.zone
 
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.*
 import net.sakuragame.eternal.kirradungeon.server.zone.sync.ZoneCondition
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -38,18 +39,18 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                 val name = KirraDungeonServer.data.getString("$it.name") ?: return@forEach
                 zones += Zone(
                     id, name.colored(), ZoneData(
-                        type = FunctionZone.readType(id),
-                        maxLastTime = FunctionZone.readMaxLastTime(id),
-                        monsterData = FunctionZone.readMonsterData(id),
-                        spawnLoc = FunctionZone.readSpawnLoc(id)!!,
-                        zoneSkyData = FunctionZone.readSkyData(id),
-                        number = FunctionZone.readNumber(id),
-                        iconNumber = FunctionZone.readIcon(id),
-                        resurgenceTime = FunctionZone.readResurgenceTime(id),
-                        models = FunctionZone.readModels(id),
-                        ores = FunctionZone.readOres(id),
-                        waveData = FunctionZone.readWaveData(id),
-                        waveSpawnLocs = FunctionZone.readWaveLocs(id)
+                        type = TypeWriter.read(id),
+                        maxLastTime = MaxLastTimeWriter.read(id),
+                        monsterData = MonsterWriter.read(id),
+                        spawnLoc = SpawnLocWriter.read(id)!!,
+                        zoneSkyData = SkyDataWriter.read(id),
+                        number = NumberWriter.read(id),
+                        iconNumber = IconNumberWriter.read(id),
+                        resurgenceTime = ResurgenceTimeWriter.read(id),
+                        models = ModelWriter.read(id),
+                        ores = OreWriter.read(id),
+                        waveData = WaveDataWriter.readData(id),
+                        waveSpawnLocs = WaveDataWriter.readLoc(id)
                     )
                 )
             }
