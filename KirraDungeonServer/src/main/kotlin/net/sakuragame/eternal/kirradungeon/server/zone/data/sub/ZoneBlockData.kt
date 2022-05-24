@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.data.sub
 
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
+import org.bukkit.Material
 
-data class ZoneMobData(val loc: ZoneLocation, val type: String, val amount: Int)
+data class ZoneBlockData(val loc: ZoneLocation, val material: Material)

@@ -3,7 +3,9 @@ package net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
+import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveBossData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
+import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveMonsterData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 import org.bukkit.Location
 
@@ -58,20 +60,20 @@ object WaveDataWriter : WriteHelper {
         val waveList = mutableListOf<ZoneWaveData>()
         val sections = data.getConfigurationSection("$id.wave") ?: return null
         sections.getKeys(false).forEach {
-            val monsterDataList = mutableListOf<ZoneWaveData.ZoneWaveMonsterData>()
+            val monsterDataList = mutableListOf<ZoneWaveMonsterData>()
             val index = it.toInt()
             data.getStringList("$id.wave.$index.monsters").forEach { str ->
                 val split = str.split("@")
                 val monsterId = split[0]
                 val amount = split[1].toIntOrNull() ?: 1
                 val health = split[2].toDoubleOrNull() ?: 1.0
-                monsterDataList += ZoneWaveData.ZoneWaveMonsterData(monsterId, amount, health)
+                monsterDataList += ZoneWaveMonsterData(monsterId, amount, health)
             }
             val boss = data.getString("$id.wave.$index.boss") ?: return null
             val split = boss.split("@")
             val bossId = split[0]
             val bossHealth = split[1].toDoubleOrNull() ?: 1.0
-            val bossData = ZoneWaveData.ZoneWaveBossData(bossId, bossHealth)
+            val bossData = ZoneWaveBossData(bossId, bossHealth)
             waveList += ZoneWaveData(monsterDataList, bossData)
         }
         return waveList

@@ -268,7 +268,6 @@ interface IDungeon {
                 secs--
                 it.sendTitle("", "&a将在 &f&l$secs &a秒后传送回您到主城.".colored(), 0, 25, 0)
                 if (secs <= 0) {
-                    it.sendTitle("", "&e&l正在传送.".colored(), 0, 200, 0)
                     KirraCoreBukkitAPI.teleportToSpawnServer(it)
                     cancel()
                     return@submit
