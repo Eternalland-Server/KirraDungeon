@@ -21,7 +21,7 @@ class SpecialDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override var isClear = false
 
-    override var isFail = false
+    override var fail = false
 
     override var lastTime = zone.data.maxLastTime
 
@@ -29,9 +29,9 @@ class SpecialDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override val monsterUUIDList = mutableListOf<UUID>()
 
-    override var bossUUID: UUID = UUID.randomUUID()!!
+    override var bossUUID = UUID.randomUUID()!!
 
-    override var failTime: Int = 60
+    override var failTime = 60
 
     override var failThread: PlatformExecutor.PlatformTask? = null
 

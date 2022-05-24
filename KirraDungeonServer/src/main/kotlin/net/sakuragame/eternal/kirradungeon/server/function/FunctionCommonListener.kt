@@ -1,6 +1,5 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
-import com.taylorswiftcn.megumi.uifactory.event.screen.UIFScreenOpenEvent
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
@@ -13,7 +12,7 @@ import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
 import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.DungeonManager
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
@@ -21,6 +20,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import org.bukkit.GameMode
+import org.bukkit.WorldType
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -74,12 +74,21 @@ object FunctionCommonListener {
             KirraMinerAPI.createTempOre(it.id, ore, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld))
         }
         dungeonWorld.bukkitWorld.isAutoSave = false
+        dungeonWorld.properties.apply {
+            isPVPEnabled = false
+            type = WorldType.CUSTOMIZED
+            addGameRule("announceAdvancements", "false")
+            addGameRule("keepInventory", "true")
+            addGameRule("doDaylightCycle", "false")
+            addGameRule("showDeathMessages", "false")
+            addGameRule("doFireTick", "false")
+        }
         // 初始化.
         when (copyZoneData.type) {
-            DEFAULT -> DungeonManager.create(DefaultDungeon(copyZone, dungeonWorld))
-            SPECIAL -> DungeonManager.create(SpecialDungeon(copyZone, dungeonWorld))
-            UNLIMITED -> DungeonManager.create(UnlimitedDungeon(copyZone, dungeonWorld))
-            WAVE -> DungeonManager.create(WaveDungeon(copyZone, dungeonWorld))
+            DEFAULT -> FunctionDungeon.create(DefaultDungeon(copyZone, dungeonWorld))
+            SPECIAL -> FunctionDungeon.create(SpecialDungeon(copyZone, dungeonWorld))
+            UNLIMITED -> FunctionDungeon.create(UnlimitedDungeon(copyZone, dungeonWorld))
+            WAVE -> FunctionDungeon.create(WaveDungeon(copyZone, dungeonWorld))
         }
     }
 
@@ -115,7 +124,7 @@ object FunctionCommonListener {
     fun e(e: PlayerDeathEvent) {
         val player = e.entity
         if (!player.profile().isChallenging) return
-        val dungeon = DungeonManager.getByPlayer(player.uniqueId) ?: return
+        val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) ?: return
         player.apply {
             playDeathAnimation()
             health = maxHealth
@@ -142,18 +151,9 @@ object FunctionCommonListener {
         val zone = Zone.getByID(e.dungeonId) ?: return
         e.players.forEach {
             val profile = it.profile()
-            if (profile.number.get() <= zone.data.number) {
-                profile.number.set(zone.data.number + 1)
+            if (profile.number <= zone.data.number) {
+                profile.number = zone.data.number + 1
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun e(e: UIFScreenOpenEvent) {
-        val player = e.player
-        val dungeon = DungeonManager.getByPlayer(player.uniqueId) ?: return
-        submit(delay = 40L) {
-            dungeon.updateBossBar(init = true)
         }
     }
 

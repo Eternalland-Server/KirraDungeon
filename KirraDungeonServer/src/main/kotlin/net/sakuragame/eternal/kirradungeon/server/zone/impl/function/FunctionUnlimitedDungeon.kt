@@ -6,7 +6,7 @@ import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.DungeonManager
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.potion.PotionEffect
@@ -29,7 +29,7 @@ object FunctionUnlimitedDungeon {
             if (!isDungeonFromUnlimited(e.dungeonWorld.worldIdentifier)) {
                 return@submit
             }
-            val dungeon = DungeonManager.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
+            val dungeon = FunctionDungeon.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
                 kickPlayerByNotFoundData(player)
                 return@submit
             }
@@ -43,7 +43,7 @@ object FunctionUnlimitedDungeon {
     @SubscribeEvent
     fun e(e: MythicMobDeathEvent) {
         val entity = e.entity
-        val dungeon = DungeonManager.getByMobUUID(entity.uniqueId) as? UnlimitedDungeon ?: return
+        val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? UnlimitedDungeon ?: return
         dungeon.removeMonsterUUID(entity.uniqueId)
         // 爬塔, 在怪物首领死后执行下一层相关操作.
         doSuccToNextFloor(dungeon)
@@ -51,7 +51,7 @@ object FunctionUnlimitedDungeon {
 
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
-        val dungeon = DungeonManager.getByMobUUID(e.entity.uniqueId) ?: return
+        val dungeon = FunctionDungeon.getByMobUUID(e.entity.uniqueId) ?: return
         if (dungeon.bossUUID == e.entity.uniqueId) {
             dungeon.updateBossBar()
         }

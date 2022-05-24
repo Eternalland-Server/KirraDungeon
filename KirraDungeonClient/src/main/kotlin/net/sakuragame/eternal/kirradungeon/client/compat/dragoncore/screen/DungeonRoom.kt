@@ -42,7 +42,7 @@ object DungeonRoom : IScreen {
 
         val profile = player.profile() ?: return
 
-        if (profile.number.get() < getNumber(room)) {
+        if (profile.number < getNumber(room)) {
             forceLock.set(true)
             name.set("&7&o暂未解锁".colored())
         }

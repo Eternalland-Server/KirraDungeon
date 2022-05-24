@@ -85,8 +85,8 @@ object Commands {
     val debug = subCommand {
         execute<Player> { player, _, _ ->
             val profile = player.profile() ?: return@execute
-            profile.debugMode.set(!profile.debugMode.get())
-            player.sendMessage("&c[System] &f${profile.debugMode.get().toString().uppercase()}".colored())
+            profile.debugMode = !profile.debugMode
+            player.sendMessage("&c[System] &f${profile.debugMode.toString().uppercase()}".colored())
         }
     }
 
@@ -110,8 +110,7 @@ object Commands {
                     val player = Bukkit.getPlayer(context.get(1)) ?: return@execute
                     val profile = player.profile() ?: return@execute
                     val number = context.get(2).toIntOrNull() ?: 1
-                    profile.number.set(number)
-                    profile.save()
+                    profile.number = number
                     sender.sendMessage("&c[System] &7已经把 ${player.name} 的编号设置为 $number".colored())
                 }
             }

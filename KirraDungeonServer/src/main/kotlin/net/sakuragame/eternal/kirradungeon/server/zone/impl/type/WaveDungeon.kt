@@ -27,7 +27,7 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     override var isClear = false
 
-    override var isFail = false
+    override var fail = false
 
     override var lastTime = zone.data.maxLastTime
 

@@ -26,7 +26,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override var isClear = false
 
-    override var isFail = false
+    override var fail = false
 
     override var lastTime = zone.data.maxLastTime
 
@@ -34,16 +34,16 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override val monsterUUIDList = mutableListOf<UUID>()
 
-    override var bossUUID: UUID = UUID.randomUUID()!!
+    override var bossUUID = UUID.randomUUID()!!
 
-    override var failTime: Int = 60
+    override var failTime = 60
 
     override var failThread: PlatformExecutor.PlatformTask? = null
 
     override fun onPlayerJoin() {
         // 移除未经过 MythicMobDeathEvent 死亡的实体。
         submit(async = true, delay = 0L, period = 20L) {
-            if (canDel() || isClear || isFail) {
+            if (canDel() || isClear || fail) {
                 cancel()
                 return@submit
             }
@@ -58,5 +58,5 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         showResurgenceTitle()
     }
 
-    override fun canClear() = getMonsters(containsBoss = true).isEmpty() && !isClear && !isFail
+    override fun canClear() = getMonsters(containsBoss = true).isEmpty() && !isClear && !fail
 }

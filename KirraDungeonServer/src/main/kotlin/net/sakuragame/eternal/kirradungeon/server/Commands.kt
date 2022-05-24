@@ -17,12 +17,11 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.Mon
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.SkyDataWriter
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.SpawnLocWriter
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.WaveDataWriter
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.DungeonManager
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
-import org.bukkit.WorldType
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.CommandBody
@@ -90,7 +89,7 @@ object Commands {
                     }
                     // argument = zoneName
                     Zone.create(zoneId, argument)
-                    DungeonServerAPI.getWorldManager().createEmptyDungeon(zoneId, getDefaultDungeonProperties(), object : RunnableVal<DungeonWorld>() {
+                    DungeonServerAPI.getWorldManager().createEmptyDungeon(zoneId, DungeonProperties(), object : RunnableVal<DungeonWorld>() {
 
                         override fun run(value: DungeonWorld?) {
                             if (value == null) return
@@ -268,7 +267,7 @@ object Commands {
     @CommandBody
     val openDragonCoreUI = subCommand {
         execute<Player> { player, _, _ ->
-            val dungeon = DungeonManager.getByPlayer(player.uniqueId) ?: return@execute
+            val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) ?: return@execute
             DragonCoreCompat.updateDragonVars(player, dungeon.zone.name)
             PacketSender.sendOpenHud(player, DragonCoreCompat.joinTitleHud.id)
         }
@@ -351,13 +350,5 @@ object Commands {
             return null
         }
         return zone
-    }
-
-    private fun getDefaultDungeonProperties() = DungeonProperties().also {
-        it.type = WorldType.CUSTOMIZED
-        it.addGameRule("announceAdvancements", "false")
-        it.addGameRule("keepInventory", "true")
-        it.addGameRule("doDaylightCycle", "false")
-        it.addGameRule("showDeathMessages", "false")
     }
 }

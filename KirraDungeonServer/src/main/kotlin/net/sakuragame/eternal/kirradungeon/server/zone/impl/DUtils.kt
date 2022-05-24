@@ -8,7 +8,7 @@ import taboolib.platform.util.asLangText
 
 fun IDungeon.startCountdown() {
     submit(async = true, delay = 20L, period = 20L) {
-        if (canDel() || isClear || isFail) {
+        if (canDel() || isClear || fail) {
             cancel()
             return@submit
         }

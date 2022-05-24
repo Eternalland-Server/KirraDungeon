@@ -21,7 +21,7 @@ class UnlimitedDungeon(override val zone: Zone, override val dungeonWorld: Dunge
 
     override var isClear = false
 
-    override var isFail = false
+    override var fail = false
 
     override var lastTime = zone.data.maxLastTime
 

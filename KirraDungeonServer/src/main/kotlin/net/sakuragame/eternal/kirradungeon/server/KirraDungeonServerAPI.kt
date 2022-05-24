@@ -1,6 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server
 
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.DungeonManager
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
 import org.bukkit.entity.Player
 import taboolib.common5.Baffle
 import java.util.concurrent.TimeUnit
@@ -18,5 +18,5 @@ object KirraDungeonServerAPI {
      * @param player 玩家
      * @return 副本实例
      */
-    fun getDungeonByPlayer(player: Player) = DungeonManager.getByPlayer(player.uniqueId)
+    fun getDungeonByPlayer(player: Player) = FunctionDungeon.getByPlayer(player.uniqueId)
 }

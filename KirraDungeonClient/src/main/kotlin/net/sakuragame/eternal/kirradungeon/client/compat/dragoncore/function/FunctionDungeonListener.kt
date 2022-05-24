@@ -80,9 +80,9 @@ object FunctionDungeonListener {
     private fun execCompSubmit(player: Player, compId: String, params: SubmitParams) {
         val paramData = getParamData(player, params)
         val profile = player.profile() ?: return
-        if (profile.debugMode.get()) {
-            Bukkit.broadcastMessage("fromData: ${paramData.fromData}")
-            Bukkit.broadcastMessage("toData: ${paramData.toData}")
+        if (profile.debugMode) {
+            player.sendMessage("fromData: ${paramData.fromData}")
+            player.sendMessage("toData: ${paramData.toData}")
         }
         when (DungeonAPI.ParamType.valueOf(params.getParam(1))) {
             UPDATE -> doUpdate(player, paramData)
@@ -151,7 +151,7 @@ object FunctionDungeonListener {
     }
 
     private fun getParamData(player: Player, params: SubmitParams): ParamData {
-        if (player.profile()?.debugMode?.get() == true) {
+        if (player.profile()?.debugMode == true) {
             printParamDataDebugMessage(player, params)
         }
         val fromNumData = getFromNumDataFromParams(params)

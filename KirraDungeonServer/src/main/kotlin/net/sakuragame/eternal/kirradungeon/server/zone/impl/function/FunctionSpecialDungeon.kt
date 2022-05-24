@@ -7,8 +7,9 @@ import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.DungeonManager
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
 import org.bukkit.Bukkit
+import org.bukkit.Effect
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 
@@ -26,7 +27,7 @@ object FunctionSpecialDungeon {
             if (!isDungeonFromSpecial(e.dungeonWorld.worldIdentifier)) {
                 return@submit
             }
-            val specialZone = DungeonManager.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
+            val specialZone = FunctionDungeon.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
                 kickPlayerByNotFoundData(player)
                 return@submit
             }
@@ -41,7 +42,7 @@ object FunctionSpecialDungeon {
     fun e(e: MythicMobDeathEvent) {
         val mobType = e.mobType
         val entity = e.entity
-        val dungeon = DungeonManager.getByMobUUID(entity.uniqueId) ?: return
+        val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) ?: return
         dungeon.removeMonsterUUID(entity.uniqueId)
         val loc = dungeon.zone.data.monsterData.mobList.map { it.loc.toBukkitLocation(entity.world) }.random()
         val resurgenceTime = dungeon.zone.data.resurgenceTime
@@ -50,6 +51,7 @@ object FunctionSpecialDungeon {
             if (Bukkit.getWorlds().none { it.uid == loc.world.uid }) {
                 return@submit
             }
+            loc.world.playEffect(loc, Effect.MOBSPAWNER_FLAMES, 5)
             val mob = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(mobType, loc, 1)
             dungeon.addMonsterUUID(mob.uniqueId)
         }

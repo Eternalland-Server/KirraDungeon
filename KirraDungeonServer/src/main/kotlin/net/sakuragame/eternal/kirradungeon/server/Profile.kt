@@ -29,7 +29,7 @@ class Profile(val player: Player) {
             return editingWorld.bukkitWorld.players.find { it.uniqueId == player.uniqueId } != null
         }
 
-    val number = AtomicInteger(1)
+    var number = 1
 
     var isChallenging = false
 
@@ -85,13 +85,13 @@ class Profile(val player: Player) {
     fun read() {
         submit(async = true) {
             val num = Database.getNumber(player) ?: return@submit
-            number.set(num)
+            number = num
         }
     }
 
     fun save() {
         submit(async = true) {
-            Database.setNumber(player, number.get())
+            Database.setNumber(player, number)
         }
     }
 

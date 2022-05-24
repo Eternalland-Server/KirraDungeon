@@ -33,85 +33,85 @@ import kotlin.random.Random
 interface IDungeon {
 
     /**
-     * 副本 UUID.
+     * 副本 UUID
      */
     val uuid: UUID
         get() = UUID.randomUUID()
 
     /**
-     * 副本创建时间.
+     * 副本创建时间
      */
     val createdTime: Long
 
     /**
-     * 副本初始化
+     * 是否已经初始化
      */
     var init: Boolean
 
     /**
-     * 原副本信息.
+     * 原副本信息
      */
     val zone: Zone
 
     /**
-     * 副本世界实例.
+     * 副本世界实例
      */
     val dungeonWorld: DungeonWorld
 
     /**
-     * 是否通关.
+     * 是否通关
      */
     var isClear: Boolean
 
     /**
-     * 是否失败.
+     * 是否失败
      */
-    var isFail: Boolean
+    var fail: Boolean
 
     /**
-     * 副本剩余时间.
+     * 副本剩余时间
      */
     var lastTime: Int
 
     /**
-     * 玩家 UUID 列表.
+     * 玩家 UUID 列表
      */
     val playerUUIDList: MutableList<UUID>
 
     /**
-     * 副本小怪 UUID 列表.
+     * 副本怪物 UUID 列表
      */
     val monsterUUIDList: MutableList<UUID>
 
     /**
-     * 副本首领 UUID.
+     * 副本首领 UUID
      */
     var bossUUID: UUID
 
     /**
-     * 失败时间, 与 failThread 挂钩.
+     * 失败时间, 与 failThread 挂钩
      */
     var failTime: Int
 
     /**
-     * 失败线程.
-     * 它会在全部玩家死亡后触发, 若所有玩家没在规定时间内复活, 则副本挑战失败.
-     * 判断死亡的依据为玩家是否为 SPECTATOR 模式.
+     * 失败线程
+     * 它会在全部玩家死亡后触发, 若所有玩家没在规定时间内复活, 则副本挑战失败
+     * 判断死亡的依据为玩家是否为 SPECTATOR 模式
      */
     var failThread: PlatformExecutor.PlatformTask?
 
     /**
-     * 根据 UUID 获取当前所有副本玩家.
+     * 根据 UUID 获取当前所有副本玩家
      */
     fun getPlayers() = playerUUIDList.mapNotNull { Bukkit.getPlayer(it) }
 
     /**
-     * 根据 UUID 获取单个玩家.
+     * 根据 UUID 获取单个玩家
      */
     fun getSinglePlayer() = Bukkit.getPlayer(playerUUIDList.first())!!
 
     /**
-     * 根据 UUID 获取当前所有副本怪物.
+     * 根据 UUID 获取当前所有副本怪物
      * @param containsBoss 是否包含怪物首领
      */
     fun getMonsters(containsBoss: Boolean): List<LivingEntity> {
@@ -122,13 +122,13 @@ interface IDungeon {
     }
 
     /**
-     * 是否全部玩家阵亡.
+     * 是否全部玩家阵亡
      */
     fun isAllPlayersDead() = getPlayers().find { !it.isSpectator() } == null
 
     /**
-     * 设置所有副本怪物的血量为满.
-     * @param containsBoss 是否包含怪物首领.
+     * 设置所有副本怪物的血量为满
+     * @param containsBoss 是否包含怪物首领
      */
     fun setAllMonsterHealth2Max(containsBoss: Boolean) {
         getMonsters(containsBoss).forEach {
@@ -137,7 +137,7 @@ interface IDungeon {
     }
 
     /**
-     * 移除所有怪物.
+     * 移除所有怪物
      */
     fun removeAllMonsters(containBoss: Boolean) {
         getMonsters(containBoss).forEach {
@@ -146,17 +146,17 @@ interface IDungeon {
     }
 
     /**
-     * 获取副本怪物首领.
+     * 获取副本怪物首领
      */
     fun getBoss() = Bukkit.getEntity(bossUUID) as? LivingEntity
 
     /**
-     * 当玩家进入.
+     * 当玩家进入
      */
     fun onPlayerJoin()
 
     /**
-     * 处理玩家进入.
+     * 处理玩家进入
      */
     fun handleJoin(player: Player, spawnBoss: Boolean, spawnMob: Boolean) {
         val data = zone.data
@@ -186,10 +186,11 @@ interface IDungeon {
     fun init(spawnBoss: Boolean, spawnMob: Boolean) {
         init = true
         spawnEntities(spawnBoss, spawnMob)
+        updateBossBar(init = true)
     }
 
     /**
-     * 生成副本怪物.
+     * 生成副本怪物
      */
     fun spawnEntities(spawnBoss: Boolean, spawnEntity: Boolean, bossLevel: Int = 1) {
         val monsterData = zone.data.monsterData
@@ -214,7 +215,7 @@ interface IDungeon {
     }
 
     /**
-     * 向玩家展示副本进入信息.
+     * 向玩家展示副本进入信息
      */
     fun showJoinMessage(player: Player, zoneName: String) {
         DragonCoreCompat.updateDragonVars(player, zoneName)
@@ -223,7 +224,7 @@ interface IDungeon {
     }
 
     /**
-     * 向玩家展示通关信息.
+     * 向玩家展示通关信息
      */
     fun sendClearMessage(players: List<Player>, delaySecs: Int) {
         val passedTime = formatSeconds(TimeUnit.SECONDS.convert((System.currentTimeMillis() - createdTime), TimeUnit.MILLISECONDS).toInt())
@@ -235,7 +236,7 @@ interface IDungeon {
     }
 
     /**
-     * 向玩家展示大标题.
+     * 向玩家展示大标题
      */
     fun sendTitle(title: String, subTitle: String, fadeIn: Int, stay: Int, fadeOut: Int) {
         getPlayers().forEach {
@@ -244,7 +245,7 @@ interface IDungeon {
     }
 
     /**
-     * 向玩家播放声音.
+     * 向玩家播放声音
      */
     fun sendSound(sound: Sound, volume: Float, pitch: Float) {
         getPlayers().forEach {
@@ -253,7 +254,7 @@ interface IDungeon {
     }
 
     /**
-     * 传送玩家至主城.
+     * 传送玩家至主城
      */
     fun teleportToSpawn() {
         var secs = 5
@@ -277,30 +278,29 @@ interface IDungeon {
     }
 
     /**
-     * 更新 BOSS 血条为所有队伍玩家.
+     * 更新 BOSS 血条为所有队伍玩家
      */
     fun updateBossBar(init: Boolean = false) {
         submit(delay = 3L) {
-            val bossEntity = getBoss() ?: return@submit
-            val healthPercent = bossEntity.health / getMobMaxHealth(bossEntity)
+            val entity = getBoss()
             getPlayers().forEach {
-                if (init) {
-                    BossBar.open(
-                        it,
-                        bossEntity.name,
-                        "",
-                        zone.data.iconNumber.toString(),
-                        healthPercent,
-                        lastTime
-                    )
+                if (entity == null) {
+                    if (init) {
+                        BossBar.open(it, lastTime)
+                    }
+                    return@forEach
                 }
-                BossBar.setHealth(it, "&c&l${bossEntity.health.roundToInt()} / ${getMobMaxHealth(bossEntity)}".colored(), healthPercent)
+                val percent = entity.health / getMobMaxHealth(entity)
+                if (init) {
+                    BossBar.open(it, entity.name, "", zone.data.iconNumber.toString(), percent, lastTime)
+                }
+                BossBar.setHealth(it, "&c&l${entity.health.roundToInt()} / ${getMobMaxHealth(entity)}".colored(), percent)
             }
         }
     }
 
     /**
-     * 开始失败线程运行.
+     * 开始失败线程运行
      */
     fun startFailThread() {
         getPlayers().forEach {
@@ -330,32 +330,32 @@ interface IDungeon {
     }
 
     /**
-     * 为副本增加一个玩家 UUID.
+     * 为副本增加一个玩家 UUID
      */
     fun addPlayerUUID(uuid: UUID) = playerUUIDList.add(uuid)
 
     /**
-     * 移除一个副本的玩家 UUID.
+     * 移除一个副本的玩家 UUID
      */
     fun removePlayerUUID(uuid: UUID) = playerUUIDList.remove(uuid)
 
     /**
-     * 为副本增加一个怪物 UUID.
+     * 为副本增加一个怪物 UUID
      */
     fun addMonsterUUID(uuid: UUID) = monsterUUIDList.add(uuid)
 
     /**
-     * 移除一个副本的怪物 UUID.
+     * 移除一个副本的怪物 UUID
      */
     fun removeMonsterUUID(uuid: UUID) = monsterUUIDList.remove(uuid)
 
     /**
-     * 是否可以通关。
+     * 是否可以通关
      */
     fun canClear(): Boolean
 
     /**
-     * 执行通关相关操作。
+     * 执行通关相关操作
      */
     fun clear() {
         isClear = true
@@ -366,11 +366,11 @@ interface IDungeon {
     }
 
     /**
-     * 玩家挑战失败.
-     * @param type 失败类型.
+     * 玩家挑战失败
+     * @param type 失败类型
      */
     fun fail(type: FailType) {
-        isFail = true
+        fail = true
         DungeonFailEvent(getPlayers(), zone.id).call()
         val failText = when (type) {
             OVERTIME -> Bukkit.getServer().consoleSender.asLangText("message-player-over-time")
@@ -387,25 +387,25 @@ interface IDungeon {
     }
 
     /**
-     * 是否可以删除副本.
+     * 是否可以删除副本
      */
     fun canDel() = playerUUIDList.size == 0
 
     /**
-     * 执行副本删除操作.
+     * 执行副本删除操作
      */
     fun del() {
         DungeonServerAPI.getWorldManager().dropDungeon(dungeonWorld)
-        DungeonManager.dungeons -= this
+        FunctionDungeon.dungeons -= this
     }
 
     /**
-     * 是否可以复活.
+     * 是否可以复活
      */
     fun canResurgence() = failThread != null
 
     /**
-     * 执行复活操作.
+     * 执行复活操作
      */
     fun resurgence(player: Player) {
         failThread?.cancel()

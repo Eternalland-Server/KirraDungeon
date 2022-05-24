@@ -9,8 +9,6 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * KirraDungeon
@@ -21,9 +19,13 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class Profile(val player: Player) {
 
-    val number = AtomicInteger(1)
+    var number = 1
+        set(value) {
+            field = value
+            save()
+        }
 
-    val debugMode = AtomicBoolean(false)
+    var debugMode = false
 
     companion object {
 
@@ -72,13 +74,13 @@ class Profile(val player: Player) {
                 }
                 return@submit
             }
-            number.set(num)
+            number = num
         }
     }
 
     fun save() {
         submit(async = true) {
-            Database.setNumber(player, number.get())
+            Database.setNumber(player, number)
         }
     }
 

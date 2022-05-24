@@ -2,7 +2,7 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl
 
 import java.util.*
 
-object DungeonManager {
+object FunctionDungeon {
 
     val dungeons = mutableListOf<IDungeon>()
 
