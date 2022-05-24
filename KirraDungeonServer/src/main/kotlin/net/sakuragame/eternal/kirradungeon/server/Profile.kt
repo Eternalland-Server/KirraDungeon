@@ -30,6 +30,10 @@ class Profile(val player: Player) {
         }
 
     var number = 1
+        set(value) {
+            field = value
+            save()
+        }
 
     var isChallenging = false
 
