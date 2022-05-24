@@ -5,6 +5,7 @@ import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.common.event.DungeonClearEvent
+import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.isSpectator
@@ -129,7 +130,8 @@ object FunctionCommonListener {
             playDeathAnimation()
             health = maxHealth
             turnToSpectator()
-            sendTitle("&c&l菜".colored(), "", 0, 40, 10)
+            val deathNotice = KirraDungeonServer.conf.getStringList("settings.delay-back-spawn-server-secs.death-notices").randomOrNull() ?: "&c&l菜"
+            sendTitle(deathNotice.colored(), "", 0, 40, 10)
         }
         submit(async = false, delay = 10L) {
             if (dungeon.isAllPlayersDead() && dungeon.failThread == null) {

@@ -7,3 +7,9 @@ settings:
     database: rpg-test
   debug-mode: true
   delay-back-spawn-server-secs: 5
+  death-notices:
+    - "&c&l菜"
+    - "&c&l?"
+    - "&c&lYOUR DIED"
+    - "&c&l死"
+    - "&c&l你太弱了"
