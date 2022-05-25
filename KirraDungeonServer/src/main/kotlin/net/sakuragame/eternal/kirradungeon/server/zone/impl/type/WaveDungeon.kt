@@ -21,6 +21,8 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
         runOverTimeCheck()
     }
 
+    override val uuid = UUID.randomUUID()!!
+
     override val createdTime = System.currentTimeMillis()
 
     override var init = false
@@ -34,6 +36,8 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
     override val playerUUIDList = mutableListOf<UUID>()
 
     override val monsterUUIDList = mutableListOf<UUID>()
+
+    override val trigger = null
 
     override var bossUUID: UUID = UUID.randomUUID()!!
 

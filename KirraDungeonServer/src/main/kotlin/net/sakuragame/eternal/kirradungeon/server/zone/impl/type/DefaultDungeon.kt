@@ -21,6 +21,8 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         runOverTimeCheck()
     }
 
+    override val uuid = UUID.randomUUID()!!
+
     override val createdTime = System.currentTimeMillis()
 
     override var init = false
@@ -62,6 +64,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
                 return@submit
             }
         }
+        init(spawnBoss = true, spawnMob = true)
         startCountdown()
         showResurgenceTitle()
     }

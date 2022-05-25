@@ -7,9 +7,12 @@ import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
+import org.bukkit.Bukkit
 import org.bukkit.event.entity.EntityDamageEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import taboolib.platform.util.broadcast
 
 object FunctionDefaultDungeon {
 
@@ -39,7 +42,7 @@ object FunctionDefaultDungeon {
     @SubscribeEvent
     fun e(e: MythicMobDeathEvent) {
         val entity = e.entity
-        val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) ?: return
+        val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? DefaultDungeon ?: return
         dungeon.removeMonsterUUID(entity.uniqueId)
         if (dungeon.canClear()) {
             // 当副本可通关时, 执行通关操作.
@@ -49,8 +52,9 @@ object FunctionDefaultDungeon {
 
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
-        val playerZone = FunctionDungeon.getByMobUUID(e.entity.uniqueId) ?: return
+        val playerZone = FunctionDungeon.getByMobUUID(e.entity.uniqueId) as? DefaultDungeon ?: return
         if (playerZone.bossUUID == e.entity.uniqueId) {
+            "reached update".broadcast()
             playerZone.updateBossBar()
         }
     }

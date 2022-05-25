@@ -15,6 +15,8 @@ class SpecialDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         runOverTimeCheck()
     }
 
+    override val uuid = UUID.randomUUID()!!
+
     override val createdTime = System.currentTimeMillis()
 
     override var init = false
@@ -28,6 +30,8 @@ class SpecialDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     override val playerUUIDList = mutableListOf<UUID>()
 
     override val monsterUUIDList = mutableListOf<UUID>()
+
+    override val trigger = null
 
     override var bossUUID = UUID.randomUUID()!!
 

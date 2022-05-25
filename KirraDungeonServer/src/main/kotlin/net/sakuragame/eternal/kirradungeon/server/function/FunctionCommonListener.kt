@@ -21,7 +21,6 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import org.bukkit.GameMode
-import org.bukkit.WorldType
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -75,14 +74,14 @@ object FunctionCommonListener {
             KirraMinerAPI.createTempOre(it.id, ore, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld))
         }
         dungeonWorld.bukkitWorld.isAutoSave = false
-        dungeonWorld.properties.apply {
-            isPVPEnabled = false
-            type = WorldType.CUSTOMIZED
-            addGameRule("announceAdvancements", "false")
-            addGameRule("keepInventory", "true")
-            addGameRule("doDaylightCycle", "false")
-            addGameRule("showDeathMessages", "false")
-            addGameRule("doFireTick", "false")
+        dungeonWorld.bukkitWorld.apply {
+            pvp = false
+            setGameRuleValue("doMobSpawning", "false")
+            setGameRuleValue("announceAdvancements", "false")
+            setGameRuleValue("keepInventory", "true")
+            setGameRuleValue("doDaylightCycle", "false")
+            setGameRuleValue("showDeathMessages", "false")
+            setGameRuleValue("doFireTick", "false")
         }
         // 初始化.
         when (copyZoneData.type) {

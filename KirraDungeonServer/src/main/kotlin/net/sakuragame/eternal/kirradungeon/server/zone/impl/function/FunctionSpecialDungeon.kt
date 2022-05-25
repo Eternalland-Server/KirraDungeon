@@ -8,6 +8,7 @@ import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import org.bukkit.Bukkit
 import org.bukkit.Effect
 import taboolib.common.platform.event.SubscribeEvent
@@ -42,7 +43,7 @@ object FunctionSpecialDungeon {
     fun e(e: MythicMobDeathEvent) {
         val mobType = e.mobType
         val entity = e.entity
-        val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) ?: return
+        val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? SpecialDungeon ?: return
         dungeon.removeMonsterUUID(entity.uniqueId)
         val loc = dungeon.zone.data.monsterData.mobList.map { it.loc.toBukkitLocation(entity.world) }.random()
         val resurgenceTime = dungeon.zone.data.resurgenceTime

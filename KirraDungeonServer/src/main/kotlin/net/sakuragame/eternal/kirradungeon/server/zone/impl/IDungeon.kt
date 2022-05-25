@@ -37,7 +37,6 @@ interface IDungeon {
      * 副本 UUID
      */
     val uuid: UUID
-        get() = UUID.randomUUID()
 
     /**
      * 副本创建时间
@@ -182,9 +181,6 @@ interface IDungeon {
         }
         submit(delay = 40) {
             showJoinMessage(player, zone.name)
-            if (!init) {
-                init(spawnBoss, spawnMob)
-            }
             onPlayerJoin()
             DungeonJoinEvent(player, zone.id).call()
         }
@@ -196,7 +192,9 @@ interface IDungeon {
     fun init(spawnBoss: Boolean, spawnMob: Boolean) {
         init = true
         spawnEntities(spawnBoss, spawnMob)
-        updateBossBar(init = true)
+        submit(async = true, delay = 20L) {
+            updateBossBar(init = true)
+        }
     }
 
     /**

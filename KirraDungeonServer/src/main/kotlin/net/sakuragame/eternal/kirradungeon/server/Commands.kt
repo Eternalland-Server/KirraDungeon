@@ -191,7 +191,7 @@ object Commands {
     }
 
     @CommandBody
-    val delDBFile = subCommand {
+    val refreshMapFile = subCommand {
         dynamic(commit = "dungeonID") {
             execute<Player> { player, _, argument ->
                 val zone = Zone.getByID(argument)
@@ -201,6 +201,17 @@ object Commands {
                 }
                 DungeonServerAPI.getWorldManager().deleteDungeon(zone.id)
                 player.sendMessage("&a已删除数据库内的地图数据.".colored())
+                player.sendMessage("&a正在创建新文件...".colored())
+                DungeonServerAPI.getWorldManager().createEmptyDungeon(zone.id, DungeonProperties(), object : RunnableVal<DungeonWorld>() {
+
+                    override fun run(value: DungeonWorld?) {
+                        if (value == null) return
+                        editingDungeonWorld = value
+                        player.sendMessage("&a成功!".colored())
+                        player.sendMessage("&a正在传送.".colored())
+                        player.teleport(value.bukkitWorld.spawnLocation)
+                    }
+                })
             }
         }
     }

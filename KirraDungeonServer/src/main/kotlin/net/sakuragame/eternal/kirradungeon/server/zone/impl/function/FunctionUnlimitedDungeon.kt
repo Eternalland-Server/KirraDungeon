@@ -51,7 +51,7 @@ object FunctionUnlimitedDungeon {
 
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
-        val dungeon = FunctionDungeon.getByMobUUID(e.entity.uniqueId) ?: return
+        val dungeon = FunctionDungeon.getByMobUUID(e.entity.uniqueId) as? UnlimitedDungeon ?: return
         if (dungeon.bossUUID == e.entity.uniqueId) {
             dungeon.updateBossBar()
         }
