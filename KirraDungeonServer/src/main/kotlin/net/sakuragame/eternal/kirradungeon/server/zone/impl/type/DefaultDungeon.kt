@@ -2,6 +2,7 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
+import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
@@ -33,6 +34,13 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     override val playerUUIDList = mutableListOf<UUID>()
 
     override val monsterUUIDList = mutableListOf<UUID>()
+
+    override val trigger: ZoneTriggerData?
+        get() = if (zone.data.trigger.triggerLoc == null) {
+            null
+        } else {
+            zone.data.trigger.copy()
+        }
 
     override var bossUUID = UUID.randomUUID()!!
 

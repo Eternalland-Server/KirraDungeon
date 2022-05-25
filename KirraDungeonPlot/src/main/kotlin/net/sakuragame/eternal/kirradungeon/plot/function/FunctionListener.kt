@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.plot.function
 
 import com.taylorswiftcn.megumi.uifactory.event.screen.UIFScreenOpenEvent
+import net.luckperms.api.node.types.PermissionNode
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
@@ -123,6 +124,11 @@ object FunctionListener {
     @SubscribeEvent
     fun e(e: NSFilmEndEvent) {
         val player = e.player
+        KirraDungeonPlot.luckPermsAPI.userManager.also {
+            val user = it.getUser(player.uniqueId)!!
+            user.data().add(PermissionNode.builder("noobie_tutorial").build())
+            it.saveUser(user)
+        }
         player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 9999999, 10))
         KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在传送至主城 &7@", true)
         KirraCoreBukkitAPI.teleportToSpawnServer(player)

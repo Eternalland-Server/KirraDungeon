@@ -14,7 +14,6 @@ import org.bukkit.World
 data class ZoneLocation(val x: Double, val y: Double, val z: Double, val yaw: Float, val pitch: Float) {
 
     companion object {
-
         fun parseToZoneLocation(loc: Location) = ZoneLocation(loc.x, loc.y, loc.z, loc.yaw, loc.pitch)
 
         fun parseToZoneLocation(string: String): ZoneLocation? {

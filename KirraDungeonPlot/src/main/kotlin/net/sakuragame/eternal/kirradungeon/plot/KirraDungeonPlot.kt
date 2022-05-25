@@ -2,6 +2,8 @@ package net.sakuragame.eternal.kirradungeon.plot
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
 import io.lumine.xikage.mythicmobs.MythicMobs
+import net.luckperms.api.LuckPerms
+import org.bukkit.Bukkit
 import taboolib.common.platform.Plugin
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
@@ -24,5 +26,9 @@ object KirraDungeonPlot : Plugin() {
 
     val mythicmobsAPI by lazy {
         MythicMobs.inst().apiHelper!!
+    }
+
+    val luckPermsAPI by lazy {
+        Bukkit.getServicesManager().getRegistration(LuckPerms::class.java).provider!!
     }
 }

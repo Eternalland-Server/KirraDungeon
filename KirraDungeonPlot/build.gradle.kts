@@ -50,6 +50,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly("net.luckperms:api:5.4")
     compileOnly("public:MythicMobs:4.12.0@jar")
     compileOnly("net.sakuragame.eternal:NergiganteScript:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")

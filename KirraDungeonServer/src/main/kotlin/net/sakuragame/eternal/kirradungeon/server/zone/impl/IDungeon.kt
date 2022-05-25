@@ -13,6 +13,7 @@ import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
+import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
 import org.bukkit.Bukkit
 import org.bukkit.Sound
@@ -82,6 +83,15 @@ interface IDungeon {
      * 副本怪物 UUID 列表
      */
     val monsterUUIDList: MutableList<UUID>
+
+    /**
+     * 触发器数据
+     * 玩家对触发器数据里的方块坐标操作 (例如: 拉动拉杆)
+     * 触发器数据里的方块将会覆盖在地图上, 同时执行 init 方法 (召唤怪物并开始倒计时)
+     *
+     * 并不是所有副本都需要触发器, 所以这个变量为可空变量
+     */
+    val trigger: ZoneTriggerData?
 
     /**
      * 副本首领 UUID
@@ -187,6 +197,14 @@ interface IDungeon {
         init = true
         spawnEntities(spawnBoss, spawnMob)
         updateBossBar(init = true)
+    }
+
+    /**
+     * 执行触发器方法 (覆盖方块)
+     */
+    fun handleTrigger() {
+        val currentTrigger = trigger ?: return
+        if (currentTrigger.blocks.isEmpty()) return
     }
 
     /**
