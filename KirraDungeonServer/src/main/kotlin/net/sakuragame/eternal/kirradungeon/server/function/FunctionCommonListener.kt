@@ -23,6 +23,7 @@ import net.sakuragame.eternal.kirramodel.KirraModelAPI
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -156,6 +157,20 @@ object FunctionCommonListener {
                 profile.number = zone.data.number + 1
             }
         }
+    }
+
+    @SubscribeEvent
+    fun e(e: BlockPhysicsEvent) {
+        val world = e.block.world
+        val uid = world.uid
+        if (uid == Zone.editingDungeonWorld?.bukkitWorld?.uid) {
+            e.isCancelled = true
+            return
+        }
+        if (FunctionDungeon.getByDungeonWorldUUID(uid) == null) {
+            return
+        }
+        e.isCancelled = true
     }
 
     @SubscribeEvent

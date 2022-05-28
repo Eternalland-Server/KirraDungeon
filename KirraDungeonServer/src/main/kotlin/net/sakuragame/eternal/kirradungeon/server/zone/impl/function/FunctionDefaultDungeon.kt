@@ -54,7 +54,6 @@ object FunctionDefaultDungeon {
     fun e(e: EntityDamageEvent) {
         val playerZone = FunctionDungeon.getByMobUUID(e.entity.uniqueId) as? DefaultDungeon ?: return
         if (playerZone.bossUUID == e.entity.uniqueId) {
-            "reached update".broadcast()
             playerZone.updateBossBar()
         }
     }

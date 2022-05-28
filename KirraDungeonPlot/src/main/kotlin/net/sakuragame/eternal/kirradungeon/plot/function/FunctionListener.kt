@@ -147,8 +147,9 @@ object FunctionListener {
             1 -> {
                 FunctionPlot.endBound(player)
                 FunctionPlot.dataRecycle(player)
-                FunctionPlot.spawnEntity(player, "dragon").also {
-                    it?.health = (getMobMaxHealth("dragon") / 2)
+                val entity = FunctionPlot.spawnEntity(player, "dragon")
+                submit(async = false, delay = 10L) {
+                    entity!!.health = getMobMaxHealth("dragon") / 2
                 }
             }
             2 -> {
