@@ -14,6 +14,7 @@ taboolib {
     description {
         dependencies {
             name("MythicMobs")
+            name("MythicMobsExtension")
             name("DataManager")
             name("KirraDungeonCommon")
             name("KirraCoreBukkit")
