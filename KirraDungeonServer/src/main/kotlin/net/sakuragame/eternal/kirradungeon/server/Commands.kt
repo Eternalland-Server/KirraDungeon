@@ -121,6 +121,9 @@ object Commands {
                         value.bukkitWorld.also { world ->
                             world.entities.forEach { it.remove() }
                         }
+                        zone.data.holograms.forEach {
+                            AdyeshachAPI.createHologram(player, it.loc.toBukkitLocation(value.bukkitWorld), it.contents.colored())
+                        }
                         player.teleport(zone.data.spawnLoc.toBukkitLocation(value.bukkitWorld))
                     }
                 })

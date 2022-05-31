@@ -5,12 +5,11 @@ import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
-import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
-import org.bukkit.Bukkit
-import org.bukkit.entity.Monster
+import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import taboolib.common.platform.event.SubscribeEvent
@@ -37,7 +36,7 @@ object FunctionDefaultDungeon {
             profile.zoneType = ZoneType.DEFAULT
             profile.zoneUUID = dungeon.uuid
             dungeon.addPlayerUUID(player.uniqueId)
-            dungeon.handleJoin(player, spawnBoss = true, spawnMob = true)
+            dungeon.handleJoin(player, spawnBoss = false, spawnMob = false, showTimeBar = false)
         }
     }
 
@@ -46,9 +45,8 @@ object FunctionDefaultDungeon {
         val entity = e.entity
         val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? DefaultDungeon ?: return
         dungeon.removeMonsterUUID(entity.uniqueId)
-        if (dungeon.canClear()) {
-            // 当副本可通关时, 执行通关操作.
-            dungeon.clear()
+        if (dungeon.getMonsters(containsBoss = false).isEmpty()) {
+            dungeon.doSpawn()
         }
     }
 
@@ -61,28 +59,25 @@ object FunctionDefaultDungeon {
     }
 
     @SubscribeEvent
-    fun e1(e: EntityDamageEvent) {
-        val entity = e.entity as? Monster ?: return
-        if (FunctionDungeon.getByMobUUID(entity.uniqueId) == null) {
-            return
-        }
-        if (e.cause == EntityDamageEvent.DamageCause.VOID) {
-            e.isCancelled = true
-            val str = entity.getMetadata("ORIGIN_LOC").getOrNull(0)?.asString() ?: return
-            val zoneLoc = ZoneLocation.parseToZoneLocation(str) ?: return
-            val bukkitLoc = zoneLoc.toBukkitLocation(entity.world)
-            entity.teleport(bukkitLoc)
-        }
-    }
-
-    @SubscribeEvent
     fun e(e: PlayerInteractEvent) {
         val player = e.player
         val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) as? DefaultDungeon ?: return
-        val block = e.clickedBlock
-        val trigger = dungeon.trigger ?: return
+        val block = e.clickedBlock ?: return
+        val trigger = dungeon.triggerData ?: return
+        if (block.type == Material.AIR || dungeon.triggered) {
+            return
+        }
         if (block.location == trigger.triggerLoc.toBukkitLocation(block.world)) {
-            val future = dungeon.handleTrigger() ?: return
+            player.playSound(player.location, Sound.BLOCK_PISTON_CONTRACT, 1f, 1.5f)
+            submit(delay = 5L) {
+                player.playSound(player.location, Sound.BLOCK_PISTON_EXTEND, 1f, 1.5f)
+            }
+            submit(delay = 10L) {
+                val delayTime = dungeon.handleTrigger() ?: return@submit
+                submit(async = false, delay = delayTime) {
+                    dungeon.doTrigger()
+                }
+            }
         }
     }
 

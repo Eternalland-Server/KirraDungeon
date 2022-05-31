@@ -1,7 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
-import com.google.gson.Gson
 import io.lumine.xikage.mythicmobs.MythicMobs
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import taboolib.common.platform.Plugin
@@ -27,10 +26,6 @@ object KirraDungeonServer : Plugin() {
         BukkitPlugin.getInstance()
     }
 
-    val gson by lazy {
-        Gson()
-    }
-
     val mythicmobsAPI by lazy {
         MythicMobs.inst().apiHelper!!
     }
@@ -40,8 +35,8 @@ object KirraDungeonServer : Plugin() {
     }
 
     val redisConn by lazy {
-        redisManager.standaloneConn.also {
-            it.setTimeout(200, TimeUnit.MILLISECONDS)
+        redisManager.standaloneConn.apply {
+            setTimeout(200, TimeUnit.MILLISECONDS)
         }!!
     }
 

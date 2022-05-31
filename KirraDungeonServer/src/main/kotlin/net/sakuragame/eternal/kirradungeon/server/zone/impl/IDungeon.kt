@@ -1,8 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
-import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeAdvancement
-import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeDisplay
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
@@ -19,8 +17,8 @@ import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
 import org.bukkit.Bukkit
+import org.bukkit.Effect
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -49,16 +47,6 @@ interface IDungeon {
     val createdTime: Long
 
     /**
-     * 是否已经初始化
-     */
-    var init: Boolean
-
-    /**
-     * 是否已经生成怪物
-     */
-    var monsterSpawned: Boolean
-
-    /**
      * 原副本信息
      */
     val zone: Zone
@@ -67,6 +55,11 @@ interface IDungeon {
      * 副本世界实例
      */
     val dungeonWorld: DungeonWorld
+
+    /**
+     * 副本是否初始化
+     */
+    var init: Boolean
 
     /**
      * 是否通关
@@ -100,7 +93,7 @@ interface IDungeon {
      *
      * 并不是所有副本都需要触发器, 所以这个变量为可空变量
      */
-    val trigger: ZoneTriggerData?
+    val triggerData: ZoneTriggerData?
 
     /**
      * 副本首领 UUID
@@ -170,14 +163,19 @@ interface IDungeon {
     fun getBoss() = Bukkit.getEntity(bossUUID) as? LivingEntity
 
     /**
+     * 副本初始化 (当第一名玩家进入副本时)
+     */
+    fun init()
+
+    /**
      * 当玩家进入
      */
-    fun onPlayerJoin()
+    fun onPlayerJoin(player: Player)
 
     /**
      * 处理玩家进入
      */
-    fun handleJoin(player: Player, spawnBoss: Boolean, spawnMob: Boolean) {
+    fun handleJoin(player: Player, spawnBoss: Boolean, spawnMob: Boolean, showTimeBar: Boolean = true) {
         val data = zone.data
         val loc = data.spawnLoc.toBukkitLocation(dungeonWorld.bukkitWorld)
         player.teleport(loc)
@@ -189,40 +187,32 @@ interface IDungeon {
                 KirraDungeonServer.skyAPI.changeSky(skyChangerPlayer, packetType, value)
             }
         }
-        if (!monsterSpawned) {
-            monsterSpawned = true
+        if (!init) {
+            init = true
+            init()
             spawnEntities(spawnBoss, spawnMob)
-            submit(async = false, delay = 20) {
-                updateBossBar(init = true)
+            if (showTimeBar) {
+                submit(async = false, delay = 20) {
+                    updateBossBar(init = true)
+                }
             }
         }
         submit(delay = 40) {
             showJoinMessage(player, zone.name)
-            onPlayerJoin()
-            // 展示成就
-            FakeAdvancement(FakeDisplay(Material.BUCKET, "&7&o愿筒子护佑你, 年轻人.".colored(), "", FakeDisplay.AdvancementFrame.GOAL, null))
-                .displayToast(player)
+            onPlayerJoin(player)
             // 展示全息
             data.holograms.forEach {
-                AdyeshachAPI.createHologram(player, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), it.contents)
+                AdyeshachAPI.createHologram(player, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), it.contents.colored())
             }
-            // 生成怪物
             DungeonJoinEvent(player, zone.id).call()
         }
-    }
-
-    /**
-     * 初始化操作
-     */
-    fun init() {
-        init = true
     }
 
     /**
      * 执行触发器方法 (覆盖方块)
      */
     fun handleTrigger(): Long? {
-        val currentTrigger = trigger ?: return null
+        val currentTrigger = triggerData ?: return null
         if (currentTrigger.blocks.isEmpty()) return null
         val blocks = currentTrigger.blocks
         var delay = 0L
@@ -233,7 +223,11 @@ interface IDungeon {
             submit(async = false, delay = delay) {
                 it.forEach {
                     val block = it.loc.toBukkitLocation(dungeonWorld.bukkitWorld).block
+                    block.world.playEffect(block.location, Effect.MOBSPAWNER_FLAMES, 1)
                     block.type = it.material
+                    getPlayers().forEach { player ->
+                        player.playSound(block.location, Sound.BLOCK_STONE_PLACE, 1.5f, 1f)
+                    }
                 }
             }
             delay += 10
@@ -330,7 +324,7 @@ interface IDungeon {
     }
 
     /**
-     * 更新 BOSS 血条为所有队伍玩家
+     * 为所有队伍玩家更新 BOSS 血条
      */
     fun updateBossBar(init: Boolean = false) {
         submit(async = false, delay = 3L) {

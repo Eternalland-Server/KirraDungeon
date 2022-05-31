@@ -6,13 +6,14 @@ import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 import taboolib.common.platform.function.submit
 import taboolib.platform.util.asLangText
 
 fun IDungeon.startCountdown() {
     submit(async = true, delay = 20L, period = 20L) {
-        if (canDel() || isClear || fail || !init) {
+        if (canDel() || isClear || fail) {
             cancel()
             return@submit
         }
@@ -32,11 +33,9 @@ fun IDungeon.startCountdown() {
     }
 }
 
-fun IDungeon.showResurgenceTitle() {
+fun showResurgenceTitle(player: Player) {
     submit(async = true, delay = 100L) {
-        getPlayers().forEach {
-            it.sendTitle("", it.asLangText("message-player-can-resurgence"), 5, 25, 0)
-        }
+        player.sendTitle("", player.asLangText("message-player-can-resurgence"), 5, 25, 0)
     }
 }
 

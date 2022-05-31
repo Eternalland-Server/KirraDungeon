@@ -1,16 +1,22 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 
+import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeAdvancement
+import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeDisplay
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
+import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
+import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.*
 import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.Sound
+import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
+import taboolib.module.chat.colored
 import java.util.*
+import kotlin.random.Random
 
 /**
  * 默认副本, 副本实现类其中之一.
@@ -27,8 +33,6 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override var init = false
 
-    override var monsterSpawned = false
-
     override var isClear = false
 
     override var fail = false
@@ -39,7 +43,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override val monsterUUIDList = mutableListOf<UUID>()
 
-    override val trigger: ZoneTriggerData?
+    override val triggerData: ZoneTriggerData?
         get() = if (zone.data.trigger.blocks.isEmpty()) {
             null
         } else {
@@ -52,24 +56,89 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override var failThread: PlatformExecutor.PlatformTask? = null
 
-    override fun onPlayerJoin() {
+    private val monsterData = zone.data.monsterData.copy()
+
+    private var bossSpawned = false
+
+    var triggered = false
+
+    override fun init() {
         // 移除未经过 MythicMobDeathEvent 死亡的实体
-        submit(async = true, delay = 100L, period = 20L) {
+        submit(async = true, delay = 0L, period = 20L) {
             if (canDel() || isClear || fail) {
                 cancel()
                 return@submit
             }
             monsterUUIDList.removeIf { Bukkit.getEntity(it) == null }
+            submit(async = false) {
+                getMonsters(true)
+                    .filter { it.location.y < 0 }
+                    .forEach { entity ->
+                        val str = entity.getMetadata("ORIGIN_LOC").getOrNull(0)?.asString() ?: return@forEach
+                        val zoneLoc = ZoneLocation.parseToZoneLocation(str) ?: return@forEach
+                        val loc = zoneLoc.toBukkitLocation(entity.world)
+                            .clone()
+                            .add(0.0, 1.0, 0.0)
+                        entity.teleport(loc)
+                    }
+            }
             if (canClear()) {
                 clear()
                 cancel()
                 return@submit
             }
         }
-        init()
-        startCountdown()
-        showResurgenceTitle()
+        submit(delay = 40) {
+            if (triggerData == null) {
+                doTrigger()
+            }
+        }
     }
 
-    override fun canClear() = getMonsters(containsBoss = true).isEmpty() && !isClear && !fail
+    override fun onPlayerJoin(player: Player) {
+        showResurgenceTitle(player)
+    }
+
+    fun doTrigger() {
+        triggered = true
+        doSpawn()
+        submit(async = true, delay = 20L) {
+            updateBossBar(init = true)
+        }
+        getPlayers().forEach {
+            it.playSound(it.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+            submit(delay = 10) {
+                it.playSound(it.location, Sound.ENTITY_ENDERDRAGON_GROWL, 1f, 1f)
+            }
+            FakeAdvancement(FakeDisplay(Material.BUCKET, "&7&o愿筒子护佑你, 年轻人.".colored(), "", FakeDisplay.AdvancementFrame.GOAL, null))
+                .displayToast(it)
+        }
+        startCountdown()
+    }
+
+    fun doSpawn() {
+        val mobData = monsterData.mobList.removeFirstOrNull()
+        if (mobData == null) {
+            val bossData = monsterData.boss
+            val loc = bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld)
+            val entity = spawnDungeonMob(loc, bossData.type) ?: return
+            bossUUID = entity.uniqueId
+            bossSpawned = true
+            entity.isGlowing = true
+            submit(async = true, delay = 20L) {
+                getPlayers().forEach { BossBar.close(it) }
+                updateBossBar(init = true)
+            }
+            return
+        }
+        val loc = mobData.loc.toBukkitLocation(dungeonWorld.bukkitWorld).add(0.0, 1.5, 0.0)
+        repeat(mobData.amount) {
+            val randomLoc = loc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
+            val entity = spawnDungeonMob(randomLoc, mobData.type) ?: return@repeat
+            entity.isGlowing = true
+            monsterUUIDList.add(entity.uniqueId)
+        }
+    }
+
+    override fun canClear() = getMonsters(containsBoss = true).isEmpty() && bossSpawned && triggered && !isClear && !fail
 }

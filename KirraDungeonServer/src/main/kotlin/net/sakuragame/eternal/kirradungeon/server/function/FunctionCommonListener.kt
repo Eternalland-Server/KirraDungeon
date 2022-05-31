@@ -1,6 +1,5 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
-import ink.ptms.adyeshach.api.AdyeshachAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
@@ -29,6 +28,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
@@ -108,14 +108,14 @@ object FunctionCommonListener {
     }
 
     @SubscribeEvent
-    fun e(e: EntityDamageEvent) {
-        val player = e.entity as? Player ?: return
+    fun e(e: PlayerMoveEvent) {
+        val player = e.player
         val profile = player.profile()
         if (profile.isEditing) {
             return
         }
-        if (e.cause == EntityDamageEvent.DamageCause.VOID) {
-            e.isCancelled = true
+        val to = e.to ?: return
+        if (to.y < 0) {
             val dungeon = profile.getIDungeon() ?: return
             player.teleport(dungeon.zone.data.spawnLoc.toBukkitLocation(player.world))
             player.sendLang("message-player-lifted-from-void")

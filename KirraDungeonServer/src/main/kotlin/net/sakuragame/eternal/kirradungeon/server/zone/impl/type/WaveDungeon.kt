@@ -1,5 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 
+import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeAdvancement
+import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeDisplay
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
@@ -9,10 +11,13 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
+import taboolib.module.chat.colored
 import java.util.*
 
 class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IDungeon {
@@ -27,8 +32,6 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     override var init = false
 
-    override var monsterSpawned = false
-
     override var isClear = false
 
     override var fail = false
@@ -39,13 +42,17 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     override val monsterUUIDList = mutableListOf<UUID>()
 
-    override val trigger = null
+    override val triggerData = null
 
     override var bossUUID: UUID = UUID.randomUUID()!!
 
     override var failTime: Int = 60
 
     override var failThread: PlatformExecutor.PlatformTask? = null
+
+    var waveCounts = 1
+
+    private var isBossSpawned = false
 
     private val waveList = mutableListOf<ZoneWaveData>().also {
         it.addAll(zone.data.waveData!!)
@@ -55,17 +62,19 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
         zone.data.waveSpawnLocs!!
     }
 
-    var currentWave: ZoneWaveData? = null
+    private var currentWave: ZoneWaveData? = null
 
-    var waveCounts = 1
 
-    var isBossSpawned = false
-
-    override fun onPlayerJoin() {
-        showResurgenceTitle()
+    override fun init() {
         submit(delay = 80) {
             waveStart()
         }
+    }
+
+    override fun onPlayerJoin(player: Player) {
+        showResurgenceTitle(player)
+        FakeAdvancement(FakeDisplay(Material.BUCKET, "&7&o愿筒子护佑你, 年轻人.".colored(), "", FakeDisplay.AdvancementFrame.GOAL, null))
+            .displayToast(player)
     }
 
     override fun canClear(): Boolean {
