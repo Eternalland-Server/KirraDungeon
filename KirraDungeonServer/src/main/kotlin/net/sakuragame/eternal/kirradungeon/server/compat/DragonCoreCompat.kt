@@ -20,16 +20,9 @@ object DragonCoreCompat {
 
     lateinit var joinTitleHudYaml: YamlConfiguration
 
-    lateinit var failHud: ScreenUI
-
-    lateinit var failHudID: String
-
-    lateinit var failHudYaml: YamlConfiguration
-
     @Awake(LifeCycle.ENABLE)
     fun init() {
         buildJoinTitleHud()
-        buildFailHud()
     }
 
     private fun buildJoinTitleHud() {
@@ -64,19 +57,6 @@ object DragonCoreCompat {
                 it.scale = 4.0.toString()
             })
         joinTitleHudYaml = joinTitleHud.build(null)
-    }
-
-    private fun buildFailHud() {
-        failHudID = "fail_hud"
-        failHud = ScreenUI(failHudID).apply {
-            match = "hud"
-            addComponent(LabelComp("fail_hud_label", "&7&oM 键消耗复活币复活 &f&k!&r &7&oN 键退出副本回主城").also { label ->
-                label.setXY("(w-body.width * body.scale)/2", "(h-body.height * body.scale)/2 + 100")
-                label.setScale(2.0)
-                label.visible = "func.PlaceholderAPI_Get('player_is_failed') == true"
-            })
-        }
-        failHudYaml = failHud.build(null)
     }
 
     fun openFailHud(player: Player) {
