@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
+import ink.ptms.adyeshach.api.AdyeshachAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
@@ -64,12 +65,12 @@ object FunctionCommonListener {
         }
         val copyZoneData = Zone.getByID(dungeonWorld.worldIdentifier)!!.data.copy()
         val copyZone = Zone.getByID(dungeonWorld.worldIdentifier)!!.copy(data = copyZoneData)
-        // 将模型数据生成在世界里.
+        // 模型数据生成
         copyZone.data.models.forEach {
             val model = KirraModelAPI.models[it.model] ?: return@forEach
             KirraModelAPI.createTempModel(it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), model, it.id)
         }
-        // 将矿物数据生成在世界里.
+        // 矿物数据生成
         copyZone.data.ores.forEach {
             val ore = KirraMinerAPI.ores[it.ore] ?: return@forEach
             KirraMinerAPI.createTempOre(it.id, ore, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld))

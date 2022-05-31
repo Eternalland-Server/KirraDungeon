@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.function.wand
 
+import net.sakuragame.eternal.kirradungeon.server.getEditingZone
 import net.sakuragame.eternal.kirradungeon.server.toCenter
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.OreWriter

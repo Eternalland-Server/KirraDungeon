@@ -1,27 +1,25 @@
 package net.sakuragame.eternal.kirradungeon.server
 
 import com.dscalzi.skychanger.core.api.SkyPacket
+import ink.ptms.adyeshach.api.AdyeshachAPI
+import ink.ptms.adyeshach.common.util.Inputs.inputBook
 import net.sakuragame.dungeonsystem.common.configuration.DungeonProperties
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionModelWand
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionOreWand
+import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionTriggerWand
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone.Companion.editingDungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
-import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.MonsterWriter
-import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.SkyDataWriter
-import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.SpawnLocWriter
-import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.WaveDataWriter
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.getWaveIndex
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
+import org.bukkit.Effect
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.CommandBody
@@ -134,11 +132,7 @@ object Commands {
     @CommandBody
     val setSpawn = subCommand {
         execute<Player> { player, _, _ ->
-            if (editingDungeonWorld == null) {
-                player.sendMessage("&c您没有在编辑一个世界.".colored())
-                return@execute
-            }
-            val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
+            val zone = getEditingZone(player) ?: return@execute
             SpawnLocWriter.set(zone, ZoneLocation.parseToZoneLocation(player.location))
             player.sendMessage("&a设置成功!".colored())
         }
@@ -221,11 +215,7 @@ object Commands {
         dynamic(commit = "mobType") {
             dynamic(commit = "mobAmount") {
                 execute<Player> { player, context, argument ->
-                    if (editingDungeonWorld == null) {
-                        player.sendMessage("&c您没有在编辑一个世界.".colored())
-                        return@execute
-                    }
-                    val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
+                    val zone = getEditingZone(player) ?: return@execute
                     val mobType = context.argument(-1)
                     val amount = argument.toIntOrNull() ?: 1
                     val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
@@ -240,11 +230,7 @@ object Commands {
     val setBoss = subCommand {
         dynamic(commit = "mobType") {
             execute<Player> { player, _, argument ->
-                if (editingDungeonWorld == null) {
-                    player.sendMessage("&c您没有在编辑一个世界.".colored())
-                    return@execute
-                }
-                val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
+                val zone = getEditingZone(player) ?: return@execute
                 val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
                 MonsterWriter.setBoss(zone, zoneLoc, argument)
                 player.sendMessage("&a成功在 &f$zoneLoc &a设置怪物首领 = &f$argument".colored())
@@ -257,11 +243,7 @@ object Commands {
         dynamic(commit = "skyColorType") {
             dynamic(commit = "skyColorValue") {
                 execute<Player> { player, context, argument ->
-                    if (editingDungeonWorld == null) {
-                        player.sendMessage("&c您没有在编辑一个世界.".colored())
-                        return@execute
-                    }
-                    val zone = Zone.getByID(editingDungeonWorld!!.worldIdentifier)!!
+                    val zone = getEditingZone(player) ?: return@execute
                     val packetType = if (context.argument(-1).toBooleanStrictOrNull() == true) {
                         SkyPacket.RAIN_LEVEL_CHANGE
                     } else {
@@ -276,11 +258,74 @@ object Commands {
     }
 
     @CommandBody
-    val openDragonCoreUI = subCommand {
-        execute<Player> { player, _, _ ->
-            val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) ?: return@execute
-            DragonCoreCompat.updateDragonVars(player, dungeon.zone.name)
-            PacketSender.sendOpenHud(player, DragonCoreCompat.joinTitleHud.id)
+    val setTrigger = subCommand {
+        literal("wand") {
+            execute<Player> { player, _, _ ->
+                player.giveItem(FunctionTriggerWand.triggerWand)
+                player.sendMessage("&a已给予魔杖.".colored())
+                return@execute
+            }
+        }
+        literal("on") {
+            execute<Player> { player, _, _ ->
+                if (getEditingZone(player) == null) {
+                    return@execute
+                }
+                FunctionTriggerWand.editingBlockPlayers += player.uniqueId
+                player.sendMessage("&a已开启".colored())
+            }
+        }
+        literal("off") {
+            execute<Player> { player, _, _ ->
+                if (getEditingZone(player) == null) {
+                    return@execute
+                }
+                FunctionTriggerWand.editingBlockPlayers -= player.uniqueId
+                player.sendMessage("&a已关闭".colored())
+            }
+        }
+        literal("export") {
+            execute<Player> { player, _, _ ->
+                val zone = getEditingZone(player) ?: return@execute
+                TriggerWriter.setBlock(zone, FunctionTriggerWand.currentBlocks)
+                FunctionTriggerWand.currentBlocks.forEach {
+                    val loc = it.loc.toBukkitLocation(player.world)
+                    loc.world.playEffect(loc, Effect.MOBSPAWNER_FLAMES, 1)
+                }
+                FunctionTriggerWand.currentBlocks.clear()
+                player.sendMessage("&a已导出".colored())
+            }
+        }
+    }
+
+    @CommandBody
+    val hologram = subCommand {
+        literal("create") {
+            dynamic(commit = "id") {
+                execute<Player> { player, _, argument ->
+                    val zone = getEditingZone(player) ?: return@execute
+                    val loc = ZoneLocation.parseToZoneLocation(player.location)
+                    player.inputBook {
+                        HologramWriter.set(zone, argument, it, loc)
+                        val hologram = AdyeshachAPI.createHologram(player, player.location, it)
+                        HologramWriter.editingHolograms += argument to hologram
+                        player.sendMessage("&a完成.".colored())
+                    }
+                }
+            }
+        }
+        literal("delete") {
+            dynamic(commit = "id") {
+                execute<Player> { player, _, argument ->
+                    if (getEditingZone(player) == null) {
+                        return@execute
+                    }
+                    val hologram = HologramWriter.editingHolograms[argument] ?: return@execute
+                    hologram.delete()
+                    HologramWriter.editingHolograms.remove(argument)
+                    player.sendMessage("&a完成.".colored())
+                }
+            }
         }
     }
 

@@ -27,6 +27,8 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     override var init = false
 
+    override var monsterSpawned = false
+
     override var isClear = false
 
     override var fail = false

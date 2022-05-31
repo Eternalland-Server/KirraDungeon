@@ -21,6 +21,8 @@ class UnlimitedDungeon(override val zone: Zone, override val dungeonWorld: Dunge
 
     override var init = false
 
+    override var monsterSpawned = false
+
     override var isClear = false
 
     override var fail = false

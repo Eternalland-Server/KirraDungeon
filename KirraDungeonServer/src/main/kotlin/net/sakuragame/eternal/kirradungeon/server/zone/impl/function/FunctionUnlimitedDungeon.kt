@@ -59,8 +59,8 @@ object FunctionUnlimitedDungeon {
 
     @Suppress("SpellCheckingInspection")
     private fun doSuccToNextFloor(dungeon: UnlimitedDungeon) {
+        dungeon.floorPlus1()
         dungeon.getPlayers().forEach {
-            dungeon.floorPlus1()
             val currentFloor = dungeon.currentFloor
             it.sendLang("message-player-succ-to-next-floor", currentFloor)
             submit(async = false, delay = 100) {

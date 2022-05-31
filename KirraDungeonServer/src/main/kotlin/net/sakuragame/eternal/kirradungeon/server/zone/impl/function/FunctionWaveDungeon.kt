@@ -51,9 +51,9 @@ object FunctionWaveDungeon {
 
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
-        val waveDungeon = FunctionDungeon.getByMobUUID(e.entity.uniqueId) as? WaveDungeon ?: return
-        if (waveDungeon.bossUUID == e.entity.uniqueId) {
-            waveDungeon.updateBossBar()
+        val dungeon = FunctionDungeon.getByMobUUID(e.entity.uniqueId) as? WaveDungeon ?: return
+        if (dungeon.bossUUID == e.entity.uniqueId) {
+            dungeon.updateBossBar()
         }
     }
 

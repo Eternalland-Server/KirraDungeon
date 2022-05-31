@@ -28,14 +28,14 @@ object FunctionSpecialDungeon {
             if (!isDungeonFromSpecial(e.dungeonWorld.worldIdentifier)) {
                 return@submit
             }
-            val specialZone = FunctionDungeon.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
+            val dungeon = FunctionDungeon.getByDungeonWorldUUID(dungeonWorld.uuid) ?: kotlin.run {
                 kickPlayerByNotFoundData(player)
                 return@submit
             }
             profile.zoneType = ZoneType.SPECIAL
-            profile.zoneUUID = specialZone.uuid
-            specialZone.addPlayerUUID(player.uniqueId)
-            specialZone.handleJoin(player, spawnBoss = false, spawnMob = true)
+            profile.zoneUUID = dungeon.uuid
+            dungeon.addPlayerUUID(player.uniqueId)
+            dungeon.handleJoin(player, spawnBoss = false, spawnMob = true)
         }
     }
 

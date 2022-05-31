@@ -5,14 +5,16 @@ import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
+import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
 import org.bukkit.Bukkit
+import org.bukkit.entity.Monster
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.platform.util.broadcast
 
 object FunctionDefaultDungeon {
 
@@ -52,9 +54,35 @@ object FunctionDefaultDungeon {
 
     @SubscribeEvent
     fun e(e: EntityDamageEvent) {
-        val playerZone = FunctionDungeon.getByMobUUID(e.entity.uniqueId) as? DefaultDungeon ?: return
-        if (playerZone.bossUUID == e.entity.uniqueId) {
-            playerZone.updateBossBar()
+        val dungeon = FunctionDungeon.getByMobUUID(e.entity.uniqueId) as? DefaultDungeon ?: return
+        if (dungeon.bossUUID == e.entity.uniqueId) {
+            dungeon.updateBossBar()
+        }
+    }
+
+    @SubscribeEvent
+    fun e1(e: EntityDamageEvent) {
+        val entity = e.entity as? Monster ?: return
+        if (FunctionDungeon.getByMobUUID(entity.uniqueId) == null) {
+            return
+        }
+        if (e.cause == EntityDamageEvent.DamageCause.VOID) {
+            e.isCancelled = true
+            val str = entity.getMetadata("ORIGIN_LOC").getOrNull(0)?.asString() ?: return
+            val zoneLoc = ZoneLocation.parseToZoneLocation(str) ?: return
+            val bukkitLoc = zoneLoc.toBukkitLocation(entity.world)
+            entity.teleport(bukkitLoc)
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: PlayerInteractEvent) {
+        val player = e.player
+        val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) as? DefaultDungeon ?: return
+        val block = e.clickedBlock
+        val trigger = dungeon.trigger ?: return
+        if (block.location == trigger.triggerLoc.toBukkitLocation(block.world)) {
+            val future = dungeon.handleTrigger() ?: return
         }
     }
 

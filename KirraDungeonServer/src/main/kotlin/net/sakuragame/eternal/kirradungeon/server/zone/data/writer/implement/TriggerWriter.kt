@@ -5,6 +5,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneBlockData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
+import org.bukkit.Bukkit
 
 @Suppress("UNCHECKED_CAST")
 object TriggerWriter : WriteHelper {
@@ -15,15 +16,24 @@ object TriggerWriter : WriteHelper {
     }
 
     fun setBlock(zone: Zone, blocks: List<ZoneBlockData>) {
-        data["${zone.id}.triggers"] = (data.getList("${zone.id}.trigger.blocks") as? MutableList<List<ZoneBlockData>> ?: mutableListOf()).also {
-            it += blocks
-        }
+        val size = data.getConfigurationSection("${zone.id}.trigger.blocks")?.getKeys(false)?.size ?: 0
+        data["${zone.id}.trigger.blocks.${size + 1}"] = blocks.map { it.toString() }
         reload()
     }
 
     fun read(id: String): ZoneTriggerData {
-        val trigger = data.getString("$id.trigger.loc")?.let { ZoneLocation.parseToZoneLocation(it) }
-        val blocks = data.getList("$id.trigger.blocks") as? MutableList<List<ZoneBlockData>> ?: mutableListOf()
+        val trigger = data.getString("$id.trigger.loc")?.let { ZoneLocation.parseToZoneLocation(it) } ?: ZoneLocation.parseToZoneLocation(Bukkit.getWorld("world").spawnLocation)
+        val blocks = readBlocks(id)
         return ZoneTriggerData(trigger, blocks)
+    }
+
+    private fun readBlocks(id: String): MutableList<List<ZoneBlockData>> {
+        val toReturn = mutableListOf<List<ZoneBlockData>>()
+        val section = data.getConfigurationSection("$id.trigger.blocks")?.getKeys(false) ?: return toReturn
+        section.forEach { internalId ->
+            val blocks = data.getStringList("$id.trigger.blocks.$internalId").map { ZoneBlockData.parseFromString(it) ?: return@forEach }
+            toReturn += blocks
+        }
+        return toReturn
     }
 }

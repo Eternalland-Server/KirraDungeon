@@ -3,6 +3,7 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeAdvancement
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeDisplay
+import ink.ptms.adyeshach.api.AdyeshachAPI
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.dragoncore.network.PacketSender
@@ -18,6 +19,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
@@ -50,6 +52,11 @@ interface IDungeon {
      * 是否已经初始化
      */
     var init: Boolean
+
+    /**
+     * 是否已经生成怪物
+     */
+    var monsterSpawned: Boolean
 
     /**
      * 原副本信息
@@ -118,9 +125,9 @@ interface IDungeon {
     fun getPlayers() = playerUUIDList.mapNotNull { Bukkit.getPlayer(it) }
 
     /**
-     * 根据 UUID 获取单个玩家
+     * 获取第一个玩家
      */
-    fun getSinglePlayer() = Bukkit.getPlayer(playerUUIDList.first())!!
+    fun getFirst() = Bukkit.getPlayer(playerUUIDList.first())!!
 
     /**
      * 根据 UUID 获取当前所有副本怪物
@@ -182,11 +189,24 @@ interface IDungeon {
                 KirraDungeonServer.skyAPI.changeSky(skyChangerPlayer, packetType, value)
             }
         }
+        if (!monsterSpawned) {
+            monsterSpawned = true
+            spawnEntities(spawnBoss, spawnMob)
+            submit(async = false, delay = 20) {
+                updateBossBar(init = true)
+            }
+        }
         submit(delay = 40) {
             showJoinMessage(player, zone.name)
             onPlayerJoin()
+            // 展示成就
             FakeAdvancement(FakeDisplay(Material.BUCKET, "&7&o愿筒子护佑你, 年轻人.".colored(), "", FakeDisplay.AdvancementFrame.GOAL, null))
                 .displayToast(player)
+            // 展示全息
+            data.holograms.forEach {
+                AdyeshachAPI.createHologram(player, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), it.contents)
+            }
+            // 生成怪物
             DungeonJoinEvent(player, zone.id).call()
         }
     }
@@ -194,20 +214,31 @@ interface IDungeon {
     /**
      * 初始化操作
      */
-    fun init(spawnBoss: Boolean, spawnMob: Boolean) {
+    fun init() {
         init = true
-        spawnEntities(spawnBoss, spawnMob)
-        submit(async = true, delay = 20L) {
-            updateBossBar(init = true)
-        }
     }
 
     /**
      * 执行触发器方法 (覆盖方块)
      */
-    fun handleTrigger() {
-        val currentTrigger = trigger ?: return
-        if (currentTrigger.blocks.isEmpty()) return
+    fun handleTrigger(): Long? {
+        val currentTrigger = trigger ?: return null
+        if (currentTrigger.blocks.isEmpty()) return null
+        val blocks = currentTrigger.blocks
+        var delay = 0L
+        blocks.forEach {
+            if (canDel()) {
+                return null
+            }
+            submit(async = false, delay = delay) {
+                it.forEach {
+                    val block = it.loc.toBukkitLocation(dungeonWorld.bukkitWorld).block
+                    block.type = it.material
+                }
+            }
+            delay += 10
+        }
+        return delay + 1
     }
 
     /**
@@ -220,17 +251,18 @@ interface IDungeon {
         if (spawnEntity) {
             mobData.forEach { monster ->
                 // 将 ZoneLocation 转换为 BukkitLocation.
-                val bukkitLoc = monster.loc.toBukkitLocation(dungeonWorld.bukkitWorld).add(0.0, 1.0, 0.0)
+                val loc = monster.loc.toBukkitLocation(dungeonWorld.bukkitWorld).add(0.0, 1.0, 0.0)
                 // 调用 MythicmobsAPI, 将怪物生成到世界坐标.
                 repeat(monster.amount) {
-                    val randomLoc = bukkitLoc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
-                    val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(monster.type, randomLoc) as? LivingEntity ?: return@repeat
+                    val randomLoc = loc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
+                    val entity = spawnDungeonMob(randomLoc, monster.type) ?: return@repeat
                     monsterUUIDList.add(entity.uniqueId)
                 }
             }
         }
         if (spawnBoss) {
-            val bossEntity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(bossData.type, bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld), bossLevel) as LivingEntity
+            val loc = bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld)
+            val bossEntity = spawnDungeonMob(loc, bossData.type, bossLevel) ?: return
             bossUUID = bossEntity.uniqueId
         }
     }
@@ -301,7 +333,7 @@ interface IDungeon {
      * 更新 BOSS 血条为所有队伍玩家
      */
     fun updateBossBar(init: Boolean = false) {
-        submit(delay = 3L) {
+        submit(async = false, delay = 3L) {
             val entity = getBoss()
             getPlayers().forEach {
                 if (entity == null) {
@@ -314,7 +346,7 @@ interface IDungeon {
                 if (init) {
                     BossBar.open(it, entity.name, "", zone.data.iconNumber.toString(), percent, lastTime)
                 }
-                BossBar.setHealth(it, "&c&l${entity.health.roundToInt()} / ${getMobMaxHealth(entity)}".colored(), percent)
+                BossBar.setHealth(it, "&c&l${entity.health.roundToInt()} / ${getMobMaxHealth(entity).roundToInt()}".colored(), percent)
             }
         }
     }
@@ -333,12 +365,17 @@ interface IDungeon {
                 return@submit
             }
             failTime--
-            getPlayers().forEach {
+            val players = getPlayers()
+            players.forEach {
                 val profile = it.profile()
                 if (profile.isQuitting) {
                     return@forEach
                 }
-                it.sendTitle("&4&l全员死亡".colored(), "&7将会在 $failTime &7秒后自动退出.".colored(), 0, 40, 0)
+                if (players.find { player -> player.gameMode != GameMode.SPECTATOR } == null) {
+                    it.sendTitle("".colored(), "M 键消耗复活币复活 &f&k!&r &7&oN 键退出副本回主城".colored(), 0, 40, 0)
+                } else {
+                    it.sendTitle("&7将在 $failTime 秒自动退出".colored(), "M 键消耗复活币复活 &f&k!&r &7&oN 键退出副本回主城.".colored(), 0, 40, 0)
+                }
             }
             if (failTime <= 0) {
                 fail(ALL_DIED)

@@ -27,6 +27,8 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override var init = false
 
+    override var monsterSpawned = false
+
     override var isClear = false
 
     override var fail = false
@@ -38,7 +40,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     override val monsterUUIDList = mutableListOf<UUID>()
 
     override val trigger: ZoneTriggerData?
-        get() = if (zone.data.trigger.triggerLoc == null) {
+        get() = if (zone.data.trigger.blocks.isEmpty()) {
             null
         } else {
             zone.data.trigger.copy()
@@ -52,7 +54,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override fun onPlayerJoin() {
         // 移除未经过 MythicMobDeathEvent 死亡的实体
-        submit(async = true, delay = 0L, period = 20L) {
+        submit(async = true, delay = 100L, period = 20L) {
             if (canDel() || isClear || fail) {
                 cancel()
                 return@submit
@@ -64,7 +66,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
                 return@submit
             }
         }
-        init(spawnBoss = true, spawnMob = true)
+        init()
         startCountdown()
         showResurgenceTitle()
     }

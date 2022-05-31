@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
+import com.google.gson.Gson
 import io.lumine.xikage.mythicmobs.MythicMobs
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import taboolib.common.platform.Plugin
@@ -24,6 +25,10 @@ object KirraDungeonServer : Plugin() {
 
     val plugin by lazy {
         BukkitPlugin.getInstance()
+    }
+
+    val gson by lazy {
+        Gson()
     }
 
     val mythicmobsAPI by lazy {

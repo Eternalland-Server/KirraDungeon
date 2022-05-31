@@ -71,7 +71,7 @@ object Commands {
         }
     }
 
-    @CommandBody(permission = "admin")
+    @CommandBody
     val reload = subCommand {
         execute<CommandSender> { sender, _, _ ->
             Zone.load()

@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.function.wand
 
 import ink.ptms.adyeshach.api.event.AdyeshachEntityInteractEvent
+import net.sakuragame.eternal.kirradungeon.server.getEditingZone
 import net.sakuragame.eternal.kirradungeon.server.toCenter
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.ModelWriter

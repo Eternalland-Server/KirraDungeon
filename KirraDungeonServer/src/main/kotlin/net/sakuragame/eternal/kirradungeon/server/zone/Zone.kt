@@ -50,6 +50,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         models = ModelWriter.read(id),
                         ores = OreWriter.read(id),
                         trigger = TriggerWriter.read(id),
+                        holograms = HologramWriter.read(id),
                         waveData = WaveDataWriter.readData(id),
                         waveSpawnLocs = WaveDataWriter.readLoc(id)
                     )

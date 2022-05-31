@@ -3,6 +3,10 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
+import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
+import org.bukkit.Location
+import org.bukkit.entity.LivingEntity
+import org.bukkit.metadata.FixedMetadataValue
 import taboolib.common.platform.function.submit
 import taboolib.platform.util.asLangText
 
@@ -54,4 +58,11 @@ fun getWaveIndex(id: String): Int? {
     return section.getKeys(false)
         .map { it.toInt() }
         .maxOf { it } + 1
+}
+
+fun spawnDungeonMob(loc: Location, type: String, level: Int = 1): LivingEntity? {
+    val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(type, loc, level) as? LivingEntity ?: return null
+    val zoneLoc = ZoneLocation.parseToZoneLocation(loc).toString()
+    entity.setMetadata("ORIGIN_LOC", FixedMetadataValue(KirraDungeonServer.plugin, zoneLoc))
+    return entity
 }
