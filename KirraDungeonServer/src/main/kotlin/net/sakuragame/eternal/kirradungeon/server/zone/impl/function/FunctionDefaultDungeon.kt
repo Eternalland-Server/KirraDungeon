@@ -45,7 +45,7 @@ object FunctionDefaultDungeon {
         val entity = e.entity
         val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? DefaultDungeon ?: return
         dungeon.removeMonsterUUID(entity.uniqueId)
-        if (dungeon.getMonsters(containsBoss = false).isEmpty()) {
+        if (dungeon.getMonsters(containsBoss = true).isEmpty()) {
             dungeon.doSpawn()
         }
     }
@@ -64,10 +64,11 @@ object FunctionDefaultDungeon {
         val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) as? DefaultDungeon ?: return
         val block = e.clickedBlock ?: return
         val trigger = dungeon.triggerData ?: return
-        if (block.type == Material.AIR || dungeon.triggered) {
+        if (block.type == Material.AIR || dungeon.triggered || dungeon.triggering) {
             return
         }
         if (block.location == trigger.triggerLoc.toBukkitLocation(block.world)) {
+            dungeon.triggering = true
             player.playSound(player.location, Sound.BLOCK_PISTON_CONTRACT, 1f, 1.5f)
             submit(delay = 5L) {
                 player.playSound(player.location, Sound.BLOCK_PISTON_EXTEND, 1f, 1.5f)

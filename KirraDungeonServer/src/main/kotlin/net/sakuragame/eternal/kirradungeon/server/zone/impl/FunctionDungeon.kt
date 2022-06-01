@@ -8,6 +8,8 @@ object FunctionDungeon {
 
     fun getByDungeonWorldUUID(uuid: UUID) = dungeons.find { it.dungeonWorld.uuid == uuid }
 
+    fun getByBukkitWorldUUID(uuid: UUID) = dungeons.find { it.dungeonWorld.bukkitWorld.uid == uuid }
+
     fun getByPlayer(playerUUID: UUID): IDungeon? {
         dungeons.forEach { dungeon ->
             if (dungeon.playerUUIDList.find { it == playerUUID } != null) {

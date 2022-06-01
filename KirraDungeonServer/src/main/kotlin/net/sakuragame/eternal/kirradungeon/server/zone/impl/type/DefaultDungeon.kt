@@ -3,10 +3,12 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeAdvancement
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeDisplay
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
+import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
+import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneMobData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -15,6 +17,8 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored
+import taboolib.platform.util.asLangText
+import taboolib.platform.util.sendLang
 import java.util.*
 import kotlin.random.Random
 
@@ -56,11 +60,15 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override var failThread: PlatformExecutor.PlatformTask? = null
 
-    private val monsterData = zone.data.monsterData.copy()
+    private val mobs = mutableListOf<ZoneMobData>().apply {
+        addAll(zone.data.monsterData.mobList)
+    }
 
     private var bossSpawned = false
 
     var triggered = false
+
+    var triggering = false
 
     override fun init() {
         // 移除未经过 MythicMobDeathEvent 死亡的实体
@@ -117,11 +125,18 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     fun doSpawn() {
-        val mobData = monsterData.mobList.removeFirstOrNull()
+        val mobData = mobs.removeFirstOrNull()
         if (mobData == null) {
-            val bossData = monsterData.boss
+            if (bossSpawned) {
+                return
+            }
+            val bossData = zone.data.monsterData.boss
             val loc = bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld)
             val entity = spawnDungeonMob(loc, bossData.type) ?: return
+            loc.world.strikeLightningEffect(loc)
+            getPlayers().forEach {
+                MessageAPI.sendActionTip(it, it.asLangText("message-default-dungeon-boss-spawned"))
+            }
             bossUUID = entity.uniqueId
             bossSpawned = true
             entity.isGlowing = true
@@ -132,6 +147,10 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
             return
         }
         val loc = mobData.loc.toBukkitLocation(dungeonWorld.bukkitWorld).add(0.0, 1.5, 0.0)
+        loc.world.strikeLightningEffect(loc)
+        getPlayers().forEach {
+            MessageAPI.sendActionTip(it, it.asLangText("message-default-dungeon-mob-spawned"))
+        }
         repeat(mobData.amount) {
             val randomLoc = loc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
             val entity = spawnDungeonMob(randomLoc, mobData.type) ?: return@repeat

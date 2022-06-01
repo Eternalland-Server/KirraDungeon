@@ -24,6 +24,7 @@ taboolib {
             name("UIFactory")
             name("Adyeshach")
             name("KirraMiner")
+            name("Skript")
         }
         contributors {
             name("闲蛋")
@@ -59,6 +60,8 @@ repositories {
 }
 
 dependencies {
+    compileOnly("net.sakuragame.eternal:Waypoints:1.0.0-SNAPSHOT@jar")
+    compileOnly("com.github.SkriptLang:Skript:2.6.1")
     compileOnly("public:MythicMobs:4.12.0@jar")
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DataManager-Bukkit-API:1.3.2-SNAPSHOT@jar")
