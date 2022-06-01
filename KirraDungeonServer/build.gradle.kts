@@ -25,6 +25,7 @@ taboolib {
             name("Adyeshach")
             name("KirraMiner")
             name("Skript")
+            name("Waypoints")
         }
         contributors {
             name("闲蛋")

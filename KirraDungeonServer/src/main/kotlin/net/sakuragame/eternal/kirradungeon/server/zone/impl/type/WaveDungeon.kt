@@ -64,7 +64,6 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
 
     private var currentWave: ZoneWaveData? = null
 
-
     override fun init() {
         submit(delay = 80) {
             waveStart()

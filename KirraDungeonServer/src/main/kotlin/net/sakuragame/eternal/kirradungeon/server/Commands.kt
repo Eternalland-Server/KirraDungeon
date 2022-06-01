@@ -178,7 +178,7 @@ object Commands {
                 player.sendMessage("&7无法进行该操作, 副本丢失.".colored())
                 return@execute
             }
-            KirraMinerAPI.removeOresOfWorld(editingDungeonWorld.bukkitWorld)
+            KirraMinerAPI.removeAllOresInWorld(editingDungeonWorld.bukkitWorld)
             DungeonServerAPI.getWorldManager().saveDungeon(editingDungeonWorld)
             player.teleport(Bukkit.getWorld("world").spawnLocation)
             DungeonServerAPI.getWorldManager().unloadDungeon(editingDungeonWorld, true)

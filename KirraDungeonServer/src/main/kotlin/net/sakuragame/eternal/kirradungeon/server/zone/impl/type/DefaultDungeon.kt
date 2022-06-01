@@ -10,7 +10,9 @@ import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneMobData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.*
+import net.sakuragame.eternal.waypoints.api.WaypointsAPI
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -18,7 +20,6 @@ import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored
 import taboolib.platform.util.asLangText
-import taboolib.platform.util.sendLang
 import java.util.*
 import kotlin.random.Random
 
@@ -133,29 +134,39 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
             val bossData = zone.data.monsterData.boss
             val loc = bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld)
             val entity = spawnDungeonMob(loc, bossData.type) ?: return
-            loc.world.strikeLightningEffect(loc)
-            getPlayers().forEach {
-                MessageAPI.sendActionTip(it, it.asLangText("message-default-dungeon-boss-spawned"))
-            }
+            doBossNotice(loc)
             bossUUID = entity.uniqueId
             bossSpawned = true
-            entity.isGlowing = true
-            submit(async = true, delay = 20L) {
-                getPlayers().forEach { BossBar.close(it) }
-                updateBossBar(init = true)
-            }
             return
         }
         val loc = mobData.loc.toBukkitLocation(dungeonWorld.bukkitWorld).add(0.0, 1.5, 0.0)
-        loc.world.strikeLightningEffect(loc)
-        getPlayers().forEach {
-            MessageAPI.sendActionTip(it, it.asLangText("message-default-dungeon-mob-spawned"))
-        }
+        doMobNotice(loc)
         repeat(mobData.amount) {
             val randomLoc = loc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
             val entity = spawnDungeonMob(randomLoc, mobData.type) ?: return@repeat
-            entity.isGlowing = true
             monsterUUIDList.add(entity.uniqueId)
+        }
+    }
+
+    private fun doMobNotice(loc: Location) {
+        loc.world.strikeLightningEffect(loc)
+        getPlayers().forEach {
+            WaypointsAPI.navPointer(it, "dungeon", loc, 1.0, listOf("怪物点位"))
+            val text = it.asLangText("message-default-dungeon-mob-spawned")
+            MessageAPI.sendActionTip(it, text)
+        }
+    }
+
+    private fun doBossNotice(loc: Location) {
+        loc.world.strikeLightningEffect(loc)
+        getPlayers().forEach {
+            WaypointsAPI.navPointer(it, "dungeon", loc, 1.0, listOf("怪物首领点位"))
+            val text = it.asLangText("message-default-dungeon-boss-spawned")
+            MessageAPI.sendActionTip(it, text)
+        }
+        submit(async = true, delay = 20L) {
+            getPlayers().forEach { BossBar.close(it) }
+            updateBossBar(init = true)
         }
     }
 

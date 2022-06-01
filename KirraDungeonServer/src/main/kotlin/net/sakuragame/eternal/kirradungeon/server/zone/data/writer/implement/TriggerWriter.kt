@@ -30,8 +30,8 @@ object TriggerWriter : WriteHelper {
     private fun readBlocks(id: String): MutableList<List<ZoneBlockData>> {
         val toReturn = mutableListOf<List<ZoneBlockData>>()
         val section = data.getConfigurationSection("$id.trigger.blocks")?.getKeys(false) ?: return toReturn
-        section.forEach { internalId ->
-            val blocks = data.getStringList("$id.trigger.blocks.$internalId").map { ZoneBlockData.parseFromString(it) ?: return@forEach }
+        section.map { it.toInt() }.sorted().forEach { num ->
+            val blocks = data.getStringList("$id.trigger.blocks.$num").map { ZoneBlockData.parseFromString(it) ?: return@forEach }
             toReturn += blocks
         }
         return toReturn
