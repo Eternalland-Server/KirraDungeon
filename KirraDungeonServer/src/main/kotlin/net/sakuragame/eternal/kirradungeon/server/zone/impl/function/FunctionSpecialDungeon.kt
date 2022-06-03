@@ -32,9 +32,15 @@ object FunctionSpecialDungeon {
                 kickPlayerByNotFoundData(player)
                 return@submit
             }
+            if (player.hasPermission("admin")) {
+                player.sendMessage("reached 1")
+            }
             profile.zoneType = ZoneType.SPECIAL
             profile.zoneUUID = dungeon.uuid
             dungeon.addPlayerUUID(player.uniqueId)
+            if (player.hasPermission("admin")) {
+                player.sendMessage("reached 2")
+            }
             dungeon.handleJoin(player, spawnBoss = false, spawnMob = true)
         }
     }

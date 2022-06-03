@@ -60,7 +60,7 @@ fun getWaveIndex(id: String): Int? {
 }
 
 fun spawnDungeonMob(loc: Location, type: String, level: Int = 1): LivingEntity? {
-    val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(type, loc, level) as? LivingEntity ?: return null
+    val entity = KirraDungeonServer.mythicmobsAPI.spawnMythicMob(type, loc, level) as LivingEntity
     val zoneLoc = ZoneLocation.parseToZoneLocation(loc).toString()
     entity.setMetadata("ORIGIN_LOC", FixedMetadataValue(KirraDungeonServer.plugin, zoneLoc))
     return entity

@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
+import com.taylorswiftcn.justwei.util.UnitConvert
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
@@ -16,6 +17,7 @@ import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import org.bukkit.Bukkit
 import org.bukkit.Effect
 import org.bukkit.GameMode
@@ -188,11 +190,19 @@ interface IDungeon {
             }
         }
         if (!init) {
+            if (player.hasPermission("admin") && this is SpecialDungeon) {
+                player.sendMessage("reached 3")
+            }
             init = true
             init()
-            spawnEntities(spawnBoss, spawnMob)
+            if (player.hasPermission("admin") && this is SpecialDungeon) {
+                player.sendMessage("reached 4")
+            }
+            submit(async = false, delay = 20) {
+                spawnEntities(spawnBoss, spawnMob)
+            }
             if (showTimeBar) {
-                submit(async = false, delay = 20) {
+                submit(async = false, delay = 40) {
                     updateBossBar(init = true)
                 }
             }
@@ -340,7 +350,9 @@ interface IDungeon {
                 if (init) {
                     BossBar.open(it, entity.name, "", zone.data.iconNumber.toString(), percent, lastTime)
                 }
-                BossBar.setHealth(it, "&c&l${entity.health.roundToInt()} / ${getMobMaxHealth(entity).roundToInt()}".colored(), percent)
+                val currentHealth = UnitConvert.formatCN(UnitConvert.TenThousand, entity.health)
+                val maxHealth = UnitConvert.formatCN(UnitConvert.TenThousand, getMobMaxHealth(entity))
+                BossBar.setHealth(it, "&c&l$currentHealth / $maxHealth".colored(), percent)
             }
         }
     }

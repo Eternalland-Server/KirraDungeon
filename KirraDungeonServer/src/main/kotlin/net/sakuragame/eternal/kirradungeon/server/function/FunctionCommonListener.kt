@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
+import ink.ptms.zaphkiel.ZaphkielAPI
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
@@ -25,6 +26,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
@@ -54,6 +56,15 @@ object FunctionCommonListener {
         }
         world.loadedChunks.forEach {
             it.unload(false)
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: ItemSpawnEvent) {
+        val item = e.entity.itemStack
+        val itemStream = ZaphkielAPI.read(item)
+        if (itemStream.isVanilla()) {
+            e.entity.remove()
         }
     }
 

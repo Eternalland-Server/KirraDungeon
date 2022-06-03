@@ -14,7 +14,6 @@ object FunctionListener {
 
     const val AUTO_CLOSE_NOTIFY_BOX_KEY = "AUTO_CLOSE_BOX"
 
-
     @SubscribeEvent
     fun e(e: ZoneUpdateEvent) {
         submit(async = true) {

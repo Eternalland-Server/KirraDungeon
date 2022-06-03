@@ -1,8 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.client.zone.util
 
-import net.sakuragame.dungeonsystem.client.api.DungeonClientAPI
 import net.sakuragame.eternal.gemseconomy.currency.EternalCurrency
-import net.sakuragame.eternal.kirradungeon.client.getTodayTimeUnix
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition
 import org.bukkit.entity.Player
@@ -24,14 +22,16 @@ fun getDefaultZoneConditions(zone: Zone): ZoneCondition {
 
 fun Player.getFeeMaxJoinCounts(zone: Zone): Int {
     if (isOp) return -1
-    return getNonDefaultZoneCondition(this, zone).dailyCounts
+    return 999
+//    return getNonDefaultZoneCondition(this, zone).dailyCounts
 }
 
 fun Player.getFeeJoinCounts(zone: Zone): Int {
-    val maxJoinCounts = getFeeMaxJoinCounts(zone)
-    if (maxJoinCounts == -1) return -1
-    val userLogs = DungeonClientAPI.getLogManager().getUserLogs(uniqueId, zone.name, false, getTodayTimeUnix(), -1).size
-    return maxJoinCounts - userLogs
+//    val maxJoinCounts = getFeeMaxJoinCounts(zone)
+//    if (maxJoinCounts == -1) return -1
+//    val userLogs = DungeonClientAPI.getLogManager().getUserLogs(uniqueId, zone.name, false, getTodayTimeUnix(), -1).size
+//    return maxJoinCounts - userLogs
+    return 999
 }
 
 fun Player.getZoneFee(zone: Zone): MutableMap<EternalCurrency, Double> {
