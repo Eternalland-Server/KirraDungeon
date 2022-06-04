@@ -56,8 +56,9 @@ object DragonCoreCompat {
         joinTitleHudYaml = joinTitleHud.build(null)
     }
 
-    fun updateDragonVars(player: Player, dungeonName: String) =
+    fun updateDragonVars(player: Player, dungeonName: String) {
         PacketSender.sendSyncPlaceholder(player, mutableMapOf<String, String>().also {
             it["kzone_dungeon_title"] = dungeonName
         })
+    }
 }
