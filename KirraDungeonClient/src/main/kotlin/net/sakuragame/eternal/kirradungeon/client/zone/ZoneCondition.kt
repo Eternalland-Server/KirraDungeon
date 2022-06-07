@@ -112,6 +112,5 @@ data class ZoneCondition(
             }
             ZoneWithDraw.recycleVars(player)
         }
-
     }
 }

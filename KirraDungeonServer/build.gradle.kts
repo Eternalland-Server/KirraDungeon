@@ -15,7 +15,7 @@ taboolib {
         dependencies {
             name("MythicMobs")
             name("MythicMobsExtension")
-            name("DataManager")
+            name("DataManager-Bukkit")
             name("KirraDungeonCommon")
             name("KirraCoreBukkit")
             name("DungeonServer")
@@ -65,14 +65,16 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.6.1")
     compileOnly("public:MythicMobs:4.12.0@jar")
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")
-    compileOnly("net.sakuragame:DataManager-Bukkit-API:1.3.2-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.2.4-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
-    compileOnly("biz.paluch.redis:lettuce:4.1.1.Final@jar")
     compileOnly("org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT")
+    @Suppress("VulnerableLibrariesLocal")
+    compileOnly("net.sakuragame:datamanager-bukkit-api:2.0.0-SNAPSHOT") {
+        isTransitive = true
+    }
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
 }

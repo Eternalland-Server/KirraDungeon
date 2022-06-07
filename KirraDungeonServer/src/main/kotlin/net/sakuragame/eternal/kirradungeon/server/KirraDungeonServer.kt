@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
+import com.lambdaworks.redis.api.sync.RedisCommands
 import io.lumine.xikage.mythicmobs.MythicMobs
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import taboolib.common.platform.Plugin
@@ -9,7 +10,6 @@ import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 import taboolib.module.configuration.createLocal
 import taboolib.platform.BukkitPlugin
-import java.util.concurrent.TimeUnit
 
 @Suppress("SpellCheckingInspection")
 object KirraDungeonServer : Plugin() {
@@ -30,14 +30,12 @@ object KirraDungeonServer : Plugin() {
         MythicMobs.inst().apiHelper!!
     }
 
-    private val redisManager by lazy {
-        ClientManagerAPI.clientPlugin.redisManager
+    val redisManager by lazy {
+        ClientManagerAPI.clientPlugin.redisManager!!
     }
 
     val redisConn by lazy {
-        redisManager.standaloneConn.apply {
-            setTimeout(200, TimeUnit.MILLISECONDS)
-        }!!
+        redisManager.pooledConn!!
     }
 
     val skyAPI by lazy {

@@ -14,13 +14,13 @@ taboolib {
     description {
         dependencies {
             name("MythicMobs")
-            name("DataManager")
             name("KirraCoreBukkit")
             name("DungeonServer")
             name("DragonCore")
             name("JustAttribute")
             name("UIFactory")
             name("JustMessage")
+            name("datamanager-bukkit-parent")
         }
         contributors {
             name("闲蛋")

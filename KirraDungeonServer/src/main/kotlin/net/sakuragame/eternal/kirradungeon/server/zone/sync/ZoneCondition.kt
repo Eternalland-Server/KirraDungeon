@@ -40,11 +40,12 @@ data class ZoneCondition(
             submit(async = true, delay = 2L) {
                 debug(conditionMap)
                 conditionMap.forEach { (id, zoneConditionList) ->
-                    KirraDungeonServer.redisConn.sync().lpush("KirraDungeonNames", id)
+                    KirraDungeonServer.redisConn.lpush("KirraDungeonNames", id)
                     zoneConditionList.forEach { zoneCondition ->
-                        KirraDungeonServer.redisConn.sync().lpush("KirraDungeonConditions:$id", Gson().toJson(zoneCondition))
+                        KirraDungeonServer.redisConn.lpush("KirraDungeonConditions:$id", Gson().toJson(zoneCondition))
                     }
                 }
+                KirraDungeonServer.redisManager.publish("KirraDungeon", "main", "update-condition")
             }
         }
 
@@ -56,9 +57,9 @@ data class ZoneCondition(
         }
 
         fun doRedisRecycle() {
-            KirraDungeonServer.redisConn.async().del("KirraDungeonNames")
+            KirraDungeonServer.redisConn.del("KirraDungeonNames")
             conditionMap.keys.forEach {
-                KirraDungeonServer.redisConn.async().del("KirraDungeonConditions:$it")
+                KirraDungeonServer.redisConn.del("KirraDungeonConditions:$it")
             }
         }
     }

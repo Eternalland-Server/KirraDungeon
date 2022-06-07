@@ -34,10 +34,13 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
          */
         @Awake(LifeCycle.ENABLE)
         fun load() {
+            val zoneNames = KirraDungeonClient.redisConn.lrange("KirraDungeonNames", 0, -1)
+            if (zoneNames.isEmpty()) {
+                return
+            }
             clearAll()
-            val zoneNames = KirraDungeonClient.redisConn.sync().lrange("KirraDungeonNames", 0, -1)
             zoneNames.forEach { name ->
-                zones += Zone(name, KirraDungeonClient.redisConn.sync().lrange("KirraDungeonConditions:$name", 0, -1)
+                zones += Zone(name, KirraDungeonClient.redisConn.lrange("KirraDungeonConditions:$name", 0, -1)
                     .map { ZoneCondition.stringToZoneCondition(it) })
             }
         }
