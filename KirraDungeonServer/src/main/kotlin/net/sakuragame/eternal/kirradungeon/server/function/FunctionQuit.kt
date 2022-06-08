@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
+import com.taylorswiftcn.megumi.uifactory.event.comp.UIFCompSubmitEvent
 import net.sakuragame.eternal.dragoncore.api.CoreAPI
 import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
 import net.sakuragame.eternal.justmessage.api.common.NotifyBox
@@ -16,43 +17,24 @@ import taboolib.module.chat.colored
 
 object FunctionQuit {
 
-    private const val QUIT_BOX_KEY = "QUIT_BOX"
-
-    private const val TRIGGER_KEY = "N"
-
-    @Awake(LifeCycle.ENABLE)
-    fun e() {
-        CoreAPI.registerKey(TRIGGER_KEY)
-    }
-
     @SubscribeEvent
-    fun e(e: KeyPressEvent) {
-        val player = e.player
-        if (!KirraDungeonServerAPI.baffle.hasNext(player.name)) {
-            return
-        }
-        KirraDungeonServerAPI.baffle.next(player.name)
-        if (e.key != TRIGGER_KEY) {
-            return
-        }
-        NotifyBox(QUIT_BOX_KEY, "&6&l副本".colored(), listOf("是否退出副本?")).open(e.player, false)
-    }
-
-    @SubscribeEvent
-    fun e(e: NotifyBoxConfirmEvent) {
-        if (e.key != QUIT_BOX_KEY) {
-            return
-        }
+    fun e(e: UIFCompSubmitEvent) {
         val player = e.player
         val profile = player.profile() ?: return
-        player.closeInventory()
-        player.turnToSpectator()
-        DragonCoreCompat.closeFailHud(player)
-        if (!profile.isChallenging) {
-            return
+        if (e.params.getParam(0) == "dungeon_esc") {
+            if (!KirraDungeonServerAPI.baffle.hasNext(player.name)) {
+                return
+            }
+            KirraDungeonServerAPI.baffle.next(player.name)
+            player.closeInventory()
+            player.turnToSpectator()
+            DragonCoreCompat.closeFailHud(player)
+            if (!profile.isChallenging) {
+                return
+            }
+            KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在将您传送回大厅. &f@", false)
+            KirraCoreBukkitAPI.teleportToSpawnServer(player)
+            profile.isQuitting = true
         }
-        KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在将您传送回大厅. &f@", false)
-        KirraCoreBukkitAPI.teleportToSpawnServer(player)
-        profile.isQuitting = true
     }
 }

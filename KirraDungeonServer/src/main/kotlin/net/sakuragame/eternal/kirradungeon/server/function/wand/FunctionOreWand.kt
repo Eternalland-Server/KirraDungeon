@@ -88,11 +88,11 @@ object FunctionOreWand : IWand {
                 val spawnLoc = loc.add(0.0, 1.0, 0.0).toCenter(0.5)
                 player.closeInventory()
                 player.inputSign(arrayOf("", "", "请在第一行输入内容")) { arr ->
-                    val id = "${element.id}_${arr[0]}"
-                    if (id.isEmpty()) {
+                    if (arr[0].isEmpty()) {
                         player.sendMessage("&c错误的内容".colored())
                         return@inputSign
                     }
+                    val id = "${element.id}_${arr[0]}"
                     if (zone.data.ores.find { it.id == id } != null) {
                         player.sendMessage("&c内容与现存矿物冲突".colored())
                         return@inputSign
