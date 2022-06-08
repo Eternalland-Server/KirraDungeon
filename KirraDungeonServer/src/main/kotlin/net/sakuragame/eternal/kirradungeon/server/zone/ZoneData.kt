@@ -35,6 +35,7 @@ data class ZoneData(
     val ores: List<ZoneOreData>,
     val trigger: ZoneTriggerData,
     val holograms: List<ZoneHologramData>,
+    val metadataMap: MutableMap<String, String>,
     val waveData: List<ZoneWaveData>? = null,
     val waveSpawnLocs: List<ZoneLocation>? = null,
 ) {

@@ -1,6 +1,5 @@
 package net.sakuragame.eternal.kirradungeon.server.zone
 
-import ink.ptms.adyeshach.api.AdyeshachAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.*
@@ -51,6 +50,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         ores = OreWriter.read(id),
                         trigger = TriggerWriter.read(id),
                         holograms = HologramWriter.read(id),
+                        metadataMap = MetadataWriter.read(id),
                         waveData = WaveDataWriter.readData(id),
                         waveSpawnLocs = WaveDataWriter.readLoc(id)
                     )

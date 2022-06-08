@@ -402,6 +402,17 @@ object Commands {
         }
     }
 
+    @CommandBody
+    val setMetadata = subCommand {
+        dynamic(commit = "key") {
+            dynamic(commit = "value") {
+                execute<Player> { player, context, _ ->
+                    
+                }
+            }
+        }
+    }
+
     private fun getZone(player: Player, zoneId: String): Zone? {
         val zone = Zone.getByID(zoneId)
         if (zone == null) {

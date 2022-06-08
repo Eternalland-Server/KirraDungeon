@@ -61,7 +61,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.sakuragame.eternal:Waypoints:1.0.0-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:Waypoints:1.1.0-SNAPSHOT@jar")
     compileOnly("com.github.SkriptLang:Skript:2.6.1")
     compileOnly("public:MythicMobs:4.12.0@jar")
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")

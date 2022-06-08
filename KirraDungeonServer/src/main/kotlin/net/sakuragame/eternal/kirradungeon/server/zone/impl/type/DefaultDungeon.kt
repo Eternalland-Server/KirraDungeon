@@ -11,6 +11,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneMobData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.*
 import net.sakuragame.eternal.waypoints.api.WaypointsAPI
+import net.sakuragame.eternal.waypoints.core.IconType
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -64,6 +65,9 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     private val mobs = mutableListOf<ZoneMobData>().apply {
         addAll(zone.data.monsterData.mobList)
     }
+
+    private val naturalSpawnBoss: Boolean
+        get() = true
 
     private var bossSpawned = false
 
@@ -151,7 +155,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     private fun doMobNotice(loc: Location) {
         loc.world.strikeLightningEffect(loc)
         getPlayers().forEach {
-            WaypointsAPI.navPointer(it, "dungeon", loc, 1.0, listOf("怪物点位"))
+            WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "击杀所有怪物来解锁下个点位!"))
             val text = it.asLangText("message-default-dungeon-mob-spawned")
             MessageAPI.sendActionTip(it, text)
         }
@@ -160,7 +164,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     private fun doBossNotice(loc: Location) {
         loc.world.strikeLightningEffect(loc)
         getPlayers().forEach {
-            WaypointsAPI.navPointer(it, "dungeon", loc, 1.0, listOf("怪物首领点位"))
+            WaypointsAPI.navPointer(it, "dungeon", IconType.Boss, loc, 1.0, listOf("怪物首领点位", "全力击败它, 通关副本!"))
             val text = it.asLangText("message-default-dungeon-boss-spawned")
             MessageAPI.sendActionTip(it, text)
         }

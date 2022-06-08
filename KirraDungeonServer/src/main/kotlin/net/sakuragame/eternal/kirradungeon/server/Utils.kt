@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server
 
+import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -44,6 +45,16 @@ fun formatSeconds(timeInSeconds: Int): String {
     val mM = (if (minutes < 10) "0" else "") + minutes
     val sS = (if (secondsLeft < 10) "0" else "") + secondsLeft
     return "${mM}分${sS}秒."
+}
+
+fun Player.playDragonCoreSound(sound: String) {
+    PacketSender.sendPlaySound(
+        this,
+        "sounds/a/$sound.ogg",
+        0.33f, 1f,
+        false,
+        0f, 0f, 0f
+    );
 }
 
 fun Location.toCenter(offset: Double): Location {
