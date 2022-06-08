@@ -62,12 +62,13 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     override var failThread: PlatformExecutor.PlatformTask? = null
 
-    private val mobs = mutableListOf<ZoneMobData>().apply {
+    val mobs = mutableListOf<ZoneMobData>().apply {
         addAll(zone.data.monsterData.mobList)
     }
 
-    private val naturalSpawnBoss: Boolean
-        get() = true
+    val naturalSpawnBoss by lazy {
+        !zone.data.metadataMap.containsKey("DISABLE_NATURAL_SPAWN")
+    }
 
     private var bossSpawned = false
 

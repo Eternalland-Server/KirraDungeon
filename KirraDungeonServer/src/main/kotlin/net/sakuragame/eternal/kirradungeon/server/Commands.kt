@@ -407,7 +407,16 @@ object Commands {
         dynamic(commit = "key") {
             dynamic(commit = "value") {
                 execute<Player> { player, context, _ ->
-                    
+                    val editingZone = getEditingZone(player) ?: return@execute
+                    val key = context.get(1)
+                    val value = context.get(2)
+                    if (value == "@NULL"){
+                        MetadataWriter.remove(editingZone, key)
+                        player.sendMessage("&c[System] &7移除成功".colored())
+                        return@execute
+                    }
+                    MetadataWriter.set(editingZone, key, value)
+                    player.sendMessage("&c[System] &7设置 $key 为 $value 成功.".colored())
                 }
             }
         }

@@ -46,6 +46,9 @@ object FunctionDefaultDungeon {
         val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? DefaultDungeon ?: return
         dungeon.removeMonsterUUID(entity.uniqueId)
         if (dungeon.getMonsters(containsBoss = true).isEmpty()) {
+            if (dungeon.mobs.size == 1 && !dungeon.naturalSpawnBoss) {
+                return
+            }
             dungeon.doSpawn()
         }
     }
