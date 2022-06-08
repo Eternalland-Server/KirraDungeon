@@ -19,7 +19,7 @@ object FunctionWaveDungeon {
     fun e(e: DungeonPlayerJoinEvent) {
         submit(delay = 3) {
             val player = e.player
-            val profile = player.profile()
+            val profile = player.profile() ?: return@submit
             val dungeonWorld = e.dungeonWorld
             if (Zone.editingDungeonWorld != null) {
                 return@submit

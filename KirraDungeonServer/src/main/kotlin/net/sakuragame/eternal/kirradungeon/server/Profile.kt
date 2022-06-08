@@ -46,7 +46,7 @@ class Profile(val player: Player) {
 
         private val profiles = mutableMapOf<String, Profile>()
 
-        fun Player.profile() = profiles.values.first { it.player.uniqueId == uniqueId }
+        fun Player.profile() = profiles.values.firstOrNull { it.player.uniqueId == uniqueId }
 
         @SubscribeEvent(priority = HIGHEST)
         fun e(e: PlayerJoinEvent) {
@@ -66,7 +66,7 @@ class Profile(val player: Player) {
         }
 
         private fun dataRecycle(player: Player) {
-            player.profile().apply {
+            player.profile()?.apply {
                 save()
                 drop()
             }

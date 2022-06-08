@@ -20,7 +20,7 @@ taboolib {
             name("JustAttribute")
             name("UIFactory")
             name("JustMessage")
-            name("datamanager-bukkit-parent")
+            name("DataManager-Bukkit")
         }
         contributors {
             name("闲蛋")

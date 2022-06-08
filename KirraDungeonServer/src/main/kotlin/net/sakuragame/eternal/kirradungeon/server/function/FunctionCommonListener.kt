@@ -121,7 +121,7 @@ object FunctionCommonListener {
     @SubscribeEvent
     fun e(e: PlayerMoveEvent) {
         val player = e.player
-        val profile = player.profile()
+        val profile = player.profile() ?: return
         if (profile.isEditing) {
             return
         }
@@ -136,7 +136,8 @@ object FunctionCommonListener {
     @SubscribeEvent
     fun e(e: PlayerDeathEvent) {
         val player = e.entity
-        if (!player.profile().isChallenging) return
+        val profile = player.profile() ?: return
+        if (!profile.isChallenging) return
         val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) ?: return
         player.apply {
             playDeathAnimation()
@@ -154,7 +155,9 @@ object FunctionCommonListener {
 
     @SubscribeEvent
     fun e(e: BlockBreakEvent) {
-        if (!e.player.profile().isChallenging) return
+        val player = e.player
+        val profile = player.profile() ?: return
+        if (!profile.isChallenging) return
         if (e.player.gameMode != GameMode.CREATIVE) {
             e.isCancelled = true
         }
@@ -164,7 +167,7 @@ object FunctionCommonListener {
     fun e(e: DungeonClearEvent) {
         val zone = Zone.getByID(e.dungeonId) ?: return
         e.players.forEach {
-            val profile = it.profile()
+            val profile = it.profile() ?: return@forEach
             if (profile.number <= zone.data.number) {
                 profile.number = zone.data.number + 1
             }

@@ -32,7 +32,7 @@ object FunctionResurgence {
             return
         }
         val player = e.player
-        val profile = player.profile()
+        val profile = player.profile() ?: return
         if (profile.isQuitting) return
         if (!KirraDungeonServerAPI.baffle.hasNext(player.name)) {
             return
@@ -54,7 +54,7 @@ object FunctionResurgence {
             return
         }
         val player = e.player
-        val profile = player.profile()
+        val profile = player.profile() ?: return
         val dungeon = profile.getIDungeon() ?: return
         player.closeInventory()
         dungeon.resurgence(player)

@@ -44,7 +44,7 @@ object FunctionQuit {
             return
         }
         val player = e.player
-        val profile = player.profile()
+        val profile = player.profile() ?: return
         player.closeInventory()
         player.turnToSpectator()
         DragonCoreCompat.closeFailHud(player)

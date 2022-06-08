@@ -181,7 +181,7 @@ interface IDungeon {
         val data = zone.data
         val loc = data.spawnLoc.toBukkitLocation(dungeonWorld.bukkitWorld)
         player.teleport(loc)
-        player.profile().isChallenging = true
+        player.profile()?.isChallenging = true
         player.reset()
         if (data.isCustomSkyEnabled()) {
             data.zoneSkyData!!.apply {
@@ -373,7 +373,7 @@ interface IDungeon {
             failTime--
             val players = getPlayers()
             players.forEach {
-                val profile = it.profile()
+                val profile = it.profile() ?: return@forEach
                 if (profile.isQuitting) {
                     return@forEach
                 }
