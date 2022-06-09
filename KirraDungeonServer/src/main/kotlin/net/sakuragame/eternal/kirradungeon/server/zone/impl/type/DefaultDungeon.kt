@@ -155,9 +155,8 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     private fun doMobNotice(loc: Location) {
-        loc.world.strikeLightningEffect(loc)
         getPlayers().forEach {
-            if (mobs.size == 0) {
+            if (mobs.size == 0 && !naturalSpawnBoss) {
                 WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "尝试触发机关来解锁下个点位"))
             } else {
                 WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "击杀所有怪物来解锁下个点位!"))
@@ -169,7 +168,6 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     private fun doBossNotice(loc: Location) {
-        loc.world.strikeLightningEffect(loc)
         getPlayers().forEach {
             WaypointsAPI.navPointer(it, "dungeon", IconType.Boss, loc, 1.0, listOf("怪物首领点位", "全力击败它, 通关副本!"))
             it.playDragonCoreSound("sounds/d/102.ogg")

@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 import taboolib.platform.util.asLangTextList
 import kotlin.math.floor
@@ -48,13 +49,15 @@ fun formatSeconds(timeInSeconds: Int): String {
 }
 
 fun Player.playDragonCoreSound(sound: String) {
-    PacketSender.sendPlaySound(
-        this,
-        sound,
-        0.33f, 1f,
-        false,
-        0f, 0f, 0f
-    );
+    submit(async = true, delay = 3L) {
+        PacketSender.sendPlaySound(
+            this@playDragonCoreSound,
+            sound,
+            1f, 1f,
+            false,
+            0f, 0f, 0f
+        );
+    }
 }
 
 fun Location.toCenter(offset: Double): Location {
