@@ -5,6 +5,7 @@ import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.Fak
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
+import net.sakuragame.eternal.kirradungeon.server.playDragonCoreSound
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
@@ -157,6 +158,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         loc.world.strikeLightningEffect(loc)
         getPlayers().forEach {
             WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "击杀所有怪物来解锁下个点位!"))
+            it.playDragonCoreSound("101")
             val text = it.asLangText("message-default-dungeon-mob-spawned")
             MessageAPI.sendActionTip(it, text)
         }
@@ -166,6 +168,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         loc.world.strikeLightningEffect(loc)
         getPlayers().forEach {
             WaypointsAPI.navPointer(it, "dungeon", IconType.Boss, loc, 1.0, listOf("怪物首领点位", "全力击败它, 通关副本!"))
+            it.playDragonCoreSound("102")
             val text = it.asLangText("message-default-dungeon-boss-spawned")
             MessageAPI.sendActionTip(it, text)
         }
