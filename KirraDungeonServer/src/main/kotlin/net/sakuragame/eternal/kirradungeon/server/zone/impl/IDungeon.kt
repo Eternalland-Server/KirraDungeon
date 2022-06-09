@@ -287,7 +287,7 @@ interface IDungeon {
         val passedTime = formatSeconds(TimeUnit.SECONDS.convert((System.currentTimeMillis() - createdTime), TimeUnit.MILLISECONDS).toInt())
         players.forEach {
             it.sendTitle("&a&l通关!".colored(), "&7通关时长: $passedTime".colored(), 0, 100, 0)
-            it.playDragonCoreSound("100")
+            it.playDragonCoreSound("sounds/d/100.ogg")
             it.sendLang("message-player-clear-dungeon", delaySecs)
         }
         teleportToSpawn()

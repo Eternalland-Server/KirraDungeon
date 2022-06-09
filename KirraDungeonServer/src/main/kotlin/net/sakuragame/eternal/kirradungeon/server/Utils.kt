@@ -50,7 +50,7 @@ fun formatSeconds(timeInSeconds: Int): String {
 fun Player.playDragonCoreSound(sound: String) {
     PacketSender.sendPlaySound(
         this,
-        "sounds/a/$sound.ogg",
+        sound,
         0.33f, 1f,
         false,
         0f, 0f, 0f

@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl
 
+import org.bukkit.Sound
 import java.util.*
 
 object FunctionDungeon {
@@ -11,6 +12,7 @@ object FunctionDungeon {
     fun getByBukkitWorldUUID(uuid: UUID) = dungeons.find { it.dungeonWorld.bukkitWorld.uid == uuid }
 
     fun getByPlayer(playerUUID: UUID): IDungeon? {
+        Sound.ITEM_TOTEM_USE
         dungeons.forEach { dungeon ->
             if (dungeon.playerUUIDList.find { it == playerUUID } != null) {
                 return dungeon

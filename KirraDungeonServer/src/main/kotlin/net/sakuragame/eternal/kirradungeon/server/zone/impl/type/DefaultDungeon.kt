@@ -157,8 +157,12 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     private fun doMobNotice(loc: Location) {
         loc.world.strikeLightningEffect(loc)
         getPlayers().forEach {
-            WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "击杀所有怪物来解锁下个点位!"))
-            it.playDragonCoreSound("101")
+            if (mobs.size == 0) {
+                WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "尝试触发机关来解锁下个点位"))
+            } else {
+                WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "击杀所有怪物来解锁下个点位!"))
+            }
+            it.playDragonCoreSound("sounds/d/101.ogg")
             val text = it.asLangText("message-default-dungeon-mob-spawned")
             MessageAPI.sendActionTip(it, text)
         }
@@ -168,7 +172,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         loc.world.strikeLightningEffect(loc)
         getPlayers().forEach {
             WaypointsAPI.navPointer(it, "dungeon", IconType.Boss, loc, 1.0, listOf("怪物首领点位", "全力击败它, 通关副本!"))
-            it.playDragonCoreSound("102")
+            it.playDragonCoreSound("sounds/d/102.ogg")
             val text = it.asLangText("message-default-dungeon-boss-spawned")
             MessageAPI.sendActionTip(it, text)
         }

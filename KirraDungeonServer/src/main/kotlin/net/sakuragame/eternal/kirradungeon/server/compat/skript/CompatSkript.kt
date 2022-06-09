@@ -41,7 +41,7 @@ object CompatSkript {
     private fun registerEffects() {
         Skript.registerEffect(
             EffectDungeonDoSpawn::class.java,
-            "do spawn next wave for %plaer%"
+            "do spawn next wave for %player%"
         )
     }
 }
