@@ -14,7 +14,8 @@ object FunctionQuit {
     fun e(e: UIFCompSubmitEvent) {
         val player = e.player
         val profile = player.profile() ?: return
-        if (e.params.getPacket("dungeon_esc") == null) {
+        val packet = e.params.getPacket("dungeon_esc") ?: return
+        if (packet != "quit") {
             return
         }
         if (!KirraDungeonServerAPI.baffle.hasNext(player.name)) {
