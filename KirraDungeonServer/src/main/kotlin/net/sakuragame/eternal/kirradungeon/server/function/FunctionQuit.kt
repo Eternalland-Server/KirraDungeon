@@ -23,7 +23,6 @@ object FunctionQuit {
         KirraDungeonServerAPI.baffle.next(player.name)
         player.closeInventory()
         player.turnToSpectator()
-        DragonCoreCompat.closeFailHud(player)
         if (!profile.isChallenging) {
             return
         }

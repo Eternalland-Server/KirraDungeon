@@ -32,7 +32,6 @@ import taboolib.platform.util.sendLang
 import taboolib.platform.util.takeItem
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 import kotlin.random.Random
 
 @JvmDefaultWithoutCompatibility
@@ -190,14 +189,8 @@ interface IDungeon {
             }
         }
         if (!init) {
-            if (player.hasPermission("admin") && this is SpecialDungeon) {
-                player.sendMessage("reached 3")
-            }
             init = true
             init()
-            if (player.hasPermission("admin") && this is SpecialDungeon) {
-                player.sendMessage("reached 4")
-            }
             submit(async = false, delay = 20) {
                 spawnEntities(spawnBoss, spawnMob)
             }
@@ -316,7 +309,6 @@ interface IDungeon {
      */
     fun teleportToSpawn() {
         var secs = 5
-        getPlayers().forEach { DragonCoreCompat.closeFailHud(it) }
         submit(delay = 60L, period = 20, async = true) {
             getPlayers().forEach {
                 if (!it.isOnline) {
@@ -363,7 +355,6 @@ interface IDungeon {
      */
     fun startFailThread() {
         getPlayers().forEach {
-            DragonCoreCompat.openFailHud(it)
             it.sendLang("message-fail-thread-started", failTime)
         }
         failThread = submit(async = true, period = 20) {
@@ -379,9 +370,9 @@ interface IDungeon {
                     return@forEach
                 }
                 if (players.find { player -> player.gameMode != GameMode.SPECTATOR } == null) {
-                    it.sendTitle("".colored(), "M 键消耗复活币复活 &f&k!&r &7&oN 键退出副本回主城".colored(), 0, 40, 0)
+                    it.sendTitle("&7将在 $failTime 秒自动退出".colored(), "&7&oM 键消耗复活币复活 &f&k!&r &7&oESC 键退出副本回主城".colored(), 0, 40, 0)
                 } else {
-                    it.sendTitle("&7将在 $failTime 秒自动退出".colored(), "M 键消耗复活币复活 &f&k!&r &7&oN 键退出副本回主城.".colored(), 0, 40, 0)
+                    it.sendTitle("", "&7&oM 键消耗复活币复活 &f&k!&r &7&oESC 键退出副本回主城.".colored(), 0, 40, 0)
                 }
             }
             if (failTime <= 0) {
@@ -475,7 +466,6 @@ interface IDungeon {
         failThread?.cancel()
         failThread = null
         failTime = 60
-        DragonCoreCompat.closeFailHud(player)
         player.teleport(zone.data.spawnLoc.toBukkitLocation(player.world))
         player.reset()
         player.sendTitle("&6&l复活".colored(), "&7尽全力打败怪物们!".colored(), 3, 40, 0)

@@ -15,8 +15,8 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.P
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen.ScreenTeleportType.*
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.isBelongDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.event.ZoneJoinEvent
-import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.platform.event.SubscribeEvent
@@ -78,6 +78,7 @@ object FunctionDungeonListener {
 
     @Suppress("RemoveRedundantQualifierName")
     private fun execCompSubmit(player: Player, compId: String, params: SubmitParams) {
+        player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
         val paramData = getParamData(player, params)
         val profile = player.profile() ?: return
         if (profile.debugMode) {

@@ -11,7 +11,7 @@ message-fail-thread-started:
   - "&4&l➱ &c所有挑战者都已经死亡了..."
   - "&4&l➱ &c您可以使用按 &fM &c键使用复活币进行复活, 否则挑战将会在 &f{0} &c秒后自动结算."
 message-player-not-has-resurgence-item: "&4&l➱ &c您没有复活币! 可以去商城购买复活币! "
-message-player-can-resurgence: "&6&l➱ &e您可以按 N 键退出副本. &7(小贴士)"
+message-player-can-resurgence: "&6&l➱ &e您可以按 ESC 键退出副本. &7(小贴士)"
 message-player-resurgence:
   - "&6&l➱ &e玩家 &r{0} &e花费了一复活币, 复活了!"
   - "&6&l➱ &e小心, 怪物们因为樱花大佐的护佑全部回满血量了, 击败他们! "

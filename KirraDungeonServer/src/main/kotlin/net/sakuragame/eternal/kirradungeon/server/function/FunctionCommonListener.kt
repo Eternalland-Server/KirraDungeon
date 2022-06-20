@@ -192,6 +192,5 @@ object FunctionCommonListener {
     fun e(e: YamlSendFinishedEvent) {
         val player = e.player
         PacketSender.sendYaml(player, FolderType.Gui, DragonCoreCompat.joinTitleHudID, DragonCoreCompat.joinTitleHudYaml)
-        DragonCoreCompat.closeFailHud(player)
     }
 }

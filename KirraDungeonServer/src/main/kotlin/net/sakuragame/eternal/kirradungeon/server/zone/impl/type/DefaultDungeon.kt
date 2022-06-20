@@ -155,11 +155,12 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     private fun doMobNotice(loc: Location) {
+        val upperLocation = loc.clone().add(0.0, 2.0, 0.0)
         getPlayers().forEach {
             if (mobs.size == 0 && !naturalSpawnBoss) {
-                WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "尝试触发机关来解锁下个点位"))
+                WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, upperLocation, 1.0, listOf("怪物点位", "尝试触发机关?"))
             } else {
-                WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, loc, 1.0, listOf("怪物点位", "击杀所有怪物来解锁下个点位!"))
+                WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, upperLocation, 1.0, listOf("怪物点位", "击杀所有怪物!"))
             }
             it.playDragonCoreSound("sounds/d/101.ogg")
             val text = it.asLangText("message-default-dungeon-mob-spawned")
@@ -168,8 +169,9 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     private fun doBossNotice(loc: Location) {
+        val upperLocation = loc.clone().add(0.0, 2.0, 0.0)
         getPlayers().forEach {
-            WaypointsAPI.navPointer(it, "dungeon", IconType.Boss, loc, 1.0, listOf("怪物首领点位", "全力击败它, 通关副本!"))
+            WaypointsAPI.navPointer(it, "dungeon", IconType.Boss, upperLocation, 1.0, listOf("怪物首领点位", "全力击败它, 通关副本!"))
             it.playDragonCoreSound("sounds/d/102.ogg")
             val text = it.asLangText("message-default-dungeon-boss-spawned")
             MessageAPI.sendActionTip(it, text)

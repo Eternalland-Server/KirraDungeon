@@ -59,14 +59,6 @@ object DragonCoreCompat {
         joinTitleHudYaml = joinTitleHud.build(null)
     }
 
-    fun openFailHud(player: Player) {
-        PacketSender.sendSyncPlaceholder(player, mutableMapOf("player_is_failed" to "true"))
-    }
-
-    fun closeFailHud(player: Player) {
-        PacketSender.sendSyncPlaceholder(player, mutableMapOf("player_is_failed" to "false"))
-    }
-
     fun updateDragonVars(player: Player, dungeonName: String) =
         PacketSender.sendSyncPlaceholder(player, mutableMapOf<String, String>().also {
             it["kzone_dungeon_title"] = dungeonName
