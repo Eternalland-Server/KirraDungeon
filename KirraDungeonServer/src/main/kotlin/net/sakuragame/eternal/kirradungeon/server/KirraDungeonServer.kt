@@ -1,7 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.server
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
-import com.lambdaworks.redis.api.sync.RedisCommands
 import io.lumine.xikage.mythicmobs.MythicMobs
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import taboolib.common.platform.Plugin

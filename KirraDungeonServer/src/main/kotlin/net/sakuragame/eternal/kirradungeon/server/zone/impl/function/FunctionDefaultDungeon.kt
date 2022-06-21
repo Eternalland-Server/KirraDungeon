@@ -67,11 +67,11 @@ object FunctionDefaultDungeon {
         val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) as? DefaultDungeon ?: return
         val block = e.clickedBlock ?: return
         val trigger = dungeon.triggerData ?: return
-        if (block.type == Material.AIR || dungeon.triggered || dungeon.triggering) {
+        if (block.type == Material.AIR || dungeon.triggered) {
             return
         }
         if (block.location == trigger.triggerLoc.toBukkitLocation(block.world)) {
-            dungeon.triggering = true
+            dungeon.triggered = true
             player.playSound(player.location, Sound.BLOCK_PISTON_CONTRACT, 1f, 1.5f)
             submit(delay = 5L) {
                 player.playSound(player.location, Sound.BLOCK_PISTON_EXTEND, 1f, 1.5f)

@@ -75,8 +75,6 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
 
     var triggered = false
 
-    var triggering = false
-
     override fun init() {
         // 移除未经过 MythicMobDeathEvent 死亡的实体
         submit(async = true, delay = 0L, period = 20L) {
@@ -105,6 +103,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         }
         submit(delay = 40) {
             if (triggerData == null) {
+                triggered = true
                 doTrigger()
             }
         }
@@ -115,7 +114,6 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     fun doTrigger() {
-        triggered = true
         doSpawn()
         submit(async = true, delay = 20L) {
             updateBossBar(init = true)
