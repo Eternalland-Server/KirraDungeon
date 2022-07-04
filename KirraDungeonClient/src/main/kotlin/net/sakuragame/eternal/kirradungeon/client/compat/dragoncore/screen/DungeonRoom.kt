@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen
 
 import com.taylorswiftcn.megumi.uifactory.generate.type.ActionType
+import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.LabelComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.TextureComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.screen.ScreenUI
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
@@ -40,7 +41,7 @@ object DungeonRoom : IScreen {
 
         val profile = player.profile() ?: return
 
-        var name = getName(room, player)
+        var name = room.name
         var forceLock = room.forceLock
 
         if (profile.number < getNumber(room)) {
@@ -98,21 +99,37 @@ object DungeonRoom : IScreen {
                 .setWidth("dungeon_${index}.width")
                 .setHeight("10")
         )
+        val joinCountsStr = getJoinCountsStr(room, player)?.colored() ?: return
+        val length = (joinCountsStr.length + 17).toString()
+        addComponent(
+            TextureComp("room_${index}_small_card", "ui/dungeon/card_small.png")
+                .setXY("room_${index}_card.x + 27", "room_${index}_card.y + 12")
+                .setWidth(length)
+                .setHeight("102")
+                .addAction(
+                    ActionType.Left_Click,
+                    DungeonAPI.getPluginParams(toScreenData = "current_selected = $index")
+                )
+        )
+        addComponent(
+            LabelComp("room_${index}_small_card_label", joinCountsStr)
+                .setXY("room_${index}_card.x + 29", "room_${index}_card.y + 85")
+        )
     }
 
-    private fun getName(room: DungeonSubScreen, player: Player): String {
+    private fun getJoinCountsStr(room: DungeonSubScreen, player: Player): String? {
         val name = room.name
         if (room.teleportType != DungeonSubScreen.ScreenTeleportType.DUNGEON) {
-            return name
+            return null
         }
         val joinCountsPair = getJoinCountsData(player, room.teleportData) ?: return name
         val currentCounts = joinCountsPair.first
         val maxCounts = joinCountsPair.second
         return when {
-            currentCounts >= 999 -> "$name &a(无限)"
-            currentCounts <= 0 -> "$name &c(&c${currentCounts}/0)"
-            currentCounts == maxCounts -> "$name &a($currentCounts/$maxCounts)"
-            else -> "$name &e($currentCounts/$maxCounts)"
+            currentCounts >= 999 -> "&a无限"
+            currentCounts <= 0 -> "&c${currentCounts}/0"
+            currentCounts == maxCounts -> "&a$currentCounts/$maxCounts"
+            else -> "&e$currentCounts/$maxCounts"
         }
     }
 

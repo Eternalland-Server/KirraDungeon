@@ -54,9 +54,8 @@ repositories {
         url = uri("https://maven.ycraft.cn/repository/maven-snapshots/")
     }
     maven {
-        url = uri("https://repo.tabooproject.org/repository/maven-releases/")
+        url = uri("https://repo.skriptlang.org/releases")
     }
-    maven { url = uri("https://lss233.littleservice.cn/repositories/minecraft/") }
     mavenCentral()
 }
 
@@ -70,7 +69,7 @@ dependencies {
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
-    compileOnly("org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT")
+    compileOnly("ink.ptms.core:v11200:11200@jar")
     @Suppress("VulnerableLibrariesLocal")
     compileOnly("net.sakuragame:datamanager-bukkit-api:2.0.0-SNAPSHOT") {
         isTransitive = true

@@ -138,7 +138,6 @@ object Dungeon : IScreen {
                     .addAction(ActionType.Enter, "dungeon_5.texture = 'ui/dungeon/hover.png';")
                     .addAction(ActionType.Leave, "dungeon_5.texture = 'ui/dungeon/default.png';")
             )
-
             .addComponent(
                 TextureComp("desc_title", "ui/dungeon/desc_title.png")
                     .setXY("body.x + 397", "body.y + 38")

@@ -21,6 +21,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeo
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -44,6 +45,7 @@ import taboolib.platform.util.sendLang
  * @author kirraObj
  * @since 2021/11/8 3:51
  */
+@Suppress("SpellCheckingInspection")
 object FunctionCommonListener {
 
     // 保险措施
@@ -126,7 +128,8 @@ object FunctionCommonListener {
             return
         }
         val to = e.to ?: return
-        if (to.y < 0) {
+        val pullBackYCoord = KirraDungeonServer.conf.getInt("settings.pull-back-y-coord")
+        if (to.y < pullBackYCoord) {
             val dungeon = profile.getIDungeon() ?: return
             player.teleport(dungeon.zone.data.spawnLoc.toBukkitLocation(player.world))
             player.sendLang("message-player-lifted-from-void")
