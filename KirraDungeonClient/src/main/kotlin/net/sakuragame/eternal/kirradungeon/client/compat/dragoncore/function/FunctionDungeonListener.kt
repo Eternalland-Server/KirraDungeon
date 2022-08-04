@@ -7,6 +7,7 @@ import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirracore.bukkit.KirraCoreBukkitAPI
+import net.sakuragame.eternal.kirracore.common.packet.impl.sub.AssignType
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.*
@@ -37,18 +38,6 @@ object FunctionDungeonListener {
         Baffle.of(3, TimeUnit.SECONDS)
     }
 
-    // 主城末地门监听.
-    @SubscribeEvent
-    fun e(e: PlayerMoveEvent) {
-        val block = e.to.block
-        val player = e.player
-        if (block != null && block.type == Material.END_GATEWAY) {
-            if (!baffle.hasNext(player.name)) return
-            baffle.next(player.name)
-            FunctionDungeon.openGUI(player, init = true)
-        }
-    }
-
     @SubscribeEvent
     fun e(e: UIFCompSubmitEvent) {
         if (!e.isBelongDungeon()) return
@@ -76,7 +65,6 @@ object FunctionDungeonListener {
         }
     }
 
-    @Suppress("RemoveRedundantQualifierName")
     private fun execCompSubmit(player: Player, compId: String, params: SubmitParams) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
         val paramData = getParamData(player, params)
@@ -106,14 +94,14 @@ object FunctionDungeonListener {
             SERVER -> {
                 val split = paramData.subScreen.teleportData.split("@")
                 if (split.size == 1) {
-                    KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], player)
+                    KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], null, null, player.uniqueId)
                     return
                 }
-                KirraCoreBukkitAPI.teleportPlayerToAnotherWorld(split[0], split[1], player)
+                KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], AssignType.ASSIGN_WORLD, split[1], player.uniqueId)
             }
             COORD -> {
                 val split = paramData.subScreen.teleportData.split("@")
-                KirraCoreBukkitAPI.teleportPlayerToAnotherCoord(split[0], split[1], player)
+                KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], AssignType.ASSIGN_COORD, split[1], player.uniqueId)
             }
         }
     }

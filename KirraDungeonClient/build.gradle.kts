@@ -34,6 +34,7 @@ taboolib {
     install("module-database")
     install("platform-bukkit")
     install("expansion-command-helper")
+    install("expansion-player-database")
     classifier = null
     version = libVersion
 }
@@ -53,14 +54,14 @@ repositories {
 
 dependencies {
     compileOnly("net.luckperms:api:5.4")
-    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.2.6-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:2.0.1-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:GemsEconomy:4.9.4-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DungeonSystem-Client-API:1.1.3-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.2.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
-    @Suppress("VulnerableLibrariesLocal")
+    @Suppress("VulnerableLibrariesLocal", "RedundantSuppression")
     compileOnly("net.sakuragame:datamanager-bukkit-api:2.0.0-SNAPSHOT") {
         isTransitive = true
     }

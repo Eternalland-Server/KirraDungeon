@@ -7,11 +7,6 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
 import org.bukkit.entity.Player
 
-/**
- * I screen
- *
- * @constructor Create empty I screen
- */
 interface IScreen {
 
     val screenId: String

@@ -7,11 +7,8 @@ import net.sakuragame.dungeonsystem.common.handler.MapRequestHandler
 import net.sakuragame.eternal.justmessage.api.common.NotifyBox
 import net.sakuragame.eternal.kirracore.bukkit.KirraCoreBukkitAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
+import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.function.FunctionListener
-import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkCounts
-import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkFee
-import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.checkItems
-import net.sakuragame.eternal.kirradungeon.client.zone.ZoneCondition.Companion.withDraw
 import net.sakuragame.eternal.kirraparty.bukkit.party.PartyAPI
 import net.sakuragame.eternal.kirraparty.bukkit.party.PartyPosition
 import org.bukkit.Bukkit
@@ -21,31 +18,27 @@ import taboolib.common.platform.Awake
 import taboolib.platform.util.sendLang
 import java.util.*
 
-data class Zone(val name: String, val condition: List<ZoneCondition>) {
+data class Zone(val id: String, val neededFatigue: Int, val num: Int) {
 
     companion object {
 
         val zones = mutableListOf<Zone>()
 
-        fun getByID(name: String) = zones.firstOrNull { it.name == name }
+        fun getByID(name: String) = zones.find { it.id == name }
 
-        /**
-         * 从 Redis 缓存里重新获取所有副本列表.
-         */
         @Awake(LifeCycle.ENABLE)
         fun load() {
-            val zoneNames = KirraDungeonClient.redisConn.lrange("KirraDungeonNames", 0, -1)
-            if (zoneNames.isEmpty()) {
-                return
-            }
-            clearAll()
-            zoneNames.forEach { name ->
-                zones += Zone(name, KirraDungeonClient.redisConn.lrange("KirraDungeonConditions:$name", 0, -1)
-                    .map { ZoneCondition.stringToZoneCondition(it) })
+            clear()
+            val section = KirraDungeonClient.dungeons.getConfigurationSection("dungeons") ?: return
+            section.getKeys(false).forEach {
+                val id = KirraDungeonClient.dungeons.getString("dungeons.$it.id") ?: return@forEach
+                val fatigue = KirraDungeonClient.dungeons.getInt("dungeons.$it.fatigue")
+                val num = KirraDungeonClient.dungeons.getInt("dungeons.$it.num")
+                zones += Zone(id, fatigue, num)
             }
         }
 
-        private fun clearAll() = zones.clear()
+        private fun clear() = zones.clear()
 
         fun preJoin(player: Player, name: String, isTeam: Boolean) {
             if (name == "nergigante_dragon" && !player.hasPermission("admin")) {
@@ -58,15 +51,17 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
                 return
             }
             val party = PartyAPI.getParty(player)
-            // 当按下了单人副本按键, 当前却在队伍
-            if (party != null && !isTeam) {
-                NotifyBox(FunctionListener.AUTO_CLOSE_NOTIFY_BOX_KEY, "&6&l副本", listOf("您目前仍在一个队伍里", "请解散或退出队伍后重试.")).open(player, false)
-                return
-            }
-            // 当按下了组队副本按键, 却不在任何队伍
-            if (party == null && isTeam) {
-                NotifyBox(FunctionListener.AUTO_CLOSE_NOTIFY_BOX_KEY, "&6&l副本", listOf("您不在任何一个队伍里", "请创建或进入队伍后重试.")).open(player, false)
-                return
+            when {
+                // 当进入单人副本当前却仍在任一队伍
+                party != null && !isTeam -> {
+                    NotifyBox(FunctionListener.AUTO_CLOSE_NOTIFY_BOX_KEY, "&6&l副本", listOf("您目前仍在一个队伍里", "请解散或退出队伍后重试.")).open(player, false)
+                    return
+                }
+                // 当进入组队副本当前却不在任何队伍
+                party == null && isTeam -> {
+                    NotifyBox(FunctionListener.AUTO_CLOSE_NOTIFY_BOX_KEY, "&6&l副本", listOf("您不在任何一个队伍里", "请创建或进入队伍后重试.")).open(player, false)
+                    return
+                }
             }
             // 正常流程
             if (party == null) {
@@ -87,14 +82,13 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
     }
 
     fun join(players: List<Player>) {
-        // 检查玩家进入是否拥有足额进入次数.
-        if (!checkCounts(players, this)) return
-        // 检查玩家是否拥有目标金额.
-        if (!checkFee(players, this)) return
-        // 检查玩家是否拥有目标物品.
-        if (!checkItems(players, this)) return
-        // 进行扣除操作. (物品 & 金额)
-        withDraw(players)
+        players.forEach {
+            val profile = it.profile() ?: return@forEach
+            if (profile.fatigue < neededFatigue) {
+                players.forEach { player -> player.sendLang("message-dungeon-fatigue-not-enough", profile.player.name) }
+                return
+            }
+        }
         // 进行传送操作, 之后转交由 Server 端处理.
         try {
             val serverId = DungeonClientAPI.getClientManager().queryServer("rpg-dungeon")
@@ -104,22 +98,22 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
                 }
                 return
             }
-            val playerSet = LinkedHashSet<Player>().also { it.addAll(players) }
+            val playerSet = LinkedHashSet<Player>().apply { addAll(players) }
             players.forEach {
-                KirraCoreBukkitAPI.showLoadingTitle(it, "&6&l➱ &e正在前往: $name &7@", false)
+                KirraCoreBukkitAPI.showLoadingAnimation(it, "&6&l➱ &e正在前往: $id &7@", false)
             }
-            DungeonClientAPI.getClientManager().queryDungeon(name, serverId, playerSet, object : MapRequestHandler() {
+            DungeonClientAPI.getClientManager().queryDungeon(id, serverId, playerSet, object : MapRequestHandler() {
 
                 override fun onTimeout(serverId: String) {
                     players.forEach {
-                        KirraCoreBukkitAPI.cancelLoadingTitle(it)
+                        KirraCoreBukkitAPI.cancelLoadingAnimation(it)
                         it.sendLang("message-dungeon-create-timed-out", serverId)
                     }
                 }
 
                 override fun onTeleportTimeout(serverID: String) {
                     players.forEach {
-                        KirraCoreBukkitAPI.cancelLoadingTitle(it)
+                        KirraCoreBukkitAPI.cancelLoadingAnimation(it)
                         it.sendLang("message-dungeon-teleport-timed-out", serverID)
                     }
                 }
@@ -132,22 +126,19 @@ data class Zone(val name: String, val condition: List<ZoneCondition>) {
             })
         } catch (e: Exception) {
             when (e) {
-                is UnknownDungeonException ->
-                    players.forEach {
-                        it.sendLang("message-unknown-dungeon-exception")
-                    }
-                is DungeonServerRunOutException ->
-                    players.forEach {
-                        it.sendLang("message-dungeon-server-ran-out-exception")
-                    }
+                is UnknownDungeonException -> players.forEach {
+                    it.sendLang("message-unknown-dungeon-exception")
+                }
+
+                is DungeonServerRunOutException -> players.forEach {
+                    it.sendLang("message-dungeon-server-ran-out-exception")
+                }
             }
         }
     }
 
     fun Player.teleportToAnotherServer(serverId: String) {
-        KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverId, this)
+        KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverId, null, null, uniqueId)
     }
-
-    override fun toString() = "Zone($name, $condition)"
 }
 

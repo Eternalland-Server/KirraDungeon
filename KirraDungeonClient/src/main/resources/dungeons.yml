@@ -1,0 +1,21 @@
+dungeons:
+  100:
+    id: "静谧之地"
+    fatigue: 10
+    num: 1
+  101:
+    id: "幽静池塘"
+    fatigue: 30
+    num: 2
+  102:
+    id: "陡峭险境"
+    fatigue: 10
+    num: 3
+  103:
+    id: "亘古平原"
+    fatigue: 30
+    num: 4
+  104:
+    id: "分岔路"
+    fatigue: 25
+    num: 5

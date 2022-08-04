@@ -11,6 +11,19 @@ import org.bukkit.entity.Player
 @Suppress("SpellCheckingInspection")
 object KirraDungeonClientAPI {
 
+    val fatigueMaxValue by lazy {
+        KirraDungeonClient.conf.getInt("settings.fatigue.max-value")
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    val fatigueMinutes by lazy {
+        KirraDungeonClient.conf.getInt("settings.fatigue.recover.period") * 60
+    }
+
+    fun getRecoverFatigueBySeconds(secs: Int): Int {
+        return (secs / fatigueMinutes) * KirraDungeonClient.conf.getInt("settings.fatigue.recover.value")
+    }
+
     /**
      * 给玩家打开指定界面.
      *

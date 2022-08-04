@@ -8,7 +8,9 @@ import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.module.chat.colored
+import taboolib.expansion.getDataContainer
+import taboolib.expansion.releaseDataContainer
+import taboolib.expansion.setupDataContainer
 
 /**
  * KirraDungeon
@@ -19,11 +21,23 @@ import taboolib.module.chat.colored
  */
 class Profile(val player: Player) {
 
+    private val uuidStr: String
+        get() = player.uniqueId.toString()
+
+    private val dataContainer by lazy {
+        player.setupDataContainer()
+        player.getDataContainer()
+    }
+
     var number = 1
         set(value) {
             field = value
             save()
         }
+
+    var fatigue = 300
+
+    var fatigueMillis = System.currentTimeMillis()
 
     var debugMode = false
 
@@ -35,6 +49,13 @@ class Profile(val player: Player) {
         fun s() {
             profiles.values.forEach {
                 it.save()
+            }
+        }
+
+        @Schedule(async = true, period = 20 * 60 * 30)
+        fun refreshFatigue() {
+            profiles.values.forEach {
+                it.plusFatigue()
             }
         }
 
@@ -66,25 +87,39 @@ class Profile(val player: Player) {
     }
 
     fun read() {
-        submit(async = true, delay = 3L) {
-            val num = Database.getNumber(player)
-            if (num == null) {
-                if (player.hasPermission("admin")) {
-                    player.sendMessage("&c[System] &7在我们准备读取您的信息时, 发生了一个错误.".colored())
-                }
-                return@submit
+        submit(async = true) {
+            dataContainer.database.apply {
+                number = get(uuidStr, "number")?.toIntOrNull() ?: number
+                fatigue = get(uuidStr, "fatigue")?.toIntOrNull() ?: fatigue
+                fatigueMillis = get(uuidStr, "fatigue_millis")?.toLongOrNull() ?: fatigueMillis
+                plusFatigue()
             }
-            number = num
         }
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun plusFatigue() {
+        val offset = (System.currentTimeMillis() - fatigueMillis).toInt() / 1000
+        if (fatigue + offset > KirraDungeonClientAPI.fatigueMaxValue) {
+            fatigue = KirraDungeonClientAPI.fatigueMaxValue
+        } else {
+            fatigue += KirraDungeonClientAPI.getRecoverFatigueBySeconds(offset)
+        }
+        fatigueMillis = System.currentTimeMillis()
     }
 
     fun save() {
         submit(async = true) {
-            Database.setNumber(player, number)
+            dataContainer.database.apply {
+                set(uuidStr, "number", "$number")
+                set(uuidStr, "fatigue", "$fatigue")
+                set(uuidStr, "fatigue_millis", "$fatigueMillis")
+            }
         }
     }
 
     fun drop() {
+        player.releaseDataContainer()
         profiles.remove(player.name)
     }
 }

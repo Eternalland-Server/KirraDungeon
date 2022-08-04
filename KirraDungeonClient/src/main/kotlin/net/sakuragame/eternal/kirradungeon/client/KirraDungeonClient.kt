@@ -1,8 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.client
 
-import com.lambdaworks.redis.api.sync.RedisCommands
-import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import taboolib.common.platform.Plugin
+import taboolib.expansion.setupPlayerDatabase
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
 import taboolib.platform.BukkitPlugin
@@ -14,15 +13,15 @@ object KirraDungeonClient : Plugin() {
     lateinit var conf: Configuration
         private set
 
+    @Config(value = "dungeons.yml")
+    lateinit var dungeons: Configuration
+        private set
+
     val plugin by lazy {
         BukkitPlugin.getInstance()
     }
 
-    val redisManager by lazy {
-        ClientManagerAPI.clientPlugin.redisManager!!
+    override fun onEnable() {
+        conf.getConfigurationSection("settings.database")?.let { setupPlayerDatabase(it, "kirradungeon_player") }
     }
-
-    val redisConn by lazy {
-        redisManager.pooledConn!!
-    }
-}
+}     

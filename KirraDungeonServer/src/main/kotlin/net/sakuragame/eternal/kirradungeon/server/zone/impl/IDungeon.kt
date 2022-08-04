@@ -17,13 +17,13 @@ import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FailType.*
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
 import org.bukkit.Bukkit
 import org.bukkit.Effect
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryClickEvent
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored
@@ -318,7 +318,7 @@ interface IDungeon {
                 secs--
                 it.sendTitle("", "&a将在 &f&l$secs &a秒后传送回您到主城.".colored(), 0, 25, 0)
                 if (secs <= 0) {
-                    KirraCoreBukkitAPI.teleportToSpawnServer(it)
+                    KirraCoreBukkitAPI.teleportPlayerToServerByBalancing("rpg-spawn", it.uniqueId)
                     cancel()
                     return@submit
                 }

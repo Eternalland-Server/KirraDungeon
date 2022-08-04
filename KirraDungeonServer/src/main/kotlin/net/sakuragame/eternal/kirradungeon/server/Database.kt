@@ -35,6 +35,7 @@ object Database {
     }
 
     fun getNumber(player: Player): Int? {
+
         val toReturn = AtomicInteger(-1)
         val uid = ClientManagerAPI.getUserID(player.uniqueId)
         if (uid == -1) return null

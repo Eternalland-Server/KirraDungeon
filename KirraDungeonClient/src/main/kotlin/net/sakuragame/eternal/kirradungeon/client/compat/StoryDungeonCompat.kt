@@ -44,7 +44,7 @@ object StoryDungeonCompat {
             }
 
             override fun handle(serverID: String, mapUUID: UUID) {
-                KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverID, player)
+                KirraCoreBukkitAPI.teleportPlayerToAnotherServer(serverID, null, null, player.uniqueId)
             }
         })
         return isSucc.get()

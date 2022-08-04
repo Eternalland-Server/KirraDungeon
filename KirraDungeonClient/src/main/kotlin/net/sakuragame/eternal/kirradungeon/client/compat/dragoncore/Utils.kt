@@ -26,10 +26,10 @@ fun UIFCompSubmitEvent.isBelongDungeon(): Boolean {
 }
 
 fun DungeonCategory.display() = when (this) {
-    NORMAL -> KirraDungeonClient.conf.getStringColored("settings.dungeon.normal-display")!!
-    TEAM -> KirraDungeonClient.conf.getStringColored("settings.dungeon.team-display")!!
-    ACTIVITY -> KirraDungeonClient.conf.getStringColored("settings.dungeon.activity-display")!!
-    SPECIAL -> KirraDungeonClient.conf.getStringColored("settings.dungeon.special-display")!!
+    NORMAL -> KirraDungeonClient.conf.getStringColored("settings.screen-dungeon.normal-display")!!
+    TEAM -> KirraDungeonClient.conf.getStringColored("settings.screen-dungeon.team-display")!!
+    ACTIVITY -> KirraDungeonClient.conf.getStringColored("settings.screen-dungeon.activity-display")!!
+    SPECIAL -> KirraDungeonClient.conf.getStringColored("settings.screen-dungeon.special-display")!!
 }
 
 fun DungeonCategory.getParentScreen() = when (this) {

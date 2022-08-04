@@ -5,8 +5,13 @@ settings:
     user: rpg-test
     password: jPGbpbpCy3W5Ssmz
     database: rpg-test
-  dungeon:
+  screen-dungeon:
     normal-display: "&f&l功能"
     team-display: "&f&l常规副本"
     activity-display: "&f&l困难副本"
     special-display: "&f&l特殊副本"
+  fatigue:
+    recover:
+      period: 30
+      value: 25
+    max-value: 300

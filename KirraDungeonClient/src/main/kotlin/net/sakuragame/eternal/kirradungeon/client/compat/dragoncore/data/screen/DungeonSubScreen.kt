@@ -5,17 +5,17 @@ import net.sakuragame.eternal.kirradungeon.client.getCurrentHour
 /**
  * 副本房间实例.
  *
- * @property name 名称.
- * @property iconPath 图标路径.
- * @property description 描述.
- * @property frameVisible 是否显示边框.
+ * @property name 名称
+ * @property iconPath 图标路径
+ * @property description 描述
+ * @property frameVisible 是否显示边框
  * @property isSingle 副本类型是否为单个, 若为单个仅会渲染
- * @property forceLock 是否强制锁定.
- * @property teleportType 传送类别.
- * @property teleportData 传送信息.
- * @property droppedItems 该副本所掉落的物品.
- * @property limitTime 副本限制开放时间.
- * @property limitRealm 副本限制境界.
+ * @property forceLock 是否强制锁定
+ * @property teleportType 传送类别
+ * @property teleportData 传送信息
+ * @property droppedItems 该副本所掉落的物品
+ * @property limitTime 副本限制开放时间
+ * @property limitRealm 副本限制境界
  */
 @Suppress("SpellCheckingInspection")
 data class DungeonSubScreen(

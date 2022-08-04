@@ -74,8 +74,8 @@ object FunctionListener {
                     player.gameMode = GameMode.SPECTATOR
                     player.teleport(FunctionPlot.playerSpawnLoc.toBukkitLocation(player.world).add(0.0, 10.0, 0.0))
                     player.title("&c&l失败", "&7你根本没在认真打吧?!", 0, 60, 5)
-                    KirraCoreBukkitAPI.teleportPlayerToAnotherServer("rpg-login-1", player)
-                    KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在传送 &7@", true)
+                    KirraCoreBukkitAPI.teleportPlayerToServerByBalancing("rpg-login", player.uniqueId)
+                    KirraCoreBukkitAPI.showLoadingAnimation(player, "&6&l➱ &e正在传送 &7@", true)
                     countDownMap.remove(player.uniqueId)
                     return@forEach
                 }
@@ -130,8 +130,8 @@ object FunctionListener {
             it.saveUser(user)
         }
         player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 9999999, 10))
-        KirraCoreBukkitAPI.showLoadingTitle(player, "&6&l➱ &e正在传送至主城 &7@", true)
-        KirraCoreBukkitAPI.teleportToSpawnServer(player)
+        KirraCoreBukkitAPI.showLoadingAnimation(player, "&6&l➱ &e正在传送至主城 &7@", true)
+        KirraCoreBukkitAPI.teleportPlayerToServerByBalancing("rpg-spawn", player.uniqueId)
     }
 
     @SubscribeEvent

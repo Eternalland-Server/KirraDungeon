@@ -73,6 +73,6 @@ object DungeonAPI {
 
     fun getNumber(subScreen: DungeonSubScreen): Int {
         val dungeonId = subScreen.teleportData
-        return Zone.getByID(dungeonId)?.condition?.first()?.number ?: return 0
+        return Zone.getByID(dungeonId)?.num ?: 0
     }
 }

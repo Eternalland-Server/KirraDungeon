@@ -1,7 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen
 
 import com.taylorswiftcn.megumi.uifactory.generate.type.ActionType
-import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.LabelComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.TextureComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.screen.ScreenUI
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
@@ -9,9 +8,6 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.getNumber
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
-import net.sakuragame.eternal.kirradungeon.client.zone.Zone
-import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeJoinCounts
-import net.sakuragame.eternal.kirradungeon.client.zone.util.getFeeMaxJoinCounts
 import org.bukkit.entity.Player
 import taboolib.module.chat.colored
 
@@ -99,44 +95,5 @@ object DungeonRoom : IScreen {
                 .setWidth("dungeon_${index}.width")
                 .setHeight("10")
         )
-        val joinCountsStr = getJoinCountsStr(room, player)?.colored() ?: return
-        val length = (joinCountsStr.length + 17).toString()
-        addComponent(
-            TextureComp("room_${index}_small_card", "ui/dungeon/card_small.png")
-                .setXY("room_${index}_card.x + 27", "room_${index}_card.y + 12")
-                .setWidth(length)
-                .setHeight("102")
-                .addAction(
-                    ActionType.Left_Click,
-                    DungeonAPI.getPluginParams(toScreenData = "current_selected = $index")
-                )
-        )
-        addComponent(
-            LabelComp("room_${index}_small_card_label", joinCountsStr)
-                .setXY("room_${index}_card.x + 29", "room_${index}_card.y + 85")
-        )
-    }
-
-    private fun getJoinCountsStr(room: DungeonSubScreen, player: Player): String? {
-        val name = room.name
-        if (room.teleportType != DungeonSubScreen.ScreenTeleportType.DUNGEON) {
-            return null
-        }
-        val joinCountsPair = getJoinCountsData(player, room.teleportData) ?: return name
-        val currentCounts = joinCountsPair.first
-        val maxCounts = joinCountsPair.second
-        return when {
-            currentCounts >= 999 -> "&a无限"
-            currentCounts <= 0 -> "&c${currentCounts}/0"
-            currentCounts == maxCounts -> "&a$currentCounts/$maxCounts"
-            else -> "&e$currentCounts/$maxCounts"
-        }
-    }
-
-    private fun getJoinCountsData(player: Player, dungeonId: String): Pair<Int, Int>? {
-        val zone = Zone.getByID(dungeonId) ?: return null
-        val maxCounts = player.getFeeMaxJoinCounts(zone)
-        val currentCounts = player.getFeeJoinCounts(zone)
-        return currentCounts to maxCounts
     }
 }

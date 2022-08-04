@@ -20,28 +20,22 @@ import java.io.File
 
 object DungeonLoader {
 
-    // 存储所有界面的表.
+    // 存储所有界面的表
     val parentScreens = mutableMapOf<DungeonCategory, MutableList<DungeonScreen>>()
 
     @Awake(LifeCycle.ENABLE)
     fun i() {
         submit(async = true) {
-            // 清理变量.
             log("-- 正在清理变量...")
             clear()
-            // 读取常规界面.
             log("-- 正在读取常规界面...")
             read(DungeonCategory.NORMAL)
-            // 读取团队界面.
             log("-- 正在读取团队界面...")
             read(DungeonCategory.TEAM)
-            // 读取活动界面.
             log("-- 正在读取活动界面...")
             read(DungeonCategory.ACTIVITY)
-            // 读取特殊界面.
             log("-- 正在读取特殊界面...")
             read(DungeonCategory.SPECIAL)
-            // 注册按键.
             log("-- 正在注册按键...")
             CoreAPI.registerKey(DungeonAPI.triggerKey)
         }
