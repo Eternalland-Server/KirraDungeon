@@ -4,13 +4,6 @@ import net.sakuragame.eternal.kirradungeon.server.splitWithNoSpace
 import org.bukkit.Location
 import org.bukkit.World
 
-/**
- * KirraDungeons
- * net.sakuragame.KirraDungeons.server.zone.ZoneLocation
- *
- * @author kirraObj
- * @since 2021/11/8 9:29
- */
 data class ZoneLocation(val x: Double, val y: Double, val z: Double, val yaw: Float, val pitch: Float) {
 
     companion object {

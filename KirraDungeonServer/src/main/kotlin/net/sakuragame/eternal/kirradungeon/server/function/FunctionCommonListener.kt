@@ -146,7 +146,7 @@ object FunctionCommonListener {
             playDeathAnimation()
             health = maxHealth
             turnToSpectator()
-            val deathNotice = KirraDungeonServer.conf.getStringList("settings.delay-back-spawn-server-secs.death-notices").randomOrNull() ?: "&c&l菜"
+            val deathNotice = KirraDungeonServer.conf.getStringList("settings.death-notices").randomOrNull() ?: "&c&l菜"
             sendTitle(deathNotice.colored(), "", 0, 40, 10)
         }
         submit(async = false, delay = 10L) {

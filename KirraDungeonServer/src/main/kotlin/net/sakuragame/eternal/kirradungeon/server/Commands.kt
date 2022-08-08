@@ -217,13 +217,16 @@ object Commands {
     val addMob = subCommand {
         dynamic(commit = "mobType") {
             dynamic(commit = "mobAmount") {
-                execute<Player> { player, context, argument ->
-                    val zone = getEditingZone(player) ?: return@execute
-                    val mobType = context.argument(-1)
-                    val amount = argument.toIntOrNull() ?: 1
-                    val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
-                    MonsterWriter.setMob(zone, zoneLoc, mobType, amount)
-                    player.sendMessage("&a成功在 &f$zoneLoc &a添加怪物 = &f$mobType x $amount".colored())
+                dynamic(commit = "levelRange") {
+                    execute<Player> { player, context, _ ->
+                        val zone = getEditingZone(player) ?: return@execute
+                        val mobType = context.get(1)
+                        val amount = context.get(2).toIntOrNull() ?: 1
+                        val levelRange = context.get(3).parseIntRange() ?: return@execute
+                        val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
+                        MonsterWriter.setMob(zone, zoneLoc, mobType, amount, levelRange)
+                        player.sendMessage("&a成功在 &f$zoneLoc &a添加怪物 = &f$mobType x $amount".colored())
+                    }
                 }
             }
         }
@@ -232,11 +235,15 @@ object Commands {
     @CommandBody
     val setBoss = subCommand {
         dynamic(commit = "mobType") {
-            execute<Player> { player, _, argument ->
-                val zone = getEditingZone(player) ?: return@execute
-                val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
-                MonsterWriter.setBoss(zone, zoneLoc, argument)
-                player.sendMessage("&a成功在 &f$zoneLoc &a设置怪物首领 = &f$argument".colored())
+            dynamic(commit = "levelRange") {
+                execute<Player> { player, context, _ ->
+                    val zone = getEditingZone(player) ?: return@execute
+                    val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
+                    val mobType = context.get(1)
+                    val levelRange = context.get(2).parseIntRange() ?: return@execute
+                    MonsterWriter.setBoss(zone, zoneLoc, mobType, levelRange)
+                    player.sendMessage("&a成功在 &f$zoneLoc &a设置怪物首领 = &f$mobType".colored())
+                }
             }
         }
     }
@@ -410,7 +417,7 @@ object Commands {
                     val editingZone = getEditingZone(player) ?: return@execute
                     val key = context.get(1)
                     val value = context.get(2)
-                    if (value == "@NULL"){
+                    if (value == "@NULL") {
                         MetadataWriter.remove(editingZone, key)
                         player.sendMessage("&c[System] &7移除成功".colored())
                         return@execute

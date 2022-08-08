@@ -22,6 +22,13 @@ fun getEditingZone(player: Player): Zone? {
     }
 }
 
+fun String.parseIntRange(): IntRange? {
+    val split = split("..")
+    val start = split.getOrNull(0)?.toIntOrNull() ?: return null
+    val end = split.getOrNull(1)?.toIntOrNull() ?: return null
+    return IntRange(start, end)
+}
+
 fun debug(any: Any) = Bukkit.getLogger().info("[DEBUG] $any")
 
 fun String.splitWithNoSpace(regex: String) = this

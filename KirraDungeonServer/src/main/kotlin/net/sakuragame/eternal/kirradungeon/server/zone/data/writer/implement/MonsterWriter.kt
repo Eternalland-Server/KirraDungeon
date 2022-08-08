@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement
 
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
+import net.sakuragame.eternal.kirradungeon.server.parseIntRange
 import net.sakuragame.eternal.kirradungeon.server.splitWithNoSpace
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
@@ -11,18 +12,19 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 
 object MonsterWriter : WriteHelper {
 
-    fun setMob(zone: Zone, loc: ZoneLocation, id: String, amount: Int) {
+    fun setMob(zone: Zone, loc: ZoneLocation, id: String, amount: Int, levelRange: IntRange) {
         val mobs = arrayListOf<String>().apply {
             addAll(data.getStringList("${zone.id}.mobs"))
         }
-        mobs.add("$loc; $id; $amount")
+        mobs.add("$loc; $id; $amount; $levelRange")
         KirraDungeonServer.data["${zone.id}.mobs"] = mobs
         reload()
     }
 
-    fun setBoss(zone: Zone, loc: ZoneLocation, id: String) {
+    fun setBoss(zone: Zone, loc: ZoneLocation, id: String, levelRange: IntRange) {
         data["${zone.id}.boss.id"] = id
         data["${zone.id}.boss.loc"] = loc.toString()
+        data["${zone.id}.level-range"] = levelRange.toString()
         reload()
     }
 
@@ -34,12 +36,14 @@ object MonsterWriter : WriteHelper {
                 val loc = ZoneLocation.parseToZoneLocation(split[0])!!
                 val monsterId = split[1]
                 val amount = split[2].toInt()
-                list += ZoneMobData(loc, monsterId, amount)
+                val levelRange = split[3].parseIntRange() ?: return@string
+                list += ZoneMobData(loc, monsterId, amount, levelRange)
             }
         }
         val bossData = ZoneBossData(
             ZoneLocation.parseToZoneLocation(KirraDungeonServer.data.getString("$id.boss.loc")!!)!!,
-            KirraDungeonServer.data.getString("$id.boss.id")!!
+            KirraDungeonServer.data.getString("$id.boss.id")!!,
+            KirraDungeonServer.data.getString("$id.boss.level-range")?.parseIntRange()!!
         )
         return ZoneMonsterData(bossData, mobData)
     }
