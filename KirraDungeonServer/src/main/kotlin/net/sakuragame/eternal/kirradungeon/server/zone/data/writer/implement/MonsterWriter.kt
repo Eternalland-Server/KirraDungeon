@@ -43,7 +43,7 @@ object MonsterWriter : WriteHelper {
         val bossData = ZoneBossData(
             ZoneLocation.parseToZoneLocation(KirraDungeonServer.data.getString("$id.boss.loc")!!)!!,
             KirraDungeonServer.data.getString("$id.boss.id")!!,
-            KirraDungeonServer.data.getString("$id.boss.level-range")?.parseIntRange()!!
+            KirraDungeonServer.data.getString("$id.boss.level-range")?.parseIntRange() ?: IntRange(1, 1)
         )
         return ZoneMonsterData(bossData, mobData)
     }
