@@ -11,17 +11,20 @@ import taboolib.common.platform.event.EventPriority.HIGHEST
 import taboolib.common.platform.event.EventPriority.LOWEST
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import taboolib.expansion.getDataContainer
+import taboolib.expansion.releaseDataContainer
+import taboolib.expansion.setupDataContainer
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * KirraDungeons
- * net.sakuragame.KirraDungeons.server.Profile
- *
- * @author kirraObj
- * @since 2021/11/9 15:51
- */
 class Profile(val player: Player) {
+
+    private val uuidStr: String
+        get() = player.uniqueId.toString()
+
+    private val dataContainer by lazy {
+        player.setupDataContainer()
+        player.getDataContainer()
+    }
 
     val isEditing: Boolean
         get() {
@@ -84,18 +87,23 @@ class Profile(val player: Player) {
             }
             BossBar.close(player)
         }
+        player.releaseDataContainer()
+        profiles.remove(player.uniqueId.toString())
     }
 
     fun read() {
         submit(async = true) {
-            val num = Database.getNumber(player) ?: return@submit
-            number = num
+            dataContainer.database.apply {
+                number = get(uuidStr, "number")?.toIntOrNull() ?: number
+            }
         }
     }
 
     fun save() {
         submit(async = true) {
-            Database.setNumber(player, number)
+            dataContainer.database.apply {
+                set(uuidStr, "number", "$number")
+            }
         }
     }
 

@@ -37,10 +37,11 @@ taboolib {
     install("module-configuration")
     install("module-chat")
     install("platform-bukkit")
-    install("expansion-command-helper")
     install("module-database")
     install("module-ui")
     install("module-nms", "module-nms-util")
+    install("expansion-command-helper")
+    install("expansion-player-database")
     classifier = null
     version = libVersion
 }
@@ -64,13 +65,13 @@ dependencies {
     compileOnly("com.github.SkriptLang:Skript:2.6.1")
     compileOnly("public:MythicMobs:4.12.0@jar")
     compileOnly("net.sakuragame:DungeonSystem-Server-API:1.1.3-SNAPSHOT@jar")
-    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:2.0.1-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:2.0.2-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
     compileOnly("ink.ptms.core:v11200:11200@jar")
-    @Suppress("VulnerableLibrariesLocal")
+    @Suppress("VulnerableLibrariesLocal", "RedundantSuppression")
     compileOnly("net.sakuragame:datamanager-bukkit-api:2.0.0-SNAPSHOT") {
         isTransitive = true
     }

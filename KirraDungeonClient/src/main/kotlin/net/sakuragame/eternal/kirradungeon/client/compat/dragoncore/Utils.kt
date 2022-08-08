@@ -5,7 +5,6 @@ import net.sakuragame.eternal.justlevel.api.JustLevelAPI
 import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory.*
-import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.Dungeon
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonCard
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonRegion
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonRoom
@@ -18,7 +17,7 @@ fun Player.getRealm(): Int {
 
 fun UIFCompSubmitEvent.isBelongDungeon(): Boolean {
     return when (screenID) {
-        Dungeon.screenId, DungeonCard.screenId, net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.DungeonCategory.screenId, DungeonRegion.screenId, DungeonRoom.screenId -> {
+        "dungeon", DungeonCard.screenId, "dungeon_category", DungeonRegion.screenId, DungeonRoom.screenId -> {
             params.getParam(0) == KirraDungeonClient.plugin.name
         }
         else -> false

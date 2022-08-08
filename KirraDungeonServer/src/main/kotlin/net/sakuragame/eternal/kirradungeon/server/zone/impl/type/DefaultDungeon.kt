@@ -25,9 +25,6 @@ import taboolib.platform.util.asLangText
 import java.util.*
 import kotlin.random.Random
 
-/**
- * 默认副本, 副本实现类其中之一.
- */
 class DefaultDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IDungeon {
 
     init {

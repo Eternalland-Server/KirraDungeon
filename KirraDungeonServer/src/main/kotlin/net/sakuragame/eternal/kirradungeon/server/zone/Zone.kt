@@ -3,10 +3,8 @@ package net.sakuragame.eternal.kirradungeon.server.zone
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.*
-import net.sakuragame.eternal.kirradungeon.server.zone.sync.ZoneCondition
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
-import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
 import taboolib.module.chat.uncolored
 
@@ -19,7 +17,7 @@ import taboolib.module.chat.uncolored
  */
 data class Zone(val id: String, val name: String, val data: ZoneData) {
 
-    override fun toString() = "Zone($id, ${name.uncolored()}, $data, ${ZoneCondition.getConditionByName(id) ?: ""})"
+    override fun toString() = "Zone($id, ${name.uncolored()}, $data)"
 
     companion object {
 
@@ -55,9 +53,6 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         waveSpawnLocs = WaveDataWriter.readLoc(id)
                     )
                 )
-            }
-            submit(async = true, delay = 2L) {
-                ZoneCondition.sync2Redis()
             }
         }
 

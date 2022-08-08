@@ -20,14 +20,6 @@ object DefaultConfigWriter : WriteHelper {
         // 怪物首领
         data["$id.boss.id"] = ""
         data["$id.boss.loc"] = ZoneLocation(0.0, 60.0, 0.0, -90.0f, 0.0f).toString()
-        // 进入条件
-        data["$id.conditions.default.daily-count"] = 10
-        data["$id.conditions.default.fee"] = mutableListOf<String>().also {
-            it.add("coins; 100")
-        }
-        data["$id.conditions.default.items"] = mutableListOf<String>().also {
-            it.add("test-item; 1")
-        }
         // 坐标
         data["$id.spawn-loc"] = ZoneLocation(0.0, 60.0, 0.0, -90.0f, 0.0f).toString()
     }

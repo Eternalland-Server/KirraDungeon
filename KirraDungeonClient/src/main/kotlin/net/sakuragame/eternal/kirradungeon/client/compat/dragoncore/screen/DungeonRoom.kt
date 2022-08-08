@@ -30,21 +30,16 @@ object DungeonRoom : IScreen {
     private fun ScreenUI.addRoom(index: Int, screen: DungeonScreen, player: Player) {
         val originIndex = index - 1
         val room = screen.dungeonSubScreens[originIndex]!!
-
         if (room.forceEmpty) {
             return
         }
-
         val profile = player.profile() ?: return
-
         var name = room.name
         var forceLock = room.forceLock
-
         if (profile.number < getNumber(room)) {
             forceLock = true
             name = "&7&o暂未解锁"
         }
-
         if (room.frameVisible) {
             val framePath =
                 "(global.dungeon_current_selected == $index) ? 'ui/dungeon/selected.png' : 'ui/dungeon/open.png'"

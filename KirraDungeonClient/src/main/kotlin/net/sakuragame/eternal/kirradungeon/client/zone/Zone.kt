@@ -84,10 +84,14 @@ data class Zone(val id: String, val neededFatigue: Int, val num: Int) {
     fun join(players: List<Player>) {
         players.forEach {
             val profile = it.profile() ?: return@forEach
+            if (profile.debugMode) {
+                return@forEach
+            }
             if (profile.fatigue < neededFatigue) {
                 players.forEach { player -> player.sendLang("message-dungeon-fatigue-not-enough", profile.player.name) }
                 return
             }
+            profile.fatigue -= neededFatigue
         }
         // 进行传送操作, 之后转交由 Server 端处理.
         try {

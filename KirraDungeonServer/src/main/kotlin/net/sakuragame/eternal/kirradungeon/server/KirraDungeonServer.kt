@@ -4,6 +4,7 @@ import com.dscalzi.skychanger.bukkit.api.SkyChanger
 import io.lumine.xikage.mythicmobs.MythicMobs
 import net.sakuragame.serversystems.manage.client.api.ClientManagerAPI
 import taboolib.common.platform.Plugin
+import taboolib.expansion.setupPlayerDatabase
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
@@ -29,15 +30,11 @@ object KirraDungeonServer : Plugin() {
         MythicMobs.inst().apiHelper!!
     }
 
-    val redisManager by lazy {
-        ClientManagerAPI.clientPlugin.redisManager!!
-    }
-
-    val redisConn by lazy {
-        redisManager.pooledConn!!
-    }
-
     val skyAPI by lazy {
         SkyChanger.getAPI()!!
+    }
+
+    override fun onEnable() {
+        conf.getConfigurationSection("settings.database")?.let { setupPlayerDatabase(it, "kirradungeon_player") }
     }
 }

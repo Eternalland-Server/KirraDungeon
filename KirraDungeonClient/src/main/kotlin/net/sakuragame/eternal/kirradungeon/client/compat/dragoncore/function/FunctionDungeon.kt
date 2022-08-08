@@ -23,13 +23,12 @@ object FunctionDungeon {
     }
 
     fun sendScreen(player: Player, screen: DungeonScreen, subScreen: DungeonSubScreen) {
-        player.also {
-            DungeonCard.send(it, screen, subScreen)
-            DungeonCategory.send(it, screen, subScreen)
-            DungeonRegion.send(it, screen, subScreen)
-            DungeonRoom.send(it, screen, subScreen)
-            Dungeon.send(it, screen, subScreen)
+        player.apply {
+            DungeonCard.send(this, screen, subScreen)
+            DungeonRegion.send(this, screen, subScreen)
+            DungeonRoom.send(this, screen, subScreen)
         }
+        syncVariables(player, screen, subScreen)
     }
 
     fun openGUI(player: Player, init: Boolean = true) {
@@ -38,8 +37,14 @@ object FunctionDungeon {
                 PacketSender.sendRunFunction(player, "default", initStatements, false)
                 sendScreen(player, DungeonAPI.getDefaultScreen(), DungeonAPI.getDefaultSubScreen(null))
             }
-            PacketSender.sendOpenGui(player, Dungeon.screenId)
+            PacketSender.sendOpenGui(player, "dungeon")
         }
+    }
+
+    private fun syncVariables(player: Player, screen: DungeonScreen, subScreen: DungeonSubScreen) {
+        PacketSender.sendSyncPlaceholder(player, hashMapOf<String, String>().also {
+            it["variable_map_bg"] = screen.mapBgPath
+        })
     }
 
     fun openAssignGUI(player: Player, numData: ParamNumData, paramData: ParamData? = null) {
@@ -54,7 +59,7 @@ object FunctionDungeon {
         val subScreen = screen.dungeonSubScreens[numData.param3 - 1] ?: DungeonAPI.getDefaultSubScreen(screen)
         submit(async = true, delay = 3L) {
             sendScreen(player, screen, subScreen)
-            PacketSender.sendOpenGui(player, Dungeon.screenId)
+            PacketSender.sendOpenGui(player, "dungeon")
             if (paramData != null) {
                 FunctionDungeonListener.doPage(player, paramData)
             }

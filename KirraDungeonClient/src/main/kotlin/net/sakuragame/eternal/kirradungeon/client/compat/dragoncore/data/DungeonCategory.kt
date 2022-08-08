@@ -2,7 +2,6 @@ package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data
 
 
 /**
- * Dungeon category
  *
  * NORMAL = 普通副本
  * TEAM = 团队副本
