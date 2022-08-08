@@ -7,7 +7,6 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneBlockData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 import org.bukkit.Bukkit
 
-@Suppress("UNCHECKED_CAST")
 object TriggerWriter : WriteHelper {
 
     fun setTrigger(zone: Zone, triggerLoc: ZoneLocation) {

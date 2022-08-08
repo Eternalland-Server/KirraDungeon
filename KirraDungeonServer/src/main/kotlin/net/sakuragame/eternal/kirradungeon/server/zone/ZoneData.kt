@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.zone
 
 import net.sakuragame.eternal.kirradungeon.server.zone.data.*
+import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneDropData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneHologramData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
 
@@ -26,6 +27,7 @@ data class ZoneData(
     val type: ZoneType,
     val maxLastTime: Int,
     val monsterData: ZoneMonsterData,
+    val monsterDropData: MutableMap<String, ZoneDropData>,
     val spawnLoc: ZoneLocation,
     val zoneSkyData: ZoneSkyData? = null,
     val number: Int,

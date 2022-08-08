@@ -40,6 +40,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         type = TypeWriter.read(id),
                         maxLastTime = MaxLastTimeWriter.read(id),
                         monsterData = MonsterWriter.read(id),
+                        monsterDropData = DropItemWriter.read(it),
                         spawnLoc = SpawnLocWriter.read(id)!!,
                         zoneSkyData = SkyDataWriter.read(id),
                         number = NumberWriter.read(id),
