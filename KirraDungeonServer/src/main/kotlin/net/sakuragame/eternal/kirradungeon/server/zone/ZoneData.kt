@@ -27,7 +27,7 @@ data class ZoneData(
     val type: ZoneType,
     val maxLastTime: Int,
     val monsterData: ZoneMonsterData,
-    val monsterDropData: MutableMap<String, ZoneDropData>,
+    val monsterDropData: MutableMap<String, MutableList<ZoneDropData>>,
     val spawnLoc: ZoneLocation,
     val zoneSkyData: ZoneSkyData? = null,
     val number: Int,
