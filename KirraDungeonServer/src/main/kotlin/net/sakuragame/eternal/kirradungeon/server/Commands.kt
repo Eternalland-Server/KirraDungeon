@@ -214,6 +214,27 @@ object Commands {
     }
 
     @CommandBody
+    val addDrop = subCommand {
+        dynamic(commit = "mobId") {
+            dynamic(commit = "itemId") {
+                dynamic(commit = "dropChance") {
+                    dynamic(commit = "dropRange") {
+                        execute<Player> { player, context, _ ->
+                            val zone = getEditingZone(player) ?: return@execute
+                            val mobId = context.get(1)
+                            val itemId = context.get(2)
+                            val dropChance = context.get(3).toDouble().coerceAtMost(1.0)
+                            val dropRange = context.get(4).parseIntRange() ?: return@execute
+                            DropItemWriter.setDrop(zone, mobId, itemId, dropChance, dropRange)
+                            player.sendMessage("&a成功给 $mobId &a添加掉落物 = &f$itemId ($dropChance, $dropRange)".colored())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @CommandBody
     val addMob = subCommand {
         dynamic(commit = "mobType") {
             dynamic(commit = "mobAmount") {

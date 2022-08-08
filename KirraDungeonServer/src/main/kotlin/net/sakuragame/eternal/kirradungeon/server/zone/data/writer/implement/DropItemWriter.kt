@@ -9,7 +9,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 
 object DropItemWriter : WriteHelper {
 
-    fun setDrop(zone: Zone, mobId: String, itemId: Int, chance: Double, amountRange: IntRange) {
+    fun setDrop(zone: Zone, mobId: String, itemId: String, chance: Double, amountRange: IntRange) {
         KirraDungeonServer.data["${zone.id}.drops.$mobId"] = "$itemId; ${chance.coerceAtMost(1.0)}; $amountRange"
         reload()
     }
