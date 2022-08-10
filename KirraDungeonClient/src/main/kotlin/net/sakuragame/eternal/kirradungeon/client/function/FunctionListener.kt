@@ -4,6 +4,7 @@ import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxCancelEvent
 import net.sakuragame.eternal.justmessage.api.event.notify.NotifyBoxConfirmEvent
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import net.sakuragame.eternal.kirradungeon.client.zone.event.ZoneJoinEvent
+import org.bukkit.Bukkit
 import taboolib.common.platform.event.SubscribeEvent
 
 object FunctionListener {
@@ -14,7 +15,9 @@ object FunctionListener {
     fun e(e: ZoneJoinEvent) {
         val player = e.player
         val dungeonId = e.dungeonId
+        Bukkit.broadcastMessage("reached 1")
         if (dungeonId == "null") return
+        Bukkit.broadcastMessage("reached 2")
         Zone.preJoin(player, dungeonId, e.isTeam)
     }
 

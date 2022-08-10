@@ -90,6 +90,8 @@ object DungeonCard : IScreen {
             if (player.getRealm() < subScreen.limitRealm.realm) {
                 addLockComponent()
             }
+        }.apply {
+            println(build(null).saveToString())
         }
     }
 
