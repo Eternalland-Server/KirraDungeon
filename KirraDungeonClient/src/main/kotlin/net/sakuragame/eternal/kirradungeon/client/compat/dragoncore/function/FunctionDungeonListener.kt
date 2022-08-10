@@ -13,13 +13,11 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.*
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamData
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamNumData
-import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen.ScreenTeleportType.*
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenTeleportType
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.isBelongDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.event.ZoneJoinEvent
-import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common5.Baffle
 import java.util.concurrent.TimeUnit
@@ -86,12 +84,13 @@ object FunctionDungeonListener {
     private fun doJoin(player: Player, compId: String, paramData: ParamData) {
         player.closeInventory()
         when (paramData.subScreen.teleportType) {
-            DUNGEON -> {
+            ScreenTeleportType.DUNGEON -> {
                 val isLocal = compId == "join_button"
                 val isTeam = !isLocal && compId == "team_button"
                 ZoneJoinEvent(player, paramData.subScreen.teleportData, isTeam).call()
             }
-            SERVER -> {
+
+            ScreenTeleportType.SERVER -> {
                 val split = paramData.subScreen.teleportData.split("@")
                 if (split.size == 1) {
                     KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], null, null, player.uniqueId)
@@ -99,7 +98,8 @@ object FunctionDungeonListener {
                 }
                 KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], AssignType.ASSIGN_WORLD, split[1], player.uniqueId)
             }
-            COORD -> {
+
+            ScreenTeleportType.COORD -> {
                 val split = paramData.subScreen.teleportData.split("@")
                 KirraCoreBukkitAPI.teleportPlayerToAnotherServer(split[0], AssignType.ASSIGN_COORD, split[1], player.uniqueId)
             }
@@ -179,6 +179,7 @@ object FunctionDungeonListener {
                     fromData.param3,
                     fromData.param4
                 )
+
             "sub_category" -> {
                 ParamNumData(
                     fromData.param1,
@@ -187,6 +188,7 @@ object FunctionDungeonListener {
                     fromData.param4
                 )
             }
+
             "current_selected" ->
                 ParamNumData(
                     fromData.param1,
@@ -194,6 +196,7 @@ object FunctionDungeonListener {
                     value.get(),
                     fromData.param4
                 )
+
             else -> fromData
         }
     }

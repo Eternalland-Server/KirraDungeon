@@ -133,11 +133,14 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
                 return
             }
             val bossData = zone.data.monsterData.boss
+            bossSpawned = true
+            if (bossData.type.isEmpty() || bossData.type.isBlank()) {
+                return
+            }
             val loc = bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld)
             val entity = spawnDungeonMob(loc, bossData.type, bossData.levelRange.random())
             doBossNotice(loc)
             bossUUID = entity.uniqueId
-            bossSpawned = true
             return
         }
         val loc = mobData.loc.toBukkitLocation(dungeonWorld.bukkitWorld).add(0.0, 1.5, 0.0)

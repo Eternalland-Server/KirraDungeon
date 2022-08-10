@@ -5,7 +5,10 @@ import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.DungeonCategory
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
-import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen.ScreenDescription
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenDescription
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenLimitRealm
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenLimitTime
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenTeleportType
 import net.sakuragame.eternal.kirradungeon.client.log
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -89,24 +92,24 @@ object DungeonLoader {
         val iconPath = section.getString("icon") ?: return null
         val description = ScreenDescription(
             section["description.text"]?.asList() ?: return null,
+            section.getString("description.tip") ?: "",
             section.getString("description.bg") ?: return null
         )
         val frameVisible = section.getBoolean("frame-visible")
         val isSingle = section.getBoolean("is-single")
         val forceLock = section.getBoolean("force-lock", false)
         val forceEmpty = section.getBoolean("force-empty", false)
-        val teleportType = DungeonSubScreen.ScreenTeleportType
-            .values()
+        val teleportType = ScreenTeleportType.values()
             .find { section.getString("teleport.type")?.uppercase() == it.name }
             ?: return null
         val teleportData = section.getString("teleport.data") ?: return null
         val droppedItems = section.getStringList("dropped-item")
-        val limitTime = DungeonSubScreen.ScreenLimitTime(0, 0).apply {
+        val limitTime = ScreenLimitTime(0, 0).apply {
             val split = section.getString("limit-time")?.split("-") ?: return@apply
             to = split[0].toInt()
             from = split[1].toInt()
         }
-        val limitRealm = DungeonSubScreen.ScreenLimitRealm(section.getInt("limit-realm", 0))
+        val limitRealm = ScreenLimitRealm(section.getInt("limit-realm", 0))
         return DungeonSubScreen(
             name,
             iconPath,

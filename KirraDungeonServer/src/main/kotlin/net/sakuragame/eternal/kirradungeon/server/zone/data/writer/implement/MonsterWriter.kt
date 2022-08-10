@@ -32,7 +32,7 @@ object MonsterWriter : WriteHelper {
         val mobData = mutableListOf<ZoneMobData>().also { list ->
             data.getStringList("$id.mobs").forEach string@{ string ->
                 val split = string.splitWithNoSpace(";")
-                if (split.size < 3) return@string
+                if (split.size < 4) return@string
                 val loc = ZoneLocation.parseToZoneLocation(split[0])!!
                 val monsterId = split[1]
                 val amount = split[2].toInt()

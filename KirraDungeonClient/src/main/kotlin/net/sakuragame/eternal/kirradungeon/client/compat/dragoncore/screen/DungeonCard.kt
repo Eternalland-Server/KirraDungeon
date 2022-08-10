@@ -36,6 +36,10 @@ object DungeonCard : IScreen {
                 TextureComp("desc_img_shade", "ui/dungeon/desc_shade.png")
                     .setExtend("desc_img")
             )
+            addComponent(
+                LabelComp("card_tip", subScreen.description.tip)
+                    .setExtend("desc_tip")
+            )
             val description = arrayListOf<String>().also {
                 it.addAll(subScreen.description.text)
             }

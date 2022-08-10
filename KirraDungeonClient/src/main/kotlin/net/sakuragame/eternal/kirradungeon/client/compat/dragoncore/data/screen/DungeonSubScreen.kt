@@ -1,6 +1,9 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen
 
-import net.sakuragame.eternal.kirradungeon.client.getCurrentHour
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenDescription
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenLimitRealm
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenLimitTime
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenTeleportType
 
 /**
  * 副本房间实例.
@@ -17,7 +20,6 @@ import net.sakuragame.eternal.kirradungeon.client.getCurrentHour
  * @property limitTime 副本限制开放时间
  * @property limitRealm 副本限制境界
  */
-@Suppress("SpellCheckingInspection")
 data class DungeonSubScreen(
     val name: String,
     val iconPath: String,
@@ -31,26 +33,4 @@ data class DungeonSubScreen(
     val droppedItems: List<String> = mutableListOf(),
     val limitTime: ScreenLimitTime,
     val limitRealm: ScreenLimitRealm
-) {
-
-    enum class ScreenTeleportType {
-        DUNGEON, SERVER, COORD
-    }
-
-    data class ScreenDescription(val text: List<String>, val bgPath: String)
-
-    data class ScreenLimitTime(var from: Int, var to: Int) {
-
-        fun isActive() = this.from != 0 && this.to != 0
-
-        fun isInLimitTime(): Boolean {
-            val currentHour = getCurrentHour()
-            if (currentHour in from until to) {
-                return true
-            }
-            return false
-        }
-    }
-
-    data class ScreenLimitRealm(val realm: Int)
-}
+)

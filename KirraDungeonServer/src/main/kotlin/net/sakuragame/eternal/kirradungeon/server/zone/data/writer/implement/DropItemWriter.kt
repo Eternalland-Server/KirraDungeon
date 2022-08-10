@@ -16,9 +16,9 @@ object DropItemWriter : WriteHelper {
 
     fun read(id: String): MutableMap<String, MutableList<ZoneDropData>> {
         val toReturn = mutableMapOf<String, MutableList<ZoneDropData>>()
-        val section = KirraDungeonServer.data.getConfigurationSection("${id}.drops") ?: return mutableMapOf()
+        val section = KirraDungeonServer.data.getConfigurationSection("$id.drops") ?: return mutableMapOf()
         section.getKeys(false).forEach {
-            val split = section.getString("$id.drops.$it")?.splitWithNoSpace(";") ?: return@forEach
+            val split = data.getString("$id.drops.$it")?.splitWithNoSpace(";") ?: return@forEach
             val itemId = split[0]
             val chance = split[1].toDouble()
             val amountRange = split[2].parseIntRange()!!
