@@ -15,9 +15,7 @@ object FunctionListener {
     fun e(e: ZoneJoinEvent) {
         val player = e.player
         val dungeonId = e.dungeonId
-        Bukkit.broadcastMessage("reached 1")
         if (dungeonId == "null") return
-        Bukkit.broadcastMessage("reached 2")
         Zone.preJoin(player, dungeonId, e.isTeam)
     }
 

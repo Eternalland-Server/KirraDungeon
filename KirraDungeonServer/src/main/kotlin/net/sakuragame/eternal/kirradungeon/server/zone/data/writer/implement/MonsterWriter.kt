@@ -24,7 +24,7 @@ object MonsterWriter : WriteHelper {
     fun setBoss(zone: Zone, loc: ZoneLocation, id: String, levelRange: IntRange) {
         data["${zone.id}.boss.id"] = id
         data["${zone.id}.boss.loc"] = loc.toString()
-        data["${zone.id}.level-range"] = levelRange.toString()
+        data["${zone.id}.boss.level-range"] = levelRange.toString()
         reload()
     }
 

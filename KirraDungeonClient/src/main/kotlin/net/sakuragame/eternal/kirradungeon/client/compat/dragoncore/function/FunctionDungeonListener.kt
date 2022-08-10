@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.Atomics
 import com.taylorswiftcn.megumi.uifactory.event.comp.UIFCompSubmitEvent
 import com.taylorswiftcn.megumi.uifactory.generate.function.SubmitParams
 import net.sakuragame.eternal.dragoncore.api.KeyPressEvent
-import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.kirracore.bukkit.KirraCoreBukkitAPI
 import net.sakuragame.eternal.kirracore.common.packet.impl.sub.AssignType
@@ -16,12 +15,10 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.P
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenTeleportType
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.isBelongDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.event.ZoneJoinEvent
-import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common5.Baffle
-import taboolib.platform.util.broadcast
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.Pattern
@@ -40,9 +37,6 @@ object FunctionDungeonListener {
 
     @SubscribeEvent
     fun e(e: UIFCompSubmitEvent) {
-        Bukkit.broadcastMessage("reached 1")
-        e.params.broadcast()
-        e.compID.broadcast()
         if (!e.isBelongDungeon()) return
         execCompSubmit(e.player, e.compID, e.params)
     }
@@ -87,6 +81,7 @@ object FunctionDungeonListener {
                 val isTeam = !isLocal && compId == "team_button"
                 ZoneJoinEvent(player, paramData.subScreen.teleportData, isTeam).call()
             }
+
             ScreenTeleportType.SERVER -> {
                 val split = paramData.subScreen.teleportData.split("@")
                 if (split.size == 1) {

@@ -31,16 +31,18 @@ object DungeonAPI {
     fun getPluginParams(
         type: ParamType = ParamType.UPDATE,
         toScreenData: String = "",
-    ) = SubmitParams().apply {
-        addValue(KirraDungeonClient.plugin.name)
-        addValue(type.name)
-        // toScreenData
-        addValue(toScreenData)
-        // fromScreenData
-        add("global.dungeon_category")
-        add("global.dungeon_sub_category")
-        add("global.dungeon_current_selected")
-        add("global.dungeon_page")
+    ): SubmitParams {
+        return SubmitParams().apply {
+            addValue(KirraDungeonClient.plugin.name)
+            addValue(type.name)
+            // toScreenData
+            addValue(toScreenData)
+            // fromScreenData
+            add("global.dungeon_category")
+            add("global.dungeon_sub_category")
+            add("global.dungeon_current_selected")
+            add("global.dungeon_page")
+        }
     }
 
     fun getDungeonCategory(index: Int) = when (index) {

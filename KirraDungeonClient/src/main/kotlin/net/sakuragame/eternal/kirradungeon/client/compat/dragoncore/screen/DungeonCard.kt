@@ -4,6 +4,7 @@ import com.taylorswiftcn.megumi.uifactory.generate.type.ActionType
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.LabelComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.TextureComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.screen.ScreenUI
+import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.JOIN
@@ -11,11 +12,9 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.getRealm
 import org.bukkit.entity.Player
+import java.io.File
 
 
-/**
- * 副本右侧介绍栏显示实现层.
- */
 object DungeonCard : IScreen {
 
     override val screenId: String
@@ -90,8 +89,6 @@ object DungeonCard : IScreen {
             if (player.getRealm() < subScreen.limitRealm.realm) {
                 addLockComponent()
             }
-        }.apply {
-            println(build(null).saveToString())
         }
     }
 

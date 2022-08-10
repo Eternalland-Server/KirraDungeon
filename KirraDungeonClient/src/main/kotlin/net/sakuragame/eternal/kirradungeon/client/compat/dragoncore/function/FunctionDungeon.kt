@@ -22,7 +22,7 @@ object FunctionDungeon {
             .build()!!
     }
 
-    fun sendScreen(player: Player, screen: DungeonScreen, subScreen: DungeonSubScreen) {
+    private fun sendScreen(player: Player, screen: DungeonScreen, subScreen: DungeonSubScreen) {
         player.apply {
             DungeonCard.send(this, screen, subScreen)
             DungeonRegion.send(this, screen, subScreen)
