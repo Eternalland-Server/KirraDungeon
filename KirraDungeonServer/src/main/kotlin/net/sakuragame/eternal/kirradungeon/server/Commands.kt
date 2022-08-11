@@ -30,6 +30,7 @@ import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
 import taboolib.platform.util.giveItem
 
+@Suppress("SpellCheckingInspection")
 @CommandHeader(name = "KirraDungeonServer", aliases = ["dungeon"], permission = "admin")
 object Commands {
 
