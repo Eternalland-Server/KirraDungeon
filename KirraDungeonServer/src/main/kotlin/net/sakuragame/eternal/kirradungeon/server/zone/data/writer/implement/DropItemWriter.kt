@@ -9,6 +9,11 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 
 object DropItemWriter : WriteHelper {
 
+    fun clear(zone: Zone) {
+        data["${zone.id}.drops"] = mutableListOf<String>()
+        reload()
+    }
+
     fun setDrop(zone: Zone, mobId: String, itemId: String, chance: Double, amountRange: IntRange) {
         val drops = arrayListOf<String>().apply {
             addAll(data.getStringList("${zone.id}.drops"))

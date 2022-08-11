@@ -235,6 +235,15 @@ object Commands {
     }
 
     @CommandBody
+    val clearDrops = subCommand {
+        execute<Player> { player, _, _ ->
+            val zone = getEditingZone(player) ?: return@execute
+            DropItemWriter.clear(zone)
+            player.sendMessage("&a成功.".colored())
+        }
+    }
+
+    @CommandBody
     val addMob = subCommand {
         dynamic(commit = "mobAmount") {
             dynamic(commit = "levelRange") {
