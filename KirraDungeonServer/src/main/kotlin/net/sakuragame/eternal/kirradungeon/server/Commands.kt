@@ -236,18 +236,15 @@ object Commands {
 
     @CommandBody
     val addMob = subCommand {
-        dynamic(commit = "mobType") {
-            dynamic(commit = "mobAmount") {
-                dynamic(commit = "levelRange") {
-                    execute<Player> { player, context, _ ->
-                        val zone = getEditingZone(player) ?: return@execute
-                        val mobType = context.get(1)
-                        val amount = context.get(2).toIntOrNull() ?: 1
-                        val levelRange = context.get(3).parseIntRange() ?: return@execute
-                        val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
-                        MonsterWriter.setMob(zone, zoneLoc, mobType, amount, levelRange)
-                        player.sendMessage("&a成功在 &f$zoneLoc &a添加怪物 = &f$mobType x $amount".colored())
-                    }
+        dynamic(commit = "mobAmount") {
+            dynamic(commit = "levelRange") {
+                execute<Player> { player, context, _ ->
+                    val zone = getEditingZone(player) ?: return@execute
+                    val amount = context.get(1).toIntOrNull() ?: 1
+                    val levelRange = context.get(2).parseIntRange() ?: return@execute
+                    val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
+                    MonsterWriter.setMob(zone, zoneLoc, amount, levelRange)
+                    player.sendMessage("&a成功在 &f$zoneLoc &a添加怪物 = &f$amount".colored())
                 }
             }
         }

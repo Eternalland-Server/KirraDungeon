@@ -17,11 +17,11 @@ object MonsterWriter : WriteHelper {
         reload()
     }
 
-    fun setMob(zone: Zone, loc: ZoneLocation, id: String, amount: Int, levelRange: IntRange) {
+    fun setMob(zone: Zone, loc: ZoneLocation, amount: Int, levelRange: IntRange) {
         val mobs = arrayListOf<String>().apply {
             addAll(data.getStringList("${zone.id}.mobs"))
         }
-        mobs.add("$loc; $id; $amount; $levelRange")
+        mobs.add("$loc; $amount; $levelRange")
         KirraDungeonServer.data["${zone.id}.mobs"] = mobs
         reload()
     }
@@ -35,13 +35,13 @@ object MonsterWriter : WriteHelper {
 
     fun read(id: String): ZoneMonsterData {
         val mobData = mutableListOf<ZoneMobData>().also { list ->
-            data.getStringList("$id.mobs").forEach string@{ string ->
+            data.getStringList("$id.mobs").forEach strList@{ string ->
                 val split = string.splitWithNoSpace(";")
-                if (split.size < 4) return@string
+                if (split.size < 3) return@strList
                 val loc = ZoneLocation.parseToZoneLocation(split[0])!!
-                val monsterId = split[1]
+                val monsterId = getRandomMonster(id) ?: return@strList
                 val amount = split[2].toInt()
-                val levelRange = split[3].parseIntRange() ?: return@string
+                val levelRange = split[3].parseIntRange() ?: return@strList
                 list += ZoneMobData(loc, monsterId, amount, levelRange)
             }
         }
@@ -51,5 +51,9 @@ object MonsterWriter : WriteHelper {
             KirraDungeonServer.data.getString("$id.boss.level-range")?.parseIntRange() ?: IntRange(1, 1)
         )
         return ZoneMonsterData(bossData, mobData)
+    }
+
+    private fun getRandomMonster(id: String): String? {
+        return DropItemWriter.read(id).keys.randomOrNull()
     }
 }
