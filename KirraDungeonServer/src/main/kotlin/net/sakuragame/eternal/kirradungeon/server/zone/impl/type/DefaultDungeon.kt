@@ -147,7 +147,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         doMobNotice(loc)
         repeat(mobData.amount) {
             val randomLoc = loc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
-            val entity = spawnDungeonMob(randomLoc, mobData.type, mobData.levelRange.random())
+            val entity = spawnDungeonMob(randomLoc, zone.data.monsterDropData.keys.random(), mobData.levelRange.random())
             monsterUUIDList.add(entity.uniqueId)
         }
     }

@@ -40,8 +40,8 @@ object MonsterWriter : WriteHelper {
                 if (split.size < 3) return@strList
                 val loc = ZoneLocation.parseToZoneLocation(split[0])!!
                 val monsterId = getRandomMonster(id) ?: return@strList
-                val amount = split[2].toInt()
-                val levelRange = split[3].parseIntRange() ?: return@strList
+                val amount = split[1].toInt()
+                val levelRange = split[2].parseIntRange() ?: return@strList
                 list += ZoneMobData(loc, monsterId, amount, levelRange)
             }
         }
