@@ -12,6 +12,11 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 
 object MonsterWriter : WriteHelper {
 
+    fun clear(zone: Zone) {
+        data["${zone.id}.mobs"] = mutableListOf<String>()
+        reload()
+    }
+
     fun setMob(zone: Zone, loc: ZoneLocation, id: String, amount: Int, levelRange: IntRange) {
         val mobs = arrayListOf<String>().apply {
             addAll(data.getStringList("${zone.id}.mobs"))

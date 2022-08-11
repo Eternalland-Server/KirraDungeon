@@ -270,6 +270,15 @@ object Commands {
     }
 
     @CommandBody
+    val clearMonsters = subCommand {
+        execute<Player> { player, _, _ ->
+            val zone = getEditingZone(player) ?: return@execute
+            MonsterWriter.clear(zone)
+            player.sendMessage("&a成功.".colored())
+        }
+    }
+
+    @CommandBody
     val setSkyColor = subCommand {
         dynamic(commit = "skyColorType") {
             dynamic(commit = "skyColorValue") {
