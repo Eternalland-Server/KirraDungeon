@@ -64,6 +64,10 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         addAll(zone.data.monsterData.mobList)
     }
 
+    val monsterIds by lazy {
+        getMonsterIdsFromZone()
+    }
+
     val naturalSpawnBoss by lazy {
         !zone.data.metadataMap.containsKey("DISABLE_NATURAL_SPAWN")
     }
@@ -147,7 +151,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         doMobNotice(loc)
         repeat(mobData.amount) {
             val randomLoc = loc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
-            val entity = spawnDungeonMob(randomLoc, zone.data.monsterDropData.keys.random(), mobData.levelRange.random())
+            val entity = spawnDungeonMob(randomLoc, monsterIds.random(), mobData.levelRange.random())
             monsterUUIDList.add(entity.uniqueId)
         }
     }
@@ -178,6 +182,14 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
             getPlayers().forEach { BossBar.close(it) }
             updateBossBar(init = true)
         }
+    }
+
+    private fun getMonsterIdsFromZone(): List<String> {
+        val boss = zone.data.monsterData.boss
+        if (boss.type.isEmpty() || boss.type.isBlank()) {
+            return zone.data.monsterDropData.keys.toMutableList()
+        }
+        return zone.data.monsterDropData.keys.filter { it != boss.type }
     }
 
     override fun canClear() = getMonsters(containsBoss = true).isEmpty() && bossSpawned && triggered && !isClear && !fail
