@@ -3,6 +3,7 @@ package net.sakuragame.eternal.kirradungeon.server
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerKickEvent
@@ -44,6 +45,8 @@ class Profile(val player: Player) {
 
     lateinit var zoneType: ZoneType
     lateinit var zoneUUID: UUID
+
+    lateinit var deathPlace: Location
 
     companion object {
 

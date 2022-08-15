@@ -142,6 +142,7 @@ object FunctionCommonListener {
         val profile = player.profile() ?: return
         if (!profile.isChallenging) return
         val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) ?: return
+        profile.deathPlace = player.location
         player.apply {
             playDeathAnimation()
             health = maxHealth
