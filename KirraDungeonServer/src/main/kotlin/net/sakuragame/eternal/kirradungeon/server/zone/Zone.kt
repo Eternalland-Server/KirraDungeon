@@ -7,6 +7,7 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.module.chat.colored
 import taboolib.module.chat.uncolored
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * 副本类
@@ -23,7 +24,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
 
         var editingDungeonWorld: DungeonWorld? = null
 
-        val zones = mutableListOf<Zone>()
+        val zones = CopyOnWriteArrayList<Zone>()
 
         fun getByName(name: String) = zones.find { it.name == name }
 
@@ -33,8 +34,8 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
         fun i() {
             clear()
             Loader.files.forEach {
-                val id = it.name
-                val name = it.getString("$it.name") ?: return@forEach
+                val id = it.getString("id") ?: return@forEach
+                val name = it.getString("name") ?: return@forEach
                 zones += Zone(
                     id, name.colored(), ZoneData(
                         type = TypeWriter.read(id),

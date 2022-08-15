@@ -14,6 +14,6 @@ object SpawnLocWriter : WriteHelper {
 
     fun read(id: String): ZoneLocation? {
         val file = getFile(id)
-        return ZoneLocation.parseToZoneLocation(file.getString("$id.spawn-loc")!!)
+        return ZoneLocation.parseToZoneLocation(file.getString("spawn-loc")!!)
     }
 }

@@ -6,6 +6,7 @@ import taboolib.module.configuration.ConfigFile
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 
 object Loader {
 
@@ -13,10 +14,16 @@ object Loader {
         File(KirraDungeonServer.plugin.dataFolder, "zones")
     }
 
-    val files = mutableListOf<ConfigFile>()
+    val files = CopyOnWriteArrayList<ConfigFile>()
 
     @Awake(LifeCycle.LOAD)
     fun i() {
-        files += folder.listFiles()!!.map { Configuration.loadFromFile(it, Type.JSON) }
+        files += folder.listFiles()!!.map { parseWithId(it) }
+    }
+
+    private fun parseWithId(file: File): ConfigFile {
+        return Configuration.loadFromFile(file, Type.JSON).also {
+            it["id"] = file.nameWithoutExtension
+        }
     }
 }

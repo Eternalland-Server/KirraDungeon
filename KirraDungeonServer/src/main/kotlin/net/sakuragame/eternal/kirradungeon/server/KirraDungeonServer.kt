@@ -17,10 +17,6 @@ object KirraDungeonServer : Plugin() {
     lateinit var conf: Configuration
         private set
 
-    val data by lazy {
-        createLocal("data.json", 200, Type.JSON)
-    }
-
     val plugin by lazy {
         BukkitPlugin.getInstance()
     }

@@ -64,7 +64,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         addAll(zone.data.monsterData.mobList)
     }
 
-    val monsterIds by lazy {
+    private val monsterIds by lazy {
         getMonsterIdsFromZone()
     }
 

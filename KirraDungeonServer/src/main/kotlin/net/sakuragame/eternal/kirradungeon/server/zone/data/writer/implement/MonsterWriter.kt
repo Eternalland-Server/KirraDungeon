@@ -50,8 +50,8 @@ object MonsterWriter : WriteHelper {
         }
         val bossData = ZoneBossData(
             ZoneLocation.parseToZoneLocation(file.getString("boss.loc")!!)!!,
-            file.getString("$id.boss.id")!!,
-            file.getString("$id.boss.level-range")?.parseIntRange() ?: IntRange(1, 1)
+            file.getString("boss.id")!!,
+            file.getString("boss.level-range")?.parseIntRange() ?: IntRange(1, 1)
         )
         return ZoneMonsterData(bossData, mobData)
     }
