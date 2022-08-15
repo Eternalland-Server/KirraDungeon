@@ -11,22 +11,25 @@ object HologramWriter : WriteHelper {
     val editingHolograms = mutableMapOf<String, Hologram<*>>()
 
     fun set(zone: Zone, id: String, message: List<String>, loc: ZoneLocation) {
-        data["${zone.id}.holograms.$id.loc"] = loc.toString()
-        data["${zone.id}.holograms.$id.contents"] = message
+        val file = getFile(zone.id)
+        file["holograms.$id.loc"] = loc.toString()
+        file["holograms.$id.contents"] = message
         reload()
     }
 
     fun remove(zone: Zone, id: String) {
-        data["${zone.id}.holograms.$id"] = null
+        val file = getFile(zone.id)
+        file["holograms.$id"] = null
         reload()
     }
 
     fun read(id: String): List<ZoneHologramData> {
         val toReturn = mutableListOf<ZoneHologramData>()
-        val sections = data.getConfigurationSection("$id.holograms")?.getKeys(false) ?: return emptyList()
+        val file = getFile(id)
+        val sections = file.getConfigurationSection("holograms")?.getKeys(false) ?: return emptyList()
         sections.forEach {
-            val loc = ZoneLocation.parseToZoneLocation(data.getString("$id.holograms.$it.loc") ?: return@forEach) ?: return@forEach
-            val contents = data.getStringList("$id.holograms.$it.contents")
+            val loc = ZoneLocation.parseToZoneLocation(file.getString("holograms.$it.loc") ?: return@forEach) ?: return@forEach
+            val contents = file.getStringList("holograms.$it.contents")
             toReturn += ZoneHologramData(loc, contents)
         }
         return toReturn

@@ -14,7 +14,6 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.getRealm
 import org.bukkit.entity.Player
 import java.io.File
 
-
 object DungeonCard : IScreen {
 
     override val screenId: String

@@ -1,6 +1,5 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement
 
-import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.parseIntRange
 import net.sakuragame.eternal.kirradungeon.server.splitWithNoSpace
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
@@ -13,29 +12,33 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 object MonsterWriter : WriteHelper {
 
     fun clear(zone: Zone) {
-        data["${zone.id}.mobs"] = mutableListOf<String>()
+        val file = getFile(zone.id)
+        file["mobs"] = mutableListOf<String>()
         reload()
     }
 
     fun setMob(zone: Zone, loc: ZoneLocation, amount: Int, levelRange: IntRange) {
+        val file = getFile(zone.id)
         val mobs = arrayListOf<String>().apply {
-            addAll(data.getStringList("${zone.id}.mobs"))
+            addAll(file.getStringList("mobs"))
         }
         mobs.add("$loc; $amount; $levelRange")
-        KirraDungeonServer.data["${zone.id}.mobs"] = mobs
+        file["mobs"] = mobs
         reload()
     }
 
     fun setBoss(zone: Zone, loc: ZoneLocation, id: String, levelRange: IntRange) {
-        data["${zone.id}.boss.id"] = id
-        data["${zone.id}.boss.loc"] = loc.toString()
-        data["${zone.id}.boss.level-range"] = levelRange.toString()
+        val file = getFile(zone.id)
+        file["boss.id"] = id
+        file["boss.loc"] = loc.toString()
+        file["boss.level-range"] = levelRange.toString()
         reload()
     }
 
     fun read(id: String): ZoneMonsterData {
+        val file = getFile(id)
         val mobData = mutableListOf<ZoneMobData>().also { list ->
-            data.getStringList("$id.mobs").forEach strList@{ string ->
+            file.getStringList("mobs").forEach strList@{ string ->
                 val split = string.splitWithNoSpace(";")
                 if (split.size < 3) return@strList
                 val loc = ZoneLocation.parseToZoneLocation(split[0])!!
@@ -46,9 +49,9 @@ object MonsterWriter : WriteHelper {
             }
         }
         val bossData = ZoneBossData(
-            ZoneLocation.parseToZoneLocation(KirraDungeonServer.data.getString("$id.boss.loc")!!)!!,
-            KirraDungeonServer.data.getString("$id.boss.id")!!,
-            KirraDungeonServer.data.getString("$id.boss.level-range")?.parseIntRange() ?: IntRange(1, 1)
+            ZoneLocation.parseToZoneLocation(file.getString("boss.loc")!!)!!,
+            file.getString("$id.boss.id")!!,
+            file.getString("$id.boss.level-range")?.parseIntRange() ?: IntRange(1, 1)
         )
         return ZoneMonsterData(bossData, mobData)
     }

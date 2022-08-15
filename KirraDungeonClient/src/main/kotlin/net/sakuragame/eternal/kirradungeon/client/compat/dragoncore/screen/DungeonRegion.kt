@@ -10,9 +10,6 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.getParentScr
 import org.bukkit.entity.Player
 import taboolib.module.chat.colored
 
-/**
- * 副本区域显示实现层.
- */
 object DungeonRegion : IScreen {
 
     override val screenId: String

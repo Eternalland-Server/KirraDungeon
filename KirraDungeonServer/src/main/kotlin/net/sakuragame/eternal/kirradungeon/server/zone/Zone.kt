@@ -1,7 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.zone
 
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
+import net.sakuragame.eternal.kirradungeon.server.Loader
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.*
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -32,15 +32,15 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
         @Awake(LifeCycle.ENABLE)
         fun i() {
             clear()
-            KirraDungeonServer.data.getKeys(false).forEach {
-                val id = it
-                val name = KirraDungeonServer.data.getString("$it.name") ?: return@forEach
+            Loader.files.forEach {
+                val id = it.name
+                val name = it.getString("$it.name") ?: return@forEach
                 zones += Zone(
                     id, name.colored(), ZoneData(
                         type = TypeWriter.read(id),
                         maxLastTime = MaxLastTimeWriter.read(id),
                         monsterData = MonsterWriter.read(id),
-                        monsterDropData = DropItemWriter.read(it),
+                        monsterDropData = DropItemWriter.read(id),
                         spawnLoc = SpawnLocWriter.read(id)!!,
                         zoneSkyData = SkyDataWriter.read(id),
                         number = NumberWriter.read(id),

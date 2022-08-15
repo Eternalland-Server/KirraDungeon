@@ -6,9 +6,13 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 object IconNumberWriter : WriteHelper {
 
     fun set(zone: Zone, num: Int) {
-        data["${zone.id}.icon"] = num
+        val file = getFile(zone.id)
+        file["icon"] = num
         reload()
     }
 
-    fun read(id: String): Int = data.getInt("$id.icon")
+    fun read(id: String): Int {
+        val file = getFile(id)
+        return file.getInt("icon")
+    }
 }

@@ -5,7 +5,13 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 
 object MaxLastTimeWriter : WriteHelper {
 
-    fun set(zone: Zone, time: Int) = data.set("${zone.id}.max-last-time", time)
+    fun set(zone: Zone, time: Int) {
+        val file = getFile(zone.id)
+        file["max-last-time"] = time
+    }
 
-    fun read(id: String) = data.getInt("$id.max-last-time")
+    fun read(id: String): Int {
+        val file = getFile(id)
+        return file.getInt("max-last-time")
+    }
 }

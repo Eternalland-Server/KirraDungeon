@@ -7,9 +7,13 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 object SpawnLocWriter : WriteHelper {
 
     fun set(zone: Zone, loc: ZoneLocation) {
-        data["${zone.id}.spawn-loc"] = loc.toString()
+        val file = getFile(zone.id)
+        file["spawn-loc"] = loc.toString()
         reload()
     }
 
-    fun read(id: String) = ZoneLocation.parseToZoneLocation(data.getString("$id.spawn-loc")!!)
+    fun read(id: String): ZoneLocation? {
+        val file = getFile(id)
+        return ZoneLocation.parseToZoneLocation(file.getString("$id.spawn-loc")!!)
+    }
 }

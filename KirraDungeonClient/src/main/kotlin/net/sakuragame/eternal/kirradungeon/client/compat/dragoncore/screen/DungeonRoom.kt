@@ -11,9 +11,6 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.
 import org.bukkit.entity.Player
 import taboolib.module.chat.colored
 
-/**
- * 副本房间显示实现层.
- */
 object DungeonRoom : IScreen {
 
     override val screenId: String

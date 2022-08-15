@@ -1,31 +1,34 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement
 
-import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.parseIntRange
 import net.sakuragame.eternal.kirradungeon.server.splitWithNoSpace
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneDropData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
+import taboolib.module.configuration.ConfigFile
 
 object DropItemWriter : WriteHelper {
 
     fun clear(zone: Zone) {
-        data["${zone.id}.drops"] = mutableListOf<String>()
+        val file = getFile(zone.id)
+        file["drops"] = mutableListOf<String>()
         reload()
     }
 
     fun setDrop(zone: Zone, mobId: String, itemId: String, chance: Double, amountRange: IntRange) {
+        val file = getFile(zone.id)
         val drops = arrayListOf<String>().apply {
-            addAll(data.getStringList("${zone.id}.drops"))
+            addAll(file.getStringList("drops"))
         }
         drops += "$mobId; $itemId; ${chance.coerceAtMost(1.0)}; $amountRange"
-        KirraDungeonServer.data["${zone.id}.drops"] = drops
+        file["drops"] = drops
         reload()
     }
 
     fun read(id: String): MutableMap<String, MutableList<ZoneDropData>> {
+        val file = getFile(id)
         val toReturn = mutableMapOf<String, MutableList<ZoneDropData>>()
-        val drops = KirraDungeonServer.data.getStringList("$id.drops")
+        val drops = file.getStringList("drops")
         drops.forEach {
             val split = it.splitWithNoSpace(";")
             if (split.size < 4) {

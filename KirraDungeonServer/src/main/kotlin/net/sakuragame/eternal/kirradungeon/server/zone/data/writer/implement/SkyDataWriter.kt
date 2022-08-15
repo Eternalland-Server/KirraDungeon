@@ -9,16 +9,18 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 object SkyDataWriter : WriteHelper {
 
     fun set(zone: Zone, skyData: ZoneSkyData) {
-        data["${zone.id}.change-sky-color.enabled"] = true
-        data["${zone.id}.change-sky-color.value"] = skyData.toString()
+        val file = getFile(zone.id)
+        file["change-sky-color.enabled"] = true
+        file["change-sky-color.value"] = skyData.toString()
         reload()
     }
 
     fun read(id: String): ZoneSkyData? {
-        if (!data.getBoolean("$id.change-sky-color.enabled")) {
+        val file = getFile(id)
+        if (!file.getBoolean("change-sky-color.enabled")) {
             return null
         }
-        val split = data.getString("$id.change-sky-color.value")!!.splitWithNoSpace(",")
+        val split = file.getString("change-sky-color.value")!!.splitWithNoSpace(",")
         return ZoneSkyData(
             when (split[0].toInt()) {
                 7 -> SkyPacket.RAIN_LEVEL_CHANGE

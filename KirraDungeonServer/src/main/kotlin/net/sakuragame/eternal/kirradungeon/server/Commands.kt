@@ -28,7 +28,10 @@ import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.Type
 import taboolib.platform.util.giveItem
+import java.io.File
 
 @Suppress("SpellCheckingInspection")
 @CommandHeader(name = "KirraDungeonServer", aliases = ["dungeon"], permission = "admin")
@@ -462,6 +465,33 @@ object Commands {
                     MetadataWriter.set(editingZone, key, value)
                     player.sendMessage("&c[System] &7设置 $key 为 $value 成功.".colored())
                 }
+            }
+        }
+    }
+
+    @CommandBody
+    val test = subCommand {
+        execute<CommandSender> { sender, _, _ ->
+            Zone.zones.forEach {
+                val id = it.id
+                val file = File(KirraDungeonServer.plugin.dataFolder, "zones/$id.json").apply {
+                    createNewFile()
+                }
+                val json = Configuration.loadFromFile(file, Type.JSON)
+                json["name"] = it.name
+                json["type"] = KirraDungeonServer.data.getString("$id.type")
+                json["mobs"] = KirraDungeonServer.data.getStringList("$id.mobs")
+                json["boss.loc"] = KirraDungeonServer.data.getString("$id.boss.loc")
+                json["boss.id"] = KirraDungeonServer.data.getString("$id.boss.id")
+                json["drops"] = KirraDungeonServer.data.getStringList("$id.drops")
+                json["number"] = KirraDungeonServer.data.getInt("$id.number")
+                json["icon"] = KirraDungeonServer.data.getInt("$id.icon")
+                json["change-sky-color.value"] = KirraDungeonServer.data.getString("$id.change-sky-color.value")
+                json["change-sky-color.enabled"] = KirraDungeonServer.data.getBoolean("$id.change-sky-color.enabled")
+                json["spawn-loc"] = KirraDungeonServer.data.getString("$id.spawn-loc")
+                json["max-last-time"] = KirraDungeonServer.data.getInt("$it.max-last-time")
+                json["resurgence-time"] = KirraDungeonServer.data.getInt("$it.resurgence-time")
+                json.saveToFile(file)
             }
         }
     }

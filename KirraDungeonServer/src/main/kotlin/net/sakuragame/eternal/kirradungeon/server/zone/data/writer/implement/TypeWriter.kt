@@ -7,9 +7,13 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.WriteHelper
 object TypeWriter : WriteHelper {
 
     fun set(zone: Zone, type: ZoneType) {
-        data["${zone.id}.type"] = type.name
+        val file = getFile(zone.id)
+        file["${zone.id}.type"] = type.name
         reload()
     }
 
-    fun read(id: String): ZoneType = ZoneType.values().find { it.name == data.getString("$id.type") } ?: ZoneType.DEFAULT
+    fun read(id: String): ZoneType {
+        val file = getFile(id)
+        return ZoneType.values().find { it.name == file.getString("type") } ?: ZoneType.DEFAULT
+    }
 }
