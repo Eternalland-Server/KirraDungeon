@@ -28,10 +28,7 @@ import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
-import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.Type
 import taboolib.platform.util.giveItem
-import java.io.File
 
 @Suppress("SpellCheckingInspection")
 @CommandHeader(name = "KirraDungeonServer", aliases = ["dungeon"], permission = "admin")
@@ -466,6 +463,33 @@ object Commands {
                     player.sendMessage("&c[System] &7设置 $key 为 $value 成功.".colored())
                 }
             }
+        }
+    }
+
+    @CommandBody
+    val addParkourDrop = subCommand {
+        dynamic(commit = "type") {
+            dynamic(commit = "value") {
+                dynamic(commit = "amount") {
+                    execute<Player> { player, context, _ ->
+                        val zone = getEditingZone(player) ?: return@execute
+                        val zoneLoc = ZoneLocation.parseToZoneLocation(player.location.block.location.toCenter(0.5))
+                        val type = context.get(1).toIntOrNull() ?: return@execute
+                        val value = context.get(2).toIntOrNull() ?: return@execute
+                        val amount = context.get(3).toIntOrNull() ?: return@execute
+                        ParkourDropWriter.set(zone, zoneLoc, type, value, amount)
+                        player.sendMessage("&a成功在 &f$zoneLoc &a设置跑酷奖励 = &f$type ($value, $amount)".colored())
+                    }
+                }
+            }
+        }
+    }
+
+    @CommandBody
+    val reload = subCommand {
+        execute<CommandSender> { sender, _, _ ->
+            Loader.reload()
+            sender.sendMessage("&c[System] &7完成".colored())
         }
     }
 

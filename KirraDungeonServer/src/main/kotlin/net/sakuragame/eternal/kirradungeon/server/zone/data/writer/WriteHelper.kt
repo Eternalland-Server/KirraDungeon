@@ -10,6 +10,7 @@ import java.io.File
 
 interface WriteHelper {
 
+    @Suppress("DuplicatedCode")
     fun getFile(id: String): ConfigFile {
         val find = Loader.files.find { it.name == id }
         return when {
@@ -23,6 +24,9 @@ interface WriteHelper {
     }
 
     fun reload() {
+        Loader.files.forEach {
+            it.saveToFile(it.file)
+        }
         Zone.i()
     }
 }

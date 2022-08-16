@@ -467,7 +467,7 @@ interface IDungeon {
         failThread = null
         failTime = 60
         val profile = player.profile() ?: return
-        player.teleport(zone.data.spawnLoc.toBukkitLocation(player.world))
+        player.teleport(profile.deathPlace)
         player.reset()
         player.sendTitle("&6&l复活".colored(), "&7尽全力打败怪物们!".colored(), 3, 40, 5)
         player.inventory.takeItem { it.itemMeta.displayName.contains("复活币") }

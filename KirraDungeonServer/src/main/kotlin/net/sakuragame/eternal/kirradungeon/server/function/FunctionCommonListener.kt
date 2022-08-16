@@ -5,6 +5,7 @@ import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
+import net.sakuragame.eternal.justlevel.api.PropGenerateAPI
 import net.sakuragame.eternal.kirradungeon.common.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
@@ -21,21 +22,22 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeo
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPhysicsEvent
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.world.WorldUnloadEvent
+import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
+import taboolib.platform.util.broadcast
+import taboolib.platform.util.isAir
 import taboolib.platform.util.sendLang
 
 /**
@@ -61,12 +63,16 @@ object FunctionCommonListener {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun e(e: ItemSpawnEvent) {
         val item = e.entity.itemStack
+        if (item.isAir()) {
+            e.isCancelled = true
+            return
+        }
         val itemStream = ZaphkielAPI.read(item)
         if (itemStream.isVanilla()) {
-            e.entity.remove()
+            e.isCancelled = true
         }
     }
 
@@ -87,6 +93,10 @@ object FunctionCommonListener {
         copyZone.data.ores.forEach {
             val ore = KirraMinerAPI.ores[it.ore] ?: return@forEach
             KirraMinerAPI.createTempOre(it.id, ore, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld))
+        }
+        // 跑酷数据生成
+        copyZone.data.parkourDrops.forEach {
+            PropGenerateAPI.spawn(it.type, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), it.value, it.amount)
         }
         dungeonWorld.bukkitWorld.isAutoSave = false
         dungeonWorld.bukkitWorld.apply {
