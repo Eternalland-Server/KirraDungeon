@@ -140,16 +140,6 @@ interface IDungeon {
     fun isAllPlayersDead() = getPlayers().find { !it.isSpectator() } == null
 
     /**
-     * 设置所有副本怪物的血量为满
-     * @param containsBoss 是否包含怪物首领
-     */
-    fun setAllMonsterHealth2Max(containsBoss: Boolean) {
-        getMonsters(containsBoss).forEach {
-            it.health = getMobMaxHealth(it)
-        }
-    }
-
-    /**
      * 移除所有怪物
      */
     fun removeAllMonsters(containBoss: Boolean) {
@@ -472,7 +462,6 @@ interface IDungeon {
         player.sendTitle("&6&l复活".colored(), "&7尽全力打败怪物们!".colored(), 3, 40, 5)
         player.inventory.takeItem { it.itemMeta.displayName.contains("复活币") }
         player.health = player.maxHealth / 2
-        setAllMonsterHealth2Max(true)
         getPlayers().forEach {
             it.sendLang("message-player-resurgence", player.displayName)
         }

@@ -32,5 +32,6 @@ data class DungeonSubScreen(
     val teleportData: String,
     val droppedItems: List<String> = mutableListOf(),
     val limitTime: ScreenLimitTime,
-    val limitRealm: ScreenLimitRealm
+    val limitRealm: ScreenLimitRealm,
+    val shopId: String?
 )

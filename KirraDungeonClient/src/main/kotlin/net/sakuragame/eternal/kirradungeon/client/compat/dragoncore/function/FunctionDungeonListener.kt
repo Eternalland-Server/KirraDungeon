@@ -15,10 +15,12 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.P
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.sub.ScreenTeleportType
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.isBelongDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.event.ZoneJoinEvent
+import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common5.Baffle
+import taboolib.platform.util.broadcast
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.Pattern
@@ -39,6 +41,15 @@ object FunctionDungeonListener {
     fun e(e: UIFCompSubmitEvent) {
         if (!e.isBelongDungeon()) return
         execCompSubmit(e.player, e.compID, e.params)
+    }
+
+    @SubscribeEvent
+    fun onShopSubmit(e: UIFCompSubmitEvent) {
+        if (e.compID == "shop") {
+            val playerName = e.player.name
+            val shopId = e.params.getParam(0)
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "shop open $playerName $shopId")
+        }
     }
 
     @SubscribeEvent

@@ -100,6 +100,14 @@ object Commands {
     }
 
     @CommandBody
+    val checkFatigue = subCommand {
+        execute<Player> { player, _, _ ->
+            val profile = player.profile() ?: return@execute
+            player.sendMessage("&c[System] &7当前体力值: ${profile.fatigue}".colored())
+        }
+    }
+
+    @CommandBody
     val setNumber = subCommand {
         dynamic(commit = "player") {
             suggestion<CommandSender> { _, _ ->

@@ -6,6 +6,7 @@ import ink.ptms.adyeshach.common.util.Inputs.inputBook
 import net.sakuragame.dungeonsystem.common.configuration.DungeonProperties
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
+import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionModelWand
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionOreWand
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionTriggerWand

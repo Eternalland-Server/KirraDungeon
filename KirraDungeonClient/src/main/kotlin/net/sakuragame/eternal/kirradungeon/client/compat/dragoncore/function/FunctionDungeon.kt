@@ -7,6 +7,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.P
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamNumData
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
+import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.display
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.*
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
@@ -44,6 +45,7 @@ object FunctionDungeon {
     private fun syncVariables(player: Player, screen: DungeonScreen, subScreen: DungeonSubScreen) {
         PacketSender.sendSyncPlaceholder(player, hashMapOf<String, String>().also {
             it["variable_map_bg"] = screen.mapBgPath
+            it["category_name"] = screen.category.display()
         })
     }
 

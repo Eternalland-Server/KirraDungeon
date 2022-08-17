@@ -1,10 +1,10 @@
 package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen
 
+import com.taylorswiftcn.megumi.uifactory.generate.function.SubmitParams
 import com.taylorswiftcn.megumi.uifactory.generate.type.ActionType
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.LabelComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.component.base.TextureComp
 import com.taylorswiftcn.megumi.uifactory.generate.ui.screen.ScreenUI
-import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI.ParamType.JOIN
@@ -12,7 +12,6 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.screen.DungeonSubScreen
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.getRealm
 import org.bukkit.entity.Player
-import java.io.File
 
 object DungeonCard : IScreen {
 
@@ -73,6 +72,20 @@ object DungeonCard : IScreen {
                         .addAction(ActionType.Left_Click, "join_button.texture = 'ui/dungeon/button/join_press.png';")
                         .addAction(ActionType.Left_Release, "join_button.texture = 'ui/dungeon/button/join.png';")
                         .addAction(ActionType.Left_Click, DungeonAPI.getPluginParams(type = JOIN))
+                )
+            }
+            if (subScreen.shopId != null) {
+                addComponent(
+                    TextureComp("shop", "ui/dungeon/shop.png")
+                        .setXY("card_contents.x+126", "card_contents.y")
+                        .setWidth("20")
+                        .setHeight("20")
+                        .addAction(ActionType.Left_Click, "func.Sound_Play();")
+                        .addAction(ActionType.Left_Click, "shop.texture = 'ui/dungeon/shop_press.png';")
+                        .addAction(ActionType.Left_Release, "shop.texture = 'ui/dungeon/shop.png';")
+                        .addAction(ActionType.Left_Release, SubmitParams().apply {
+                            addValue("${subScreen.shopId}")
+                        })
                 )
             }
             if (player.hasPermission("admin")) {

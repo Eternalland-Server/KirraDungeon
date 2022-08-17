@@ -66,10 +66,10 @@ object DungeonLoader {
     }
 
     private fun DungeonCategory.getFolder() = when (this) {
-        DungeonCategory.NORMAL -> File(KirraDungeonClient.plugin.dataFolder, "dungeon/normal")
-        DungeonCategory.ACTIVITY -> File(KirraDungeonClient.plugin.dataFolder, "dungeon/activity")
-        DungeonCategory.SPECIAL -> File(KirraDungeonClient.plugin.dataFolder, "dungeon/special")
-        DungeonCategory.TEAM -> File(KirraDungeonClient.plugin.dataFolder, "dungeon/team")
+        DungeonCategory.NORMAL -> File(KirraDungeonClient.plugin.dataFolder, "dungeon/01")
+        DungeonCategory.TEAM -> File(KirraDungeonClient.plugin.dataFolder, "dungeon/02")
+        DungeonCategory.ACTIVITY -> File(KirraDungeonClient.plugin.dataFolder, "dungeon/03")
+        DungeonCategory.SPECIAL -> File(KirraDungeonClient.plugin.dataFolder, "dungeon/04")
     }
 
     private fun readScreen(category: DungeonCategory, conf: ConfigFile): DungeonScreen {
@@ -110,6 +110,7 @@ object DungeonLoader {
             from = split[1].toInt()
         }
         val limitRealm = ScreenLimitRealm(section.getInt("limit-realm", 0))
+        val shopCommand = section.getString("shop")
         return DungeonSubScreen(
             name,
             iconPath,
@@ -122,7 +123,8 @@ object DungeonLoader {
             teleportData = teleportData,
             droppedItems = droppedItems,
             limitTime = limitTime,
-            limitRealm = limitRealm
+            limitRealm = limitRealm,
+            shopId = shopCommand
         )
     }
 }
