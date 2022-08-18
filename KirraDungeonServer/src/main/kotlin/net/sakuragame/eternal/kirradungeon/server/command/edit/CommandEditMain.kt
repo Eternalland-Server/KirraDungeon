@@ -21,7 +21,7 @@ import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
 import taboolib.platform.util.giveItem
 
-@CommandHeader("DungeonEditMain")
+@CommandHeader("DungeonEdit")
 object CommandEditMain {
 
     @CommandBody
