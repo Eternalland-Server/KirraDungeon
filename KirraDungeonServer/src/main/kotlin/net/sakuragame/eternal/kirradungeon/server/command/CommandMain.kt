@@ -30,12 +30,6 @@ object CommandMain {
     }
 
     @CommandBody
-    val commandEditMain = CommandEditMain
-
-    @CommandBody
-    val commandHelper = CommandHelper
-
-    @CommandBody
     val list = subCommand {
         execute<CommandSender> { sender, _, _ ->
             sender.sendMessage("&c[System] &7目前可用的副本如下 ".colored())

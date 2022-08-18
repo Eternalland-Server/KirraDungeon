@@ -30,12 +30,6 @@ object CommandEditMain {
     }
 
     @CommandBody
-    val commandEditWave = CommandEditWave
-
-    @CommandBody
-    val commandEditParkour = CommandEditParkour
-
-    @CommandBody
     val setSpawn = subCommand {
         execute<Player> { player, _, _ ->
             val zone = getEditingZone(player) ?: return@execute
