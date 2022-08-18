@@ -18,6 +18,7 @@ import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
+import taboolib.platform.util.broadcast
 import java.util.*
 
 @CommandHeader("DungeonEditParkour")
@@ -63,24 +64,20 @@ object CommandEditParkour {
         dynamic(commit = "multiplyValue") {
             dynamic(commit = "yValue") {
                 execute<Player> { player, context, _ ->
-                    val multiplyValue = context.get(1).toIntOrNull() ?: return@execute
-                    val yValue = context.get(2).toIntOrNull() ?: return@execute
-                    val block = player.getTargetBlock(setOf(Material.SKULL), 10)
-                    if (block == null || block.type == Material.AIR) {
-                        player.sendMessage("&c[System] &7方块不存在!".colored())
-                        return@execute
-                    }
+                    val multiplyValue = context.get(1).toDoubleOrNull() ?: return@execute
+                    val yValue = context.get(2).toDoubleOrNull() ?: return@execute
+                    val block = player.getTargetBlock(setOf(Material.AIR), 3)
                     val entity = (block.world as CraftWorld).getTileEntityAt(block.x, block.y, block.z) as? TileEntitySkull ?: run {
                         player.sendMessage("&c[System] &7无法转换成 TileEntity 数据.".colored())
                         return@execute
                     }
                     entity.gameProfile = entity.gameProfile ?: GameProfile(UUID.randomUUID(), "").apply {
-                        properties.put("multiplyValue", Property("$multiplyValue", ""))
-                        properties.put("yValue", Property("$yValue", ""))
+                        properties.put("multiplyValue", Property("$multiplyValue", "$multiplyValue"))
+                        properties.put("yValue", Property("$yValue", "$yValue"))
                     }
                     entity.update()
                     block.state.update()
-                    player.sendMessage("&c[System] &7成功设置.")
+                    player.sendMessage("&c[System] &7成功设置.".colored())
                 }
             }
         }

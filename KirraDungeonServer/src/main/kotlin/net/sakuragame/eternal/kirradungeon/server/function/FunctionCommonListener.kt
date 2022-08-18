@@ -21,6 +21,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeo
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
@@ -38,6 +39,7 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
+import taboolib.platform.util.broadcast
 import taboolib.platform.util.groundBlock
 import taboolib.platform.util.isAir
 import taboolib.platform.util.sendLang
@@ -143,8 +145,11 @@ object FunctionCommonListener {
     @SubscribeEvent
     fun e(e: PlayerMoveEvent) {
         val player = e.player
+        if (e.from.x == e.to.x && e.from.y == e.to.y && e.from.z == e.to.z) {
+            return
+        }
         handleLift(e, player)
-        handleParkourBlock(e, player)
+        handleParkourBlock(player)
     }
 
     @SubscribeEvent
@@ -229,9 +234,8 @@ object FunctionCommonListener {
         }
     }
 
-    private fun handleParkourBlock(e: PlayerMoveEvent, player: Player) {
-        val profile = player.profile() ?: return
-        if (profile.isEditing) {
+    private fun handleParkourBlock(player: Player) {
+        if (player.profile() == null) {
             return
         }
         val block = player.groundBlock
@@ -241,8 +245,8 @@ object FunctionCommonListener {
         val moveDirection = PlayerAPI.getMoveDirection(player)?.clone() ?: return
         val entity = (block.world as CraftWorld).getTileEntityAt(block.x, block.y, block.z) as? TileEntitySkull ?: return
         val gameProfile = entity.gameProfile ?: return
-        val multiplyValue = gameProfile.properties.get("multiplyValue")?.firstOrNull()?.name?.toDoubleOrNull() ?: return
-        val yValue = gameProfile.properties.get("yValue")?.firstOrNull()?.name?.toDoubleOrNull() ?: return
+        val multiplyValue = gameProfile.properties.get("multiplyValue")?.firstOrNull()?.value?.toDoubleOrNull() ?: return
+        val yValue = gameProfile.properties.get("yValue")?.firstOrNull()?.value?.toDoubleOrNull() ?: return
         moveDirection.multiply(multiplyValue)
         moveDirection.y = yValue
         player.velocity = moveDirection

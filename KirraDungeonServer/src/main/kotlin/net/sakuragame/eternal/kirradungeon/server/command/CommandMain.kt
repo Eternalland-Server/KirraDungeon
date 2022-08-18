@@ -21,7 +21,7 @@ import taboolib.common.platform.command.subCommand
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
 
-@CommandHeader("Dungeon", aliases = ["dungeon"])
+@CommandHeader("dungeon")
 object CommandMain {
 
     @CommandBody
