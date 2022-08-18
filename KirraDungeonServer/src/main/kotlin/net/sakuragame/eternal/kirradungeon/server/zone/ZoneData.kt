@@ -40,6 +40,7 @@ data class ZoneData(
     val holograms: List<ZoneHologramData>,
     val metadataMap: MutableMap<String, String>,
     val parkourDrops: List<ZoneParkourDropData>,
+    val parkourLocations: ZoneParkourLocationData?,
     val waveData: List<ZoneWaveData>? = null,
     val waveSpawnLocs: List<ZoneLocation>? = null,
 ) {

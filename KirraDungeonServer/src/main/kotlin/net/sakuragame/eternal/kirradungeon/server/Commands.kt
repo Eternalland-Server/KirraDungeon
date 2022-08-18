@@ -6,7 +6,7 @@ import ink.ptms.adyeshach.common.util.Inputs.inputBook
 import net.sakuragame.dungeonsystem.common.configuration.DungeonProperties
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
+import net.sakuragame.eternal.justlevel.api.PropGenerateAPI
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionModelWand
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionOreWand
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionTriggerWand
@@ -125,6 +125,9 @@ object Commands {
                         }
                         zone.data.holograms.forEach {
                             AdyeshachAPI.createHologram(player, it.loc.toBukkitLocation(value.bukkitWorld), it.contents.colored())
+                        }
+                        zone.data.parkourDrops.forEach {
+                            PropGenerateAPI.spawn(it.type, it.loc.toBukkitLocation(value.bukkitWorld), it.value, it.amount)
                         }
                         player.teleport(zone.data.spawnLoc.toBukkitLocation(value.bukkitWorld))
                     }
@@ -468,6 +471,16 @@ object Commands {
     }
 
     @CommandBody
+    val addParkourLocations = subCommand {
+        execute<Player> { player, _, _ ->
+            val zone = getEditingZone(player) ?: return@execute
+            val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
+            ParkourLocationWriter.set(zone, zoneLoc)
+            player.sendMessage("&a成功在 &f$zoneLoc &a设置跑酷信标".colored())
+        }
+    }
+
+    @CommandBody
     val addParkourDrop = subCommand {
         dynamic(commit = "type") {
             dynamic(commit = "value") {
@@ -479,6 +492,7 @@ object Commands {
                         val value = context.get(2).toIntOrNull() ?: return@execute
                         val amount = context.get(3).toIntOrNull() ?: return@execute
                         ParkourDropWriter.set(zone, zoneLoc, type, value, amount)
+                        PropGenerateAPI.spawn(type, zoneLoc.toBukkitLocation(player.world), value, amount)
                         player.sendMessage("&a成功在 &f$zoneLoc &a设置跑酷奖励 = &f$type ($value, $amount)".colored())
                     }
                 }

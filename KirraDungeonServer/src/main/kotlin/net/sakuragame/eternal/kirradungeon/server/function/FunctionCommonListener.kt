@@ -7,12 +7,9 @@ import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
 import net.sakuragame.eternal.justlevel.api.PropGenerateAPI
 import net.sakuragame.eternal.kirradungeon.common.event.DungeonClearEvent
-import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
+import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
-import net.sakuragame.eternal.kirradungeon.server.isSpectator
-import net.sakuragame.eternal.kirradungeon.server.playDeathAnimation
-import net.sakuragame.eternal.kirradungeon.server.turnToSpectator
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
@@ -31,12 +28,12 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
-import taboolib.platform.util.broadcast
 import taboolib.platform.util.isAir
 import taboolib.platform.util.sendLang
 
@@ -72,6 +69,14 @@ object FunctionCommonListener {
         }
         val itemStream = ZaphkielAPI.read(item)
         if (itemStream.isVanilla()) {
+            e.isCancelled = true
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: PlayerPickupItemEvent) {
+        val player = e.player
+        if (getEditingZone(player, silent = true) != null) {
             e.isCancelled = true
         }
     }
@@ -141,7 +146,13 @@ object FunctionCommonListener {
         val pullBackYCoord = KirraDungeonServer.conf.getInt("settings.pull-back-y-coord")
         if (to.y < pullBackYCoord) {
             val dungeon = profile.getIDungeon() ?: return
-            player.teleport(dungeon.zone.data.spawnLoc.toBukkitLocation(player.world))
+            val parkourLocations = dungeon.zone.data.parkourLocations ?: kotlin.run {
+                player.teleport(dungeon.zone.data.spawnLoc.toBukkitLocation(player.world))
+                player.sendLang("message-player-lifted-from-void")
+                return
+            }
+            val location = parkourLocations.locations.minByOrNull { (_, value) -> value } ?: return
+            player.teleport(location.toBukkitLocation(player.world))
             player.sendLang("message-player-lifted-from-void")
         }
     }

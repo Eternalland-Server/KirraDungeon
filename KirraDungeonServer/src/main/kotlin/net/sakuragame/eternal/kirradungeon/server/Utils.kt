@@ -11,13 +11,17 @@ import taboolib.module.chat.colored
 import taboolib.platform.util.asLangTextList
 import kotlin.math.floor
 
-fun getEditingZone(player: Player): Zone? {
+fun getEditingZone(player: Player, silent: Boolean = true): Zone? {
     val world = Zone.editingDungeonWorld ?: run {
-        player.sendMessage("&c无效编辑, 你并没有在配置副本".colored())
+        if (!silent) {
+            player.sendMessage("&c无效编辑, 你并没有在配置副本".colored())
+        }
         return null
     }
     return Zone.getByID(world.worldIdentifier) ?: run {
-        player.sendMessage("&c错误, 副本不存在".colored())
+        if (silent) {
+            player.sendMessage("&c错误, 副本不存在".colored())
+        }
         return null
     }
 }

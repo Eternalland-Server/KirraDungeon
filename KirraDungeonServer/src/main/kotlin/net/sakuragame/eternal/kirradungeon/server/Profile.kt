@@ -108,7 +108,9 @@ class Profile(val player: Player) {
                 set(uuidStr, "number", "$number")
             }
             if (player.hasPermission("admin") && isEditing) {
-                player.performCommand("dungeon save")
+                submit(async = false) {
+                    player.performCommand("dungeon save")
+                }
             }
         }
     }

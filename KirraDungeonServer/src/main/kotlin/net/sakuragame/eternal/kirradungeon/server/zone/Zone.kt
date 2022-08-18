@@ -53,6 +53,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         holograms = HologramWriter.read(id),
                         metadataMap = MetadataWriter.read(id),
                         parkourDrops = ParkourDropWriter.read(id),
+                        parkourLocations = ParkourLocationWriter.read(id),
                         waveData = WaveDataWriter.readData(id),
                         waveSpawnLocs = WaveDataWriter.readLoc(id)
                     )
