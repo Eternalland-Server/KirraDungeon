@@ -129,7 +129,9 @@ object CommandEditParkour {
                 properties.put("multiplyValue", Property("$multiplyValue", "$multiplyValue"))
                 properties.put("yValue", Property("$yValue", "$yValue"))
             }
-            player.sendMessage("&c[System] &7MultiplyValue = $multiplyValue, yValue: $yValue".colored())
+            entity.update()
+            block.state.update()
+            player.sendMessage("&c[System] &7成功设置.".colored())
         }
     }
 }

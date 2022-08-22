@@ -23,7 +23,6 @@ import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryClickEvent
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored

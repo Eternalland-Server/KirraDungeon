@@ -15,13 +15,9 @@ import net.sakuragame.eternal.kirradungeon.server.compat.DragonCoreCompat
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType.*
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.DefaultDungeon
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.SpecialDungeon
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.UnlimitedDungeon
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.*
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.eternal.kirramodel.KirraModelAPI
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
@@ -39,7 +35,6 @@ import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
-import taboolib.platform.util.broadcast
 import taboolib.platform.util.groundBlock
 import taboolib.platform.util.isAir
 import taboolib.platform.util.sendLang
@@ -223,14 +218,12 @@ object FunctionCommonListener {
         val pullBackYCoord = KirraDungeonServer.conf.getInt("settings.pull-back-y-coord")
         if (to.y < pullBackYCoord) {
             val dungeon = profile.getIDungeon() ?: return
-            val parkourLocations = dungeon.zone.data.parkourLocations ?: kotlin.run {
-                player.teleport(dungeon.zone.data.spawnLoc.toBukkitLocation(player.world))
-                player.sendLang("message-player-lifted-from-void")
+            if (dungeon is ParkourDungeon) {
                 return
             }
-            val location = parkourLocations.locations.minByOrNull { (_, value) -> value } ?: return
-            player.teleport(location.toBukkitLocation(player.world))
+            player.teleport(dungeon.zone.data.spawnLoc.toBukkitLocation(player.world))
             player.sendLang("message-player-lifted-from-void")
+            return
         }
     }
 
@@ -247,6 +240,9 @@ object FunctionCommonListener {
         val gameProfile = entity.gameProfile ?: return
         val multiplyValue = gameProfile.properties.get("multiplyValue")?.firstOrNull()?.value?.toDoubleOrNull() ?: return
         val yValue = gameProfile.properties.get("yValue")?.firstOrNull()?.value?.toDoubleOrNull() ?: return
+        if (multiplyValue == 0.0 && yValue == 0.0) {
+            return
+        }
         moveDirection.multiply(multiplyValue)
         moveDirection.y = yValue
         player.velocity = moveDirection

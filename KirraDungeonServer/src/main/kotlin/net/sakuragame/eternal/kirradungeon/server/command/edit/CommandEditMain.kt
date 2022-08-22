@@ -178,7 +178,7 @@ object CommandEditMain {
                     val loc = ZoneLocation.parseToZoneLocation(player.location)
                     player.inputBook {
                         HologramWriter.set(zone, argument, it, loc)
-                        val hologram = AdyeshachAPI.createHologram(player, player.location, it)
+                        val hologram = AdyeshachAPI.createHologram(player, player.location, it.colored())
                         HologramWriter.editingHolograms += argument to hologram
                         player.sendMessage("&a完成.".colored())
                     }
