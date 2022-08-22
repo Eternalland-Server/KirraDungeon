@@ -44,6 +44,7 @@ object CommandEditParkour {
         dynamic(commit = "type") {
             dynamic(commit = "value") {
                 dynamic(commit = "amount") {
+
                     execute<Player> { player, context, _ ->
                         val zone = getEditingZone(player) ?: return@execute
                         val zoneLoc = ZoneLocation.parseToZoneLocation(player.location.block.location.toCenter(0.5))

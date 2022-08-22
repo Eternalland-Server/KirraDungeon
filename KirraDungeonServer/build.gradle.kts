@@ -71,7 +71,7 @@ dependencies {
     compileOnly("net.sakuragame.eternal:JustAttribute:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.4-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
-    compileOnly("net.sakuragame.eternal:JustLevel:1.1.5-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:JustLevel:1.1.6-SNAPSHOT@jar")
     compileOnly("ink.ptms.core:v11200:11200@jar")
     @Suppress("VulnerableLibrariesLocal", "RedundantSuppression")
     compileOnly("net.sakuragame:datamanager-bukkit-api:2.0.0-SNAPSHOT") {

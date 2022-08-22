@@ -121,6 +121,7 @@ object FunctionCommonListener {
             SPECIAL -> FunctionDungeon.create(SpecialDungeon(copyZone, dungeonWorld))
             UNLIMITED -> FunctionDungeon.create(UnlimitedDungeon(copyZone, dungeonWorld))
             WAVE -> FunctionDungeon.create(WaveDungeon(copyZone, dungeonWorld))
+            PARKOUR -> FunctionDungeon.create(ParkourDungeon(copyZone, dungeonWorld))
         }
     }
 
@@ -238,8 +239,23 @@ object FunctionCommonListener {
         val moveDirection = PlayerAPI.getMoveDirection(player)?.clone() ?: return
         val entity = (block.world as CraftWorld).getTileEntityAt(block.x, block.y, block.z) as? TileEntitySkull ?: return
         val gameProfile = entity.gameProfile ?: return
+        val name = gameProfile.name
         val multiplyValue = gameProfile.properties.get("multiplyValue")?.firstOrNull()?.value?.toDoubleOrNull() ?: return
         val yValue = gameProfile.properties.get("yValue")?.firstOrNull()?.value?.toDoubleOrNull() ?: return
+        when (name) {
+            "303" -> PacketSender.sendPlaySound(
+                player, "sounds/a/1000.ogg",
+                0.33f, 1f,
+                false,
+                0f, 0f, 0f
+            )
+            else -> PacketSender.sendPlaySound(
+                player, "sounds/a/1001.ogg",
+                0.33f, 1f,
+                false,
+                0f, 0f, 0f
+            )
+        }
         if (multiplyValue == 0.0 && yValue == 0.0) {
             return
         }

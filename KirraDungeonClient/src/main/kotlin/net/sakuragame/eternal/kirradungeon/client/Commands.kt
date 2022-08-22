@@ -1,5 +1,6 @@
 package net.sakuragame.eternal.kirradungeon.client
 
+import ink.ptms.zaphkiel.taboolib.module.ui.VectorUtil
 import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.StoryDungeonCompat
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonLoader
@@ -7,6 +8,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.P
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.function.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.client.zone.Zone
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.CommandBody
@@ -15,6 +17,7 @@ import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
+import taboolib.platform.util.buildItem
 
 @Suppress("SpellCheckingInspection")
 @CommandHeader(name = "KirraDungeonClient", aliases = ["dungeon"])
@@ -95,6 +98,20 @@ object Commands {
         dynamic(commit = "dungeonId") {
             execute<Player> { player, _, argument ->
                 KirraDungeonClientAPI.openUI(player, argument)
+            }
+        }
+    }
+
+    @CommandBody
+    val drop = subCommand {
+        dynamic(commit = "bulletSpread") {
+            dynamic(commit = "radius") {
+                execute<Player> { player, context, _ ->
+                    val spread = context.get(1).toDoubleOrNull() ?: return@execute
+                    val radius = context.get(2).toDoubleOrNull() ?: return@execute
+                    VectorUtil.itemDrop(player, buildItem(Material.DIAMOND), spread, radius)
+                    player.sendMessage("&c[System] &7Ok!".colored())
+                }
             }
         }
     }

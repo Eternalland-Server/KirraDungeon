@@ -49,6 +49,10 @@ object CommandMain {
             Zone.zones.filter { it.data.type == ZoneType.WAVE }.forEach {
                 sender.sendMessage("&a${it.id} &7(${it.name}&7)".colored())
             }
+            sender.sendMessage("&c[System] &7跑酷类型:".colored())
+            Zone.zones.filter { it.data.type == ZoneType.PARKOUR }.forEach {
+                sender.sendMessage("&a${it.id} &7(${it.name}&7)".colored())
+            }
         }
     }
 
