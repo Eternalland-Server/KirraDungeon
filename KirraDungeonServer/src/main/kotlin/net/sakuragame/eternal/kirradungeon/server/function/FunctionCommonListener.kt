@@ -7,7 +7,8 @@ import net.sakuragame.eternal.dragoncore.api.PlayerAPI
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.justlevel.api.PropGenerateAPI
+import net.sakuragame.eternal.justlevel.JustLevel
+import net.sakuragame.eternal.justlevel.api.JustLevelAPI
 import net.sakuragame.eternal.kirradungeon.common.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
@@ -79,6 +80,9 @@ object FunctionCommonListener {
     fun e(e: PlayerPickupItemEvent) {
         val player = e.player
         if (getEditingZone(player, silent = true) != null) {
+            if (player.gameMode == GameMode.SURVIVAL) {
+                e.item.remove()
+            }
             e.isCancelled = true
         }
     }
@@ -100,10 +104,6 @@ object FunctionCommonListener {
         copyZone.data.ores.forEach {
             val ore = KirraMinerAPI.ores[it.ore] ?: return@forEach
             KirraMinerAPI.createTempOre(it.id, ore, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld))
-        }
-        // 跑酷数据生成
-        copyZone.data.parkourDrops.forEach {
-            PropGenerateAPI.spawn(it.type, it.loc.toBukkitLocation(dungeonWorld.bukkitWorld), it.value, it.amount)
         }
         dungeonWorld.bukkitWorld.isAutoSave = false
         dungeonWorld.bukkitWorld.apply {
@@ -249,6 +249,7 @@ object FunctionCommonListener {
                 false,
                 0f, 0f, 0f
             )
+
             else -> PacketSender.sendPlaySound(
                 player, "sounds/a/1001.ogg",
                 0.33f, 1f,

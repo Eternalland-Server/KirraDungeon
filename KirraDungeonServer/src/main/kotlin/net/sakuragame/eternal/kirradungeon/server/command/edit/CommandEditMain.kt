@@ -3,11 +3,9 @@ package net.sakuragame.eternal.kirradungeon.server.command.edit
 import com.dscalzi.skychanger.core.api.SkyPacket
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import ink.ptms.adyeshach.common.util.Inputs.inputBook
-import net.sakuragame.eternal.justlevel.api.PropGenerateAPI
 import net.sakuragame.eternal.kirradungeon.server.function.wand.FunctionTriggerWand
 import net.sakuragame.eternal.kirradungeon.server.getEditingZone
 import net.sakuragame.eternal.kirradungeon.server.parseIntRange
-import net.sakuragame.eternal.kirradungeon.server.toCenter
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneSkyData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.*
@@ -179,7 +177,7 @@ object CommandEditMain {
                     player.inputBook {
                         HologramWriter.set(zone, argument, it, loc)
                         val hologram = AdyeshachAPI.createHologram(player, player.location, it.colored())
-                        HologramWriter.editingHolograms += argument to hologram
+                        HologramWriter.editingHolograms[argument] = hologram
                         player.sendMessage("&a完成.".colored())
                     }
                 }
@@ -188,12 +186,11 @@ object CommandEditMain {
         literal("delete") {
             dynamic(commit = "id") {
                 execute<Player> { player, _, argument ->
-                    if (getEditingZone(player) == null) {
-                        return@execute
-                    }
+                    val zone = getEditingZone(player) ?: return@execute
                     val hologram = HologramWriter.editingHolograms[argument] ?: return@execute
                     hologram.delete()
                     HologramWriter.editingHolograms.remove(argument)
+                    HologramWriter.remove(zone, argument)
                     player.sendMessage("&a完成.".colored())
                 }
             }

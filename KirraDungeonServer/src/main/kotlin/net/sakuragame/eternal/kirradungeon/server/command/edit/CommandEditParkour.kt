@@ -3,12 +3,8 @@ package net.sakuragame.eternal.kirradungeon.server.command.edit
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import net.minecraft.server.v1_12_R1.TileEntitySkull
-import net.sakuragame.eternal.justlevel.api.PropGenerateAPI
 import net.sakuragame.eternal.kirradungeon.server.getEditingZone
-import net.sakuragame.eternal.kirradungeon.server.toCenter
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
-import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.ParkourDropWriter
-import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.ParkourLocationWriter
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
 import org.bukkit.entity.Player
@@ -27,37 +23,6 @@ object CommandEditParkour {
     @CommandBody
     val main = mainCommand {
         createHelper()
-    }
-
-    @CommandBody
-    val addParkourLocations = subCommand {
-        execute<Player> { player, _, _ ->
-            val zone = getEditingZone(player) ?: return@execute
-            val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
-            ParkourLocationWriter.set(zone, zoneLoc)
-            player.sendMessage("&a成功在 &f$zoneLoc &a设置跑酷信标".colored())
-        }
-    }
-
-    @CommandBody
-    val addParkourDrop = subCommand {
-        dynamic(commit = "type") {
-            dynamic(commit = "value") {
-                dynamic(commit = "amount") {
-
-                    execute<Player> { player, context, _ ->
-                        val zone = getEditingZone(player) ?: return@execute
-                        val zoneLoc = ZoneLocation.parseToZoneLocation(player.location.block.location.toCenter(0.5))
-                        val type = context.get(1).toIntOrNull() ?: return@execute
-                        val value = context.get(2).toIntOrNull() ?: return@execute
-                        val amount = context.get(3).toIntOrNull() ?: return@execute
-                        ParkourDropWriter.set(zone, zoneLoc, type, value, amount)
-                        PropGenerateAPI.spawn(type, zoneLoc.toBukkitLocation(player.world), value, amount)
-                        player.sendMessage("&a成功在 &f$zoneLoc &a设置跑酷奖励 = &f$type ($value, $amount)".colored())
-                    }
-                }
-            }
-        }
     }
 
     @CommandBody

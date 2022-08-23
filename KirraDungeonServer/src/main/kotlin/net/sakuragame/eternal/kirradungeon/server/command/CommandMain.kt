@@ -4,11 +4,10 @@ import ink.ptms.adyeshach.api.AdyeshachAPI
 import net.sakuragame.dungeonsystem.common.configuration.DungeonProperties
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.justlevel.api.PropGenerateAPI
 import net.sakuragame.eternal.kirradungeon.server.Loader
-import net.sakuragame.eternal.kirradungeon.server.command.edit.CommandEditMain
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.HologramWriter
 import net.sakuragame.eternal.kirraminer.KirraMinerAPI
 import net.sakuragame.serversystems.manage.api.runnable.RunnableVal
 import org.bukkit.Bukkit
@@ -113,14 +112,9 @@ object CommandMain {
                     override fun run(value: DungeonWorld?) {
                         if (value == null) return
                         Zone.editingDungeonWorld = value
-                        value.bukkitWorld.also { world ->
-                            world.entities.forEach { it.remove() }
-                        }
+
                         zone.data.holograms.forEach {
-                            AdyeshachAPI.createHologram(player, it.loc.toBukkitLocation(value.bukkitWorld), it.contents.colored())
-                        }
-                        zone.data.parkourDrops.forEach {
-                            PropGenerateAPI.spawn(it.type, it.loc.toBukkitLocation(value.bukkitWorld), it.value, it.amount)
+                            HologramWriter.editingHolograms[it.id] = AdyeshachAPI.createHologram(player, it.loc.toBukkitLocation(value.bukkitWorld), it.contents.colored())
                         }
                         player.teleport(zone.data.spawnLoc.toBukkitLocation(value.bukkitWorld))
                     }

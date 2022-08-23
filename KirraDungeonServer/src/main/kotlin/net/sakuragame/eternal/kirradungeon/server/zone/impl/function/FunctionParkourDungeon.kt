@@ -2,6 +2,8 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.function
 
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.eternal.justability.api.event.PowerCastEvent
+import net.sakuragame.eternal.justlevel.JustLevel
+import net.sakuragame.eternal.justlevel.api.JustLevelAPI
 import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
@@ -12,6 +14,7 @@ import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.ParkourDungeon
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.event.block.Action
+import org.bukkit.event.entity.ItemMergeEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.platform.event.SubscribeEvent
@@ -73,6 +76,23 @@ object FunctionParkourDungeon {
     fun e(e: PowerCastEvent.Pre) {
         val player = e.player
         if (FunctionDungeon.getByPlayer(player.uniqueId) is ParkourDungeon) {
+            e.isCancelled = true
+        }
+    }
+
+    @SubscribeEvent
+    fun onEditingMerge(e: ItemMergeEvent) {
+        val world = e.entity.world
+        val zoneWorld = Zone.editingDungeonWorld?.bukkitWorld ?: return
+        if (world.uid == zoneWorld.uid) {
+            e.isCancelled = true
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: ItemMergeEvent) {
+        val world = e.entity.world
+        if (FunctionDungeon.getByBukkitWorldUUID(world.uid) is ParkourDungeon) {
             e.isCancelled = true
         }
     }

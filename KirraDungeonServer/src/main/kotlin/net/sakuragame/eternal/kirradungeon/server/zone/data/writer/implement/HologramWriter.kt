@@ -30,7 +30,7 @@ object HologramWriter : WriteHelper {
         sections.forEach {
             val loc = ZoneLocation.parseToZoneLocation(file.getString("holograms.$it.loc") ?: return@forEach) ?: return@forEach
             val contents = file.getStringList("holograms.$it.contents")
-            toReturn += ZoneHologramData(loc, contents)
+            toReturn += ZoneHologramData(it, loc, contents)
         }
         return toReturn
     }
