@@ -30,3 +30,6 @@ message-player-lifted-from-void:
 message-default-dungeon-mob-spawned: "&6&l➱ &e一波怪物被刷新了!"
 message-default-dungeon-boss-spawned: "&6&l➱ &e怪物首领被刷新了!"
 message-parkour-dungeon-location-record: "&6&l➱ &e已为您更新最新的坐标点!"
+message-parkour-dungeon-experience-multiplier:
+  - "&6&l当前 {0} 倍率"
+  - "&ex {1}"

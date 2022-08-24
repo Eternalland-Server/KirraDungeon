@@ -7,8 +7,6 @@ import net.sakuragame.eternal.dragoncore.api.PlayerAPI
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.dragoncore.config.FolderType
 import net.sakuragame.eternal.dragoncore.network.PacketSender
-import net.sakuragame.eternal.justlevel.JustLevel
-import net.sakuragame.eternal.justlevel.api.JustLevelAPI
 import net.sakuragame.eternal.kirradungeon.common.event.DungeonClearEvent
 import net.sakuragame.eternal.kirradungeon.server.*
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
@@ -242,6 +240,9 @@ object FunctionCommonListener {
         val name = gameProfile.name
         val multiplyValue = gameProfile.properties.get("multiplyValue")?.firstOrNull()?.value?.toDoubleOrNull() ?: return
         val yValue = gameProfile.properties.get("yValue")?.firstOrNull()?.value?.toDoubleOrNull() ?: return
+        if (multiplyValue == 0.0 && yValue == 0.0) {
+            return
+        }
         when (name) {
             "303" -> PacketSender.sendPlaySound(
                 player, "sounds/a/1000.ogg",
@@ -256,9 +257,6 @@ object FunctionCommonListener {
                 false,
                 0f, 0f, 0f
             )
-        }
-        if (multiplyValue == 0.0 && yValue == 0.0) {
-            return
         }
         moveDirection.multiply(multiplyValue)
         moveDirection.y = yValue

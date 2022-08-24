@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.platform.util.sendLang
+import taboolib.platform.util.*
 
 @Suppress("SpellCheckingInspection")
 object FunctionParkourDungeon {
@@ -56,7 +56,7 @@ object FunctionParkourDungeon {
         val loc = player.location
         val dungeon = FunctionDungeon.getByPlayer(player.uniqueId) as? ParkourDungeon ?: return
         dungeon.locationRecorder[player.uniqueId] = loc
-        player.sendLang("message-parkour-dungeon-location-record")
+        player.title("", player.asLangText("message-parkour-dungeon-location-record"), 5, 25, 5)
     }
 
     @SubscribeEvent
@@ -110,7 +110,7 @@ object FunctionParkourDungeon {
         if (to.y < pullBackYCoord) {
             player.playSound(player.location, Sound.ENTITY_VILLAGER_NO, 1f, 1f)
             player.teleport(loc)
-            player.sendLang("message-player-lifted-from-void")
+            player.title("", player.asLangTextList("message-player-lifted-from-void").first(), 5, 20, 5)
         }
     }
 

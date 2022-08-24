@@ -5,6 +5,7 @@ import com.mojang.authlib.properties.Property
 import net.minecraft.server.v1_12_R1.TileEntitySkull
 import net.sakuragame.eternal.kirradungeon.server.getEditingZone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
+import net.sakuragame.eternal.kirradungeon.server.zone.data.writer.implement.MetadataWriter
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
 import org.bukkit.entity.Player
@@ -51,6 +52,15 @@ object CommandEditParkour {
                     }
                 }
             }
+        }
+    }
+
+    @CommandBody
+    val setFinalPoint = subCommand {
+        execute<Player> { player, _, _ ->
+            val zone = getEditingZone(player) ?: return@execute
+            MetadataWriter.set(zone, "goalPoint", ZoneLocation.parseToZoneLocation(player.location).toString())
+            player.sendMessage("&c[System] &7Ok!".colored())
         }
     }
 
