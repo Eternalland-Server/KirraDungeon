@@ -39,12 +39,6 @@ fun IDungeon.startCountdown() {
     }
 }
 
-fun showResurgenceTitle(player: Player) {
-    submit(async = true, delay = 80L) {
-        player.sendTitle("", player.asLangText("message-player-can-resurgence"), 5, 25, 0)
-    }
-}
-
 fun IDungeon.runOverTimeCheck() {
     submit(async = true, delay = 1000) {
         if (Zone.editingDungeonWorld != null) {

@@ -3,14 +3,16 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeAdvancement
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeDisplay
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.playDragonCoreSound
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.data.ZoneTriggerData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneMobData
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.*
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.spawnDungeonMob
+import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
 import net.sakuragame.eternal.waypoints.api.WaypointsAPI
 import net.sakuragame.eternal.waypoints.core.IconType
 import org.bukkit.Bukkit
@@ -21,7 +23,6 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored
-import taboolib.platform.util.asLangText
 import java.util.*
 import kotlin.random.Random
 
@@ -111,7 +112,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     override fun onPlayerJoin(player: Player) {
-        showResurgenceTitle(player)
+
     }
 
     fun doTrigger() {
@@ -165,8 +166,6 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
                 WaypointsAPI.navPointer(it, "dungeon", IconType.Mobs, upperLocation, 1.0, listOf("击杀所有怪物!"))
             }
             it.playDragonCoreSound("sounds/d/101.ogg")
-            val text = it.asLangText("message-default-dungeon-mob-spawned")
-            MessageAPI.sendActionTip(it, text)
         }
     }
 
@@ -175,8 +174,6 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
         getPlayers().forEach {
             WaypointsAPI.navPointer(it, "dungeon", IconType.Boss, upperLocation, 1.0, listOf("全力击败它, 通关副本!"))
             it.playDragonCoreSound("sounds/d/102.ogg")
-            val text = it.asLangText("message-default-dungeon-boss-spawned")
-            MessageAPI.sendActionTip(it, text)
         }
         submit(async = true, delay = 20L) {
             getPlayers().forEach { BossBar.close(it) }

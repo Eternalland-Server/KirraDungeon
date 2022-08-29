@@ -6,7 +6,6 @@ import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -48,7 +47,6 @@ class SpecialDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     override fun onPlayerJoin(player: Player) {
-        showResurgenceTitle(player)
         FakeAdvancement(FakeDisplay(Material.BUCKET, "&7&o愿筒子护佑你, 年轻人.".colored(), "", FakeDisplay.AdvancementFrame.GOAL, null))
             .displayToast(player)
     }

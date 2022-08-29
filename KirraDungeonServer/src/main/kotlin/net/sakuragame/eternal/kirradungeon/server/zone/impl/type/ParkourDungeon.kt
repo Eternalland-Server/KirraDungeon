@@ -3,12 +3,10 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeAdvancement
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeDisplay
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
-import net.sakuragame.eternal.justlevel.api.JustLevelAPI
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneLocation
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
 import net.sakuragame.eternal.waypoints.api.WaypointsAPI
 import net.sakuragame.eternal.waypoints.core.IconType
@@ -17,8 +15,6 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored
-import taboolib.platform.util.asLangTextList
-import taboolib.platform.util.title
 import java.util.*
 
 class ParkourDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IDungeon {
@@ -64,12 +60,9 @@ class ParkourDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     override fun onPlayerJoin(player: Player) {
-        showResurgenceTitle(player)
         FakeAdvancement(FakeDisplay(Material.BUCKET, "&7&o愿筒子护佑你, 年轻人.".colored(), "", FakeDisplay.AdvancementFrame.GOAL, null))
             .displayToast(player)
         WaypointsAPI.navPointer(player, "parkour", IconType.Normal, goalLocation?.toBukkitLocation(player.world) ?: return, 1.0, listOf("终点(%distance%)"))
-//        val multiplierTitle = player.asLangTextList("message-parkour-dungeon-experience-multiplier", JustLevelAPI.getTotalStage(player.uniqueId) / 10)
-//        player.title(multiplierTitle.first(), multiplierTitle[1], 5, 40, 5)
     }
 
     override fun canClear(): Boolean {

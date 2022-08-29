@@ -16,9 +16,12 @@ interface WriteHelper {
         return when {
             find != null -> find
             else -> {
-                val file = Configuration.loadFromFile(File(KirraDungeonServer.plugin.dataFolder, "zones/$id.json"), Type.JSON)
-                Loader.files += file
-                file
+                val file = File(KirraDungeonServer.plugin.dataFolder, "zones/$id.json").apply {
+                    createNewFile()
+                }
+                val conf = Configuration.loadFromFile(file, Type.JSON)
+                Loader.files += conf
+                conf
             }
         }
     }

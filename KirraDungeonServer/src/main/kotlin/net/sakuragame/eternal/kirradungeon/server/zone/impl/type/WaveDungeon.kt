@@ -8,7 +8,6 @@ import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.IDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.runOverTimeCheck
-import net.sakuragame.eternal.kirradungeon.server.zone.impl.showResurgenceTitle
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.startCountdown
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -71,7 +70,6 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
     }
 
     override fun onPlayerJoin(player: Player) {
-        showResurgenceTitle(player)
         FakeAdvancement(FakeDisplay(Material.BUCKET, "&7&o愿筒子护佑你, 年轻人.".colored(), "", FakeDisplay.AdvancementFrame.GOAL, null))
             .displayToast(player)
     }

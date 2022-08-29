@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl
 
 import com.dscalzi.skychanger.bukkit.api.SkyChanger
+import com.sakuragame.eternal.justattribute.api.JustAttributeAPI
 import com.taylorswiftcn.justwei.util.UnitConvert
 import ink.ptms.adyeshach.api.AdyeshachAPI
 import net.sakuragame.dungeonsystem.server.api.DungeonServerAPI
@@ -297,7 +298,7 @@ interface IDungeon {
      * 传送玩家至主城
      */
     fun teleportToSpawn() {
-        var secs = 5
+        var secs = 10
         submit(delay = 60L, period = 20, async = true) {
             getPlayers().forEach {
                 if (!it.isOnline) {
@@ -456,11 +457,16 @@ interface IDungeon {
         failThread = null
         failTime = 60
         val profile = player.profile() ?: return
-        player.teleport(profile.deathPlace)
-        player.reset()
-        player.sendTitle("&6&l复活".colored(), "&7尽全力打败怪物们!".colored(), 3, 40, 5)
-        player.inventory.takeItem { it.itemMeta.displayName.contains("复活币") }
-        player.health = player.maxHealth / 2
+        player.apply {
+            reset()
+            teleport(profile.deathPlace)
+            sendTitle("&6&l复活".colored(), "&7尽全力打败怪物们!".colored(), 3, 40, 5)
+            player.inventory.takeItem { it.itemMeta.displayName.contains("复活币") }
+        }
+        JustAttributeAPI.getRoleCharacter(player).apply {
+            setHealth(maxHP * 0.4)
+            setMana(maxMP * 0.4)
+        }
         getPlayers().forEach {
             it.sendLang("message-player-resurgence", player.displayName)
         }

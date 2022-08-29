@@ -1,35 +1,25 @@
 message-player-not-found-data:
-  - "&4&l➱ &c抱歉, 但我们未能查询到您的副本信息, 请重试."
-  - "&4&l➱ &c若频繁出现该信息, 请联系管理员."
+  - " &8&l[&6&l亘古大陆&8&l] &7抱歉, 但我们未能获取副本信息, 请重试。"
 message-player-join-dungeon:
-  - "&6&l➱ &e开始挑战: &f{0}"
-  - "&6&l➱ &e祝您好运, 愿筒子护佑您."
+  - " &8&l[&6&l亘古大陆&8&l] &7开始挑战: &f{0}"
 message-player-clear-dungeon:
-  - "&6&l➱ &e挑战成功! "
-  - "&6&l➱ &f{0} &e秒后会将您传送回主城服务器!"
+  - " &8&l[&6&l亘古大陆&8&l] &a挑战成功！ "
+  - " &8&l[&6&l亘古大陆&8&l] &f{0} &7秒后会将您传送回主城服务器！"
 message-fail-thread-started:
-  - "&4&l➱ &c所有挑战者都已经死亡了..."
-  - "&4&l➱ &c您可以使用按 &fM &c键使用复活币进行复活, 否则挑战将会在 &f{0} &c秒后自动结算."
-message-player-not-has-resurgence-item: "&4&l➱ &c您没有复活币! 可以去商城购买复活币! "
-message-player-can-resurgence: "&6&l➱ &e您可以按 ESC 键退出副本. &7(小贴士)"
+  - " &8&l[&6&l亘古大陆&8&l] &c挑战失败..."
+  - " &8&l[&6&l亘古大陆&8&l] &7您可以使用按 &fM &7键使用复活币进行复活, 否则副本将会在 &f{0} &7秒后自动结算。"
+message-player-not-has-resurgence-item: " &8&l[&6&l亘古大陆&8&l] &7您背包内没有复活币!"
 message-player-resurgence:
-  - "&6&l➱ &e玩家 &r{0} &e花费了一复活币, 复活了!"
-  - "&6&l➱ &e小心, 怪物们因为樱花大佐的护佑全部回满血量了, 击败他们! "
+  - " &8&l[&6&l亘古大陆&8&l] &f{0} &7使用了复活币"
 message-player-lose-dungeon:
-  - "&4&l➱ &c死亡! &c您在副本 {0} &c的挑战中死亡了..."
-  - "&4&l➱ &c您可以等待您的队友通关, 或是再次回到主城服进行挑战."
-message-player-over-time: "&4&l超时!"
-message-player-all-dead: "&4&l全灭!"
+  - " &8&l[&6&l亘古大陆&8&l] &7你已经阵亡!"
+message-player-over-time: "&b&l时间到!"
+message-player-all-dead: "&c&l全灭!"
 message-player-succ-to-next-floor:
   - "&6&l➱ &e成功击杀 BOSS, 当前层数: {0} &a(+1)"
   - "&6&l➱ &e将自动跳转到下一层..."
 message-player-start-to-fight:
   - "&6&l➱ &e开始战斗! "
 message-player-lifted-from-void:
-  - "&6&l➱ &eOpps! 请不要在这里做极限运动! "
-message-default-dungeon-mob-spawned: "&6&l➱ &e一波怪物被刷新了!"
-message-default-dungeon-boss-spawned: "&6&l➱ &e怪物首领被刷新了!"
-message-parkour-dungeon-location-record: "&6&l➱ &e已为您更新最新的坐标点!"
-message-parkour-dungeon-experience-multiplier:
-  - "&6&l当前 {0} 倍率"
-  - "&ex {1}"
+  - "&eOpps! 请不要在这里做极限运动!"
+message-parkour-dungeon-location-record: "&e已为您更新复活点!"

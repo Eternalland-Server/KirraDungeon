@@ -68,7 +68,7 @@ object CommandEditWave {
 
     @CommandBody
     val addWaveLoc = subCommand {
-        execute<Player> { player, context, _ ->
+        execute<Player> { player, _, _ ->
             val zone = getEditingZone(player) ?: return@execute
             WaveDataWriter.addWaveLoc(zone, player.location)
             player.sendMessage("&c[System] &7成功!".colored())
