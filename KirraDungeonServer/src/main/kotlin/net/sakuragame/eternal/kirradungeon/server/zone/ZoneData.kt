@@ -3,6 +3,7 @@ package net.sakuragame.eternal.kirradungeon.server.zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.*
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneDropData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneHologramData
+import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneStagedMobData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
 
 /**
@@ -38,6 +39,7 @@ data class ZoneData(
     val trigger: ZoneTriggerData,
     val holograms: List<ZoneHologramData>,
     val metadataMap: MutableMap<String, String>,
+    val stagedMobs: List<ZoneStagedMobData>,
     val waveData: List<ZoneWaveData>? = null,
     val waveSpawnLocs: List<ZoneLocation>? = null,
 ) {

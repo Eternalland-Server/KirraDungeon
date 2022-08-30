@@ -3,6 +3,7 @@ package net.sakuragame.eternal.kirradungeon.server.zone.impl.type
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeAdvancement
 import com.gmail.berndivader.mythicmobsext.volatilecode.v1_12_R1.advancement.FakeDisplay
 import net.sakuragame.dungeonsystem.server.api.world.DungeonWorld
+import net.sakuragame.eternal.justlevel.api.JustLevelAPI
 import net.sakuragame.eternal.justmessage.screen.hud.BossBar
 import net.sakuragame.eternal.kirradungeon.server.playDragonCoreSound
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
@@ -24,6 +25,7 @@ import taboolib.common.platform.function.submit
 import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.chat.colored
 import java.util.*
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 class DefaultDungeon(override val zone: Zone, override val dungeonWorld: DungeonWorld) : IDungeon {
@@ -112,7 +114,14 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     override fun onPlayerJoin(player: Player) {
-
+        if (zone.data.stagedMobs.isEmpty()) {
+            return
+        }
+        val playerStage = JustLevelAPI.getTotalStage(player)
+        zone.data.stagedMobs.forEach {
+            val level = (it.multiplier * playerStage).roundToInt()
+            spawnDungeonMob(it.loc.toBukkitLocation(player.world), it.monsterId, level)
+        }
     }
 
     fun doTrigger() {

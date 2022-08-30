@@ -242,14 +242,14 @@ interface IDungeon {
                 // 调用 MythicmobsAPI, 将怪物生成到世界坐标.
                 repeat(monster.amount) {
                     val randomLoc = loc.add(Random.nextDouble(0.1, 0.3), 0.0, Random.nextDouble(0.1, 0.3))
-                    val entity = spawnDungeonMob(randomLoc, monster.type) ?: return@repeat
+                    val entity = spawnDungeonMob(randomLoc, monster.type)
                     monsterUUIDList.add(entity.uniqueId)
                 }
             }
         }
         if (spawnBoss) {
             val loc = bossData.loc.toBukkitLocation(dungeonWorld.bukkitWorld)
-            val bossEntity = spawnDungeonMob(loc, bossData.type, bossLevel) ?: return
+            val bossEntity = spawnDungeonMob(loc, bossData.type, bossLevel)
             bossUUID = bossEntity.uniqueId
         }
     }
