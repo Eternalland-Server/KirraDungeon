@@ -46,6 +46,7 @@ object FunctionOreWand : IWand {
                 e.isCancelled = true
                 player.openMenu1(block.location)
             }
+
             else -> return
         }
     }
@@ -58,7 +59,7 @@ object FunctionOreWand : IWand {
             return
         }
         val zone = getEditingZone(player) ?: return
-        val ore = KirraMinerAPI.getOreByEntityUUID(e.rightClicked.uniqueId) ?: kotlin.run {
+        val ore = KirraMinerAPI.getOreByLocation(e.rightClicked.location) ?: kotlin.run {
             player.sendMessage("&c错误, 这并不是一个矿物.".colored())
             return
         }
