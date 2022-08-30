@@ -47,7 +47,8 @@ object FunctionDefaultDungeon {
         val entity = e.entity
         val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? DefaultDungeon ?: return
         dungeon.removeMonsterUUID(entity.uniqueId)
-        if (dungeon.getMonsters(containsBoss = true).isEmpty()) {
+        val monsters = dungeon.getMonsters(containsBoss = true)
+        if (monsters.isEmpty()) {
             when {
                 dungeon.mobs.isEmpty() && !dungeon.naturalSpawnBoss -> return
                 dungeon.mobs.size > 1 -> dungeon.doSpawn()
@@ -55,6 +56,9 @@ object FunctionDefaultDungeon {
                     dungeon.doSpawn()
                 }
             }
+        }
+        if (monsters.size in 1..3) {
+            monsters.forEach { it.isGlowing = true }
         }
         e.drops.clear()
         val drops = dungeon.zone.data.monsterDropData[e.mobType.internalName] ?: return

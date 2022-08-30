@@ -27,6 +27,7 @@ import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.world.WorldUnloadEvent
@@ -70,6 +71,13 @@ object FunctionCommonListener {
         }
         val itemStream = ZaphkielAPI.read(item)
         if (itemStream.isVanilla()) {
+            e.isCancelled = true
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: PlayerInteractEvent) {
+        if (e.player.gameMode == GameMode.SPECTATOR) {
             e.isCancelled = true
         }
     }
