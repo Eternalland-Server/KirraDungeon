@@ -1,6 +1,5 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl.function
 
-import ink.ptms.zaphkiel.ZaphkielAPI
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
@@ -15,7 +14,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.common.util.random
 
 object FunctionDefaultDungeon {
 
@@ -46,7 +44,6 @@ object FunctionDefaultDungeon {
     fun e(e: MythicMobDeathEvent) {
         val entity = e.entity
         val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? DefaultDungeon ?: return
-        dungeon.removeMonsterUUID(entity.uniqueId)
         val monsters = dungeon.getMonsters(containsBoss = true)
         if (monsters.isEmpty()) {
             when {
@@ -59,18 +56,6 @@ object FunctionDefaultDungeon {
         }
         if (monsters.size in 1..3) {
             monsters.forEach { it.isGlowing = true }
-        }
-        e.drops.clear()
-        val drops = dungeon.zone.data.monsterDropData[e.mobType.internalName] ?: return
-        drops.forEach {
-            val random = random(0.0, 1.0)
-            val dropAmount = it.dropRange.random()
-            if (it.chance < random || dropAmount <= 0) {
-                return@forEach
-            }
-            val item = ZaphkielAPI.getItemStack(it.itemId) ?: return@forEach
-            item.amount = dropAmount
-            entity.world.dropItemNaturally(entity.location, item)
         }
     }
 

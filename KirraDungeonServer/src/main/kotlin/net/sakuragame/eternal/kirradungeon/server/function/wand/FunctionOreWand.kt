@@ -10,7 +10,6 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.chat.colored
@@ -52,20 +51,24 @@ object FunctionOreWand : IWand {
     }
 
     @SubscribeEvent
-    fun e(e: PlayerInteractAtEntityEvent) {
+    fun e1(e: PlayerInteractEvent) {
         val player = e.player
         val item = player.inventory.itemInMainHand
         if (!item.isSimilar(oreWand)) {
             return
         }
+        if (e.action != Action.RIGHT_CLICK_BLOCK) {
+            return
+        }
         val zone = getEditingZone(player) ?: return
-        val ore = KirraMinerAPI.getOreByLocation(e.rightClicked.location) ?: kotlin.run {
+        val ore = KirraMinerAPI.getOreByLocation(e.clickedBlock.location) ?: kotlin.run {
             player.sendMessage("&c错误, 这并不是一个矿物.".colored())
             return
         }
         val mapId = KirraMinerAPI.getOreMapId(ore) ?: return
         KirraMinerAPI.removeOre(mapId)
         OreWriter.remove(zone, mapId)
+        player.sendMessage("&a移除成功!".colored())
     }
 
     private fun Player.openMenu1(loc: Location) {
@@ -73,7 +76,9 @@ object FunctionOreWand : IWand {
             rows(6)
             slots(inventoryCenterSlots)
             elements {
-                KirraMinerAPI.ores.values.filter { !it.isTemp && it.loc == null }
+                KirraMinerAPI.ores.values
+                    .filter { !it.isTemp && it.loc == null }
+                    .filter { !it.id.contains("dummy") }
             }
             onGenerate { _, element, _, _ ->
                 buildItem(Material.MINECART) {

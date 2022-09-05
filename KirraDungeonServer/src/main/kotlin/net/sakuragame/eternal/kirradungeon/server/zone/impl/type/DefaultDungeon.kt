@@ -114,14 +114,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     override fun onPlayerJoin(player: Player) {
-        if (zone.data.stagedMobs.isEmpty()) {
-            return
-        }
-        val playerStage = JustLevelAPI.getTotalStage(player)
-        zone.data.stagedMobs.forEach {
-            val level = (it.multiplier * playerStage).roundToInt()
-            spawnDungeonMob(it.loc.toBukkitLocation(player.world), it.monsterId, level)
-        }
+
     }
 
     fun doTrigger() {

@@ -83,20 +83,13 @@ object CommandEditMain {
     }
 
     @CommandBody
-    val addStagedMob = subCommand {
-        dynamic(commit = "monsterId") {
-            dynamic(commit = "amount") {
-                dynamic(commit = "multiplier") {
-                    execute<Player> { player, context, _ ->
-                        val zone = getEditingZone(player) ?: return@execute
-                        val monsterId = context.get(1)
-                        val amount = context.get(2).toIntOrNull() ?: return@execute
-                        val multiplier = context.get(3).toDoubleOrNull() ?: return@execute
-                        val zoneLoc = ZoneLocation.parseToZoneLocation(player.location)
-                        StagedMobWriter.setMob(zone, zoneLoc, monsterId, amount, multiplier)
-                        player.sendMessage("&a成功在 &f$zoneLoc &a添加阶段怪物 = &f$monsterId ($multiplier)".colored())
-                    }
-                }
+    val setMultiplier = subCommand {
+        dynamic(commit = "multiplier") {
+            execute<Player> { player, context, _ ->
+                val zone = getEditingZone(player) ?: return@execute
+                val multiplier = context.get(1).parseIntRange() ?: return@execute
+                StagedLevelWriter.set(zone, multiplier)
+                player.sendMessage("&a成功设置阶段等级 = &f$multiplier".colored())
             }
         }
     }

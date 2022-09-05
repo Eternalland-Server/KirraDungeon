@@ -1,6 +1,7 @@
 package net.sakuragame.eternal.kirradungeon.server.function
 
 import ink.ptms.zaphkiel.ZaphkielAPI
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
 import net.minecraft.server.v1_12_R1.TileEntitySkull
 import net.sakuragame.dungeonsystem.server.api.event.DungeonLoadedEvent
 import net.sakuragame.eternal.dragoncore.api.PlayerAPI
@@ -34,6 +35,7 @@ import org.bukkit.event.world.WorldUnloadEvent
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import taboolib.common.util.random
 import taboolib.module.chat.colored
 import taboolib.platform.util.groundBlock
 import taboolib.platform.util.isAir
@@ -90,6 +92,25 @@ object FunctionCommonListener {
                 e.item.remove()
             }
             e.isCancelled = true
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: MythicMobDeathEvent) {
+        val entity = e.entity
+        val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) ?: return
+        dungeon.removeMonsterUUID(entity.uniqueId)
+        e.drops.clear()
+        val drops = dungeon.zone.data.monsterDropData[e.mobType.internalName] ?: return
+        drops.forEach {
+            val random = random(0.0, 1.0)
+            val dropAmount = it.dropRange.random()
+            if (it.chance < random || dropAmount <= 0) {
+                return@forEach
+            }
+            val item = ZaphkielAPI.getItemStack(it.itemId) ?: return@forEach
+            item.amount = dropAmount
+            entity.world.dropItemNaturally(entity.location, item)
         }
     }
 
