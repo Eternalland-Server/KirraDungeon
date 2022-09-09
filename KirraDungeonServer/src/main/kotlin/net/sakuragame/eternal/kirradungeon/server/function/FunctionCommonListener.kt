@@ -95,11 +95,10 @@ object FunctionCommonListener {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun e(e: MythicMobDeathEvent) {
         val entity = e.entity
         val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) ?: return
-        dungeon.removeMonsterUUID(entity.uniqueId)
         e.drops.clear()
         val drops = dungeon.zone.data.monsterDropData[e.mobType.internalName] ?: return
         drops.forEach {

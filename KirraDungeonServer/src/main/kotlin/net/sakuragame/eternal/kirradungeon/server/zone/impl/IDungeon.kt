@@ -308,7 +308,7 @@ interface IDungeon {
                 secs--
                 it.sendTitle("", "&a将在 &f&l$secs &a秒后传送回您到主城.".colored(), 0, 25, 0)
                 if (secs <= 0) {
-                    KirraCoreBukkitAPI.teleportPlayerToServerByBalancing("rpg-spawn", it.uniqueId)
+                    KirraCoreBukkitAPI.teleportPlayerToServerByBalancing("test", it.uniqueId)
                     cancel()
                     return@submit
                 }

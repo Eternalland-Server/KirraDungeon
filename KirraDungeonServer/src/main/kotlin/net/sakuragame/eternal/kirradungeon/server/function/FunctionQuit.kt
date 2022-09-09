@@ -27,7 +27,7 @@ object FunctionQuit {
             return
         }
         KirraCoreBukkitAPI.showLoadingAnimation(player, "&6&l➱ &e正在将您传送回大厅. &f@", false)
-        KirraCoreBukkitAPI.teleportPlayerToServerByBalancing("rpg-spawn", player.uniqueId)
+        KirraCoreBukkitAPI.teleportPlayerToServerByBalancing("test", player.uniqueId)
         profile.isQuitting = true
     }
 }

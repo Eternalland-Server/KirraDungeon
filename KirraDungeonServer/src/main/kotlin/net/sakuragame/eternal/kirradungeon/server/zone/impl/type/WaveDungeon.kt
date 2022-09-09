@@ -75,7 +75,7 @@ class WaveDungeon(override val zone: Zone, override val dungeonWorld: DungeonWor
     }
 
     override fun canClear(): Boolean {
-        return waveList.isEmpty()
+        return false
     }
 
     private fun waveStart() {

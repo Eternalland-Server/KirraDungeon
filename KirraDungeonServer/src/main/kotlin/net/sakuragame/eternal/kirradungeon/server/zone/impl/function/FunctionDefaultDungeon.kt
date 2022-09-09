@@ -44,7 +44,8 @@ object FunctionDefaultDungeon {
     fun e(e: MythicMobDeathEvent) {
         val entity = e.entity
         val dungeon = FunctionDungeon.getByMobUUID(entity.uniqueId) as? DefaultDungeon ?: return
-        val monsters = dungeon.getMonsters(containsBoss = true)
+        dungeon.removeMonsterUUID(entity.uniqueId)
+        val monsters = dungeon.getMonsters(containsBoss = false)
         if (monsters.isEmpty()) {
             when {
                 dungeon.mobs.isEmpty() && !dungeon.naturalSpawnBoss -> return

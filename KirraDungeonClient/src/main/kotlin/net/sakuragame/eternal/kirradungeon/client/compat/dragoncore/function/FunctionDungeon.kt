@@ -2,6 +2,8 @@ package net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.function
 
 import com.taylorswiftcn.megumi.uifactory.generate.function.Statements
 import net.sakuragame.eternal.dragoncore.network.PacketSender
+import net.sakuragame.eternal.kirradungeon.client.KirraDungeonClient
+import net.sakuragame.eternal.kirradungeon.client.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.DungeonAPI
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamData
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.data.param.ParamNumData
@@ -11,6 +13,7 @@ import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.display
 import net.sakuragame.eternal.kirradungeon.client.compat.dragoncore.screen.*
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.submit
+import taboolib.platform.util.broadcast
 
 object FunctionDungeon {
 
@@ -43,9 +46,12 @@ object FunctionDungeon {
     }
 
     private fun syncVariables(player: Player, screen: DungeonScreen, subScreen: DungeonSubScreen) {
+        val profile = player.profile() ?: return
         PacketSender.sendSyncPlaceholder(player, hashMapOf<String, String>().also {
             it["variable_map_bg"] = screen.mapBgPath
             it["category_name"] = screen.category.display()
+            it["fatigue_current"] = profile.fatigue.toString()
+            it["fatigue_max"] = KirraDungeonClient.conf.getInt("settings.fatigue.max-value").toString()
         })
     }
 
