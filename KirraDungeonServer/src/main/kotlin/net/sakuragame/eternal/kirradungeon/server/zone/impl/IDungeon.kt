@@ -158,6 +158,10 @@ interface IDungeon {
      */
     fun init()
 
+    fun whenTeleportToSpawn() {
+
+    }
+
     /**
      * 当玩家进入
      */
@@ -298,6 +302,7 @@ interface IDungeon {
      * 传送玩家至主城
      */
     fun teleportToSpawn() {
+        whenTeleportToSpawn()
         var secs = 10
         submit(delay = 60L, period = 20, async = true) {
             getPlayers().forEach {

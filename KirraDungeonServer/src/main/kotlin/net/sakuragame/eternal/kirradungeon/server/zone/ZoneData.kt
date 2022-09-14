@@ -3,7 +3,6 @@ package net.sakuragame.eternal.kirradungeon.server.zone
 import net.sakuragame.eternal.kirradungeon.server.zone.data.*
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneDropData
 import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.ZoneHologramData
-import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveData
 
 /**
  * 副本数据
@@ -19,8 +18,6 @@ import net.sakuragame.eternal.kirradungeon.server.zone.data.sub.wave.ZoneWaveDat
  * @property models 模型数据
  * @property ores 矿物数据
  * @property trigger 方块触发数据
- * @property waveData      波次数据
- * @property waveSpawnLocs      波次怪物的出生坐标数据
  *
  */
 data class ZoneData(
@@ -38,9 +35,7 @@ data class ZoneData(
     val trigger: ZoneTriggerData,
     val holograms: List<ZoneHologramData>,
     val metadataMap: MutableMap<String, String>,
-    val stagedMultiplier: IntRange?,
-    val waveData: List<ZoneWaveData>? = null,
-    val waveSpawnLocs: List<ZoneLocation>? = null,
+    val stagedMultiplier: IntRange?
 ) {
 
     fun isCustomSkyEnabled() = this.zoneSkyData != null

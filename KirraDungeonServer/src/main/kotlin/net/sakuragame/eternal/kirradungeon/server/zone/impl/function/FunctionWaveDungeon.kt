@@ -1,17 +1,24 @@
 package net.sakuragame.eternal.kirradungeon.server.zone.impl.function
 
-import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
+import io.lumine.xikage.mythicmobs.MythicMobs
 import net.sakuragame.dungeonsystem.server.api.event.DungeonPlayerJoinEvent
+import net.sakuragame.eternal.dragoncore.network.PacketSender
+import net.sakuragame.eternal.justlevel.JustLevel
+import net.sakuragame.eternal.justlevel.api.event.PropPickupEvent
+import net.sakuragame.eternal.kirradungeon.server.KirraDungeonServer
 import net.sakuragame.eternal.kirradungeon.server.Profile.Companion.profile
 import net.sakuragame.eternal.kirradungeon.server.kickPlayerByNotFoundData
 import net.sakuragame.eternal.kirradungeon.server.zone.Zone
 import net.sakuragame.eternal.kirradungeon.server.zone.ZoneType
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.FunctionDungeon
 import net.sakuragame.eternal.kirradungeon.server.zone.impl.type.WaveDungeon
+import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
-import taboolib.common.platform.event.EventPriority
+import org.bukkit.event.entity.ItemMergeEvent
+import org.bukkit.metadata.FixedMetadataValue
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import kotlin.math.roundToInt
 
 object FunctionWaveDungeon {
 
@@ -38,23 +45,52 @@ object FunctionWaveDungeon {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun e(e: MythicMobDeathEvent) {
-        val entity = e.entity
-        val waveZone = FunctionDungeon.getByMobUUID(entity.uniqueId) as? WaveDungeon ?: return
-        e.drops.clear()
-        waveZone.removeMonsterUUID(entity.uniqueId)
-        submit(delay = 3) {
-            waveZone.handleMonsterRemove()
+    @SubscribeEvent
+    fun e(e: EntityDamageEvent) {
+        val entity = e.entity as? LivingEntity ?: return
+        if (FunctionDungeon.getByMobUUID(entity.uniqueId) !is WaveDungeon) {
+            return
+        }
+        if (MythicMobs.inst().apiHelper.getMythicMobInstance(entity).type.internalName != "盗贼宝箱") {
+            return
+        }
+        if (entity.hasMetadata("opening")) {
+            e.isCancelled = true
+            return
+        }
+        if (entity.health <= entity.maxHealth * 0.1) {
+            entity.setMetadata("opening", FixedMetadataValue(KirraDungeonServer.plugin, ""))
+            submit(delay = 20) {
+                PacketSender.setModelEntityAnimation(entity, "open", 1)
+            }
+            submit(delay = 80) {
+                entity.remove()
+            }
+        }
+        JustLevel.getPropGenerate().itemSpray(entity.location, 2, (e.finalDamage / 3).roundToInt(), 3, 1.0)
+    }
+
+    @SubscribeEvent
+    fun e(e: ItemMergeEvent) {
+        val world = e.entity.world
+        if (FunctionDungeon.getByBukkitWorldUUID(world.uid) !is WaveDungeon) {
+            return
+        }
+        if (e.entity.name.contains("金币")) {
+            e.isCancelled = true
         }
     }
 
     @SubscribeEvent
-    fun e(e: EntityDamageEvent) {
-        val dungeon = FunctionDungeon.getByMobUUID(e.entity.uniqueId) as? WaveDungeon ?: return
-        if (dungeon.bossUUID == e.entity.uniqueId) {
-            dungeon.updateBossBar()
+    fun e(e: PropPickupEvent) {
+        val player = e.player
+        val profile = player.profile() ?: return
+        val dungeon = profile.getIDungeon() as? WaveDungeon ?: return
+        if (e.type != 2) {
+            return
         }
+        val value = e.value
+        dungeon.pickUpCoins += value
     }
 
     private fun isDungeonFromWave(name: String): Boolean {

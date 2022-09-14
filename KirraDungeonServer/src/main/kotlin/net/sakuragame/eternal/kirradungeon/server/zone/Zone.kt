@@ -52,9 +52,7 @@ data class Zone(val id: String, val name: String, val data: ZoneData) {
                         trigger = TriggerWriter.read(id),
                         holograms = HologramWriter.read(id),
                         metadataMap = MetadataWriter.read(id),
-                        stagedMultiplier = StagedLevelWriter.read(id),
-                        waveData = WaveDataWriter.readData(id),
-                        waveSpawnLocs = WaveDataWriter.readLoc(id)
+                        stagedMultiplier = StagedLevelWriter.read(id)
                     )
                 )
             }

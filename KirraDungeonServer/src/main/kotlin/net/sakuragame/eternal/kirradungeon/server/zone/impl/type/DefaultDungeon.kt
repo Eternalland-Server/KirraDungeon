@@ -72,7 +72,7 @@ class DefaultDungeon(override val zone: Zone, override val dungeonWorld: Dungeon
     }
 
     val naturalSpawnBoss by lazy {
-        !zone.data.metadataMap.containsKey("DISABLE_NATURAL_SPAWN")
+        !zone.data.metadataMap.containsKey("disableNaturalSpawn")
     }
 
     private var bossSpawned = false

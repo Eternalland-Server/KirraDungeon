@@ -28,12 +28,12 @@ object FunctionPlot {
 
     const val battleThemeBgmId = "nergigante_dragon_battle_theme.ogg"
 
-     val playerSpawnLoc by lazy {
+    val playerSpawnLoc by lazy {
         val strLoc = KirraDungeonPlot.conf.getString("settings.spawn-point.player")!!
         ZoneLocation.parseToZoneLocation(strLoc)!!
     }
 
-     val mobSpawnLoc by lazy {
+    val mobSpawnLoc by lazy {
         val strLoc = KirraDungeonPlot.conf.getString("settings.spawn-point.mob")!!
         ZoneLocation.parseToZoneLocation(strLoc)!!
     }
