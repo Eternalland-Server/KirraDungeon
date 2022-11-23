@@ -4,9 +4,9 @@
 
 ## 简介
 
-简单的副本插件, 基于 `Kotlin & TabooLib 6` 进行开发.
+简单的副本插件, 基于 `Kotlin & TabooLib 6` 进行开发。
 
-跟 `DungeonSystem` 挂钩.
+跟 `DungeonSystem` 挂钩。
 
 ## 项目结构
 

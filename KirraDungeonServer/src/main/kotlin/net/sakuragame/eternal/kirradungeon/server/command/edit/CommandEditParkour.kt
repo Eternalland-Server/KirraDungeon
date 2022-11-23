@@ -32,6 +32,7 @@ object CommandEditParkour {
             dynamic(commit = "multiplyValue") {
                 dynamic(commit = "yValue") {
                     execute<Player> { player, context, _ ->
+                        player.noDamageTicks
                         val skullId = context.get(1)
                         val multiplyValue = context.get(2).toDoubleOrNull() ?: return@execute
                         val yValue = context.get(3).toDoubleOrNull() ?: return@execute
