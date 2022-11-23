@@ -11,8 +11,8 @@
 ## 项目结构
 
 - KirraDungeonClient
-    - 实现副本远程操作的模块, 对接 DungeonSystem-Client.
+    - 实现副本远程操作的模块, 对接 DungeonSystem-Client。
 - KirraDungeonPlot
-    - 实现玩家初次进入剧情的模块, 对接 DungeonSystem-Client.
+    - 实现玩家初次进入剧情的模块, 对接 DungeonSystem-Client。
 - KirraDungeonServer
-    - 实现副本服务器实例的模块, 对接 DungeonSystem-Server.
+    - 实现副本服务器实例的模块, 对接 DungeonSystem-Server。
